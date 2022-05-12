@@ -89,16 +89,15 @@ const EditProfileDialog = (props: Props) => {
   useEffect(() => {
     reset({
       roleId: 1,
-      firstName: "John",
-      lastName: "Smith",
-      email: "johnsmith@gmail.com",
-      mobileNumber: "391887289",
-    })
-  }, [reset])
+      firstName: 'John',
+      lastName: 'Smith',
+      email: 'johnsmith@gmail.com',
+      mobileNumber: '391887289',
+    });
+  }, [reset]);
 
   const onSubmit = async (data: FormData) => {
     //upload image: depend Backend (use base64)
-    console.log("update profile", data);
   };
 
   const handleDropCover = async ([file]: File[]) => {
@@ -142,43 +141,27 @@ const EditProfileDialog = (props: Props) => {
           <FormGroup>
             <Grid container alignItems="center" columnSpacing={2}>
               <Grid item xs={4}>
-                <FormLabel
-                  required
-                  title="First name"
-                  name="firstName" />
+                <FormLabel required title="First name" name="firstName" />
               </Grid>
               <Grid item xs={8}>
-                <ControllerTextField
-                  name="firstName"
-                  control={control}
-                />
+                <ControllerTextField name="firstName" control={control} />
               </Grid>
             </Grid>
           </FormGroup>
           <FormGroup>
             <Grid container alignItems="center" columnSpacing={2}>
               <Grid item xs={4}>
-                <FormLabel
-                  required
-                  title="Last name"
-                  name="lastName" />
+                <FormLabel required title="Last name" name="lastName" />
               </Grid>
               <Grid item xs={8}>
-                <ControllerTextField
-                  name="lastName"
-                  control={control}
-                />
+                <ControllerTextField name="lastName" control={control} />
               </Grid>
             </Grid>
           </FormGroup>
           <FormGroup>
             <Grid container alignItems="center" columnSpacing={2}>
               <Grid item xs={4}>
-                <FormLabel
-                  required
-                  title="Phone number"
-                  name="mobileNumber"
-                />
+                <FormLabel required title="Phone number" name="mobileNumber" />
               </Grid>
               <Grid item xs={8}>
                 <ControllerTextField
@@ -186,10 +169,7 @@ const EditProfileDialog = (props: Props) => {
                   control={control}
                   InputProps={{
                     startAdornment: (
-                      <FormInputAdornment
-                        position="start"
-                        title={"+84"}
-                      />
+                      <FormInputAdornment position="start" title={'+84'} />
                     ),
                   }}
                 />
@@ -200,11 +180,7 @@ const EditProfileDialog = (props: Props) => {
           <FormGroup>
             <Grid container alignItems="center" columnSpacing={2}>
               <Grid item xs={4}>
-                <FormLabel
-                  required
-                  title="Role"
-                  name="roleId"
-                />
+                <FormLabel required title="Role" name="roleId" />
               </Grid>
               <Grid item xs={8}>
                 <EntitySelecter

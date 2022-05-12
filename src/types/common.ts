@@ -17,4 +17,14 @@ export interface Dictionary<T = any> {
 
 export type Order = 'asc' | 'desc' | '';
 
-export type Role = 'admin' | 'user';
+export type Role =
+  | 'hkl1'
+  | 'hkl2'
+  | 'hkl3'
+  | 'hkl4'
+  | 'hkl2_1'
+  | 'hkl2_1_1'
+  | 'hkl2_1_2'
+  | 'hkl2_1_3'
+  | 'hkl2_1_4'
+  | 'empty';

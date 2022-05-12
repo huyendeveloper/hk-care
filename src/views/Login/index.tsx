@@ -1,6 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LockIcon from '@mui/icons-material/Lock';
-import LoginIcon from '@mui/icons-material/Login';
 import PersonIcon from '@mui/icons-material/Person';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
@@ -8,9 +7,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 import Page from 'components/common/Page';
-import RouteLink from 'components/common/RouteLink';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import FormGroup from 'components/Form/FormGroup';
 import useAuth from 'hooks/useAuth';
@@ -24,16 +21,16 @@ import * as yup from 'yup';
 const validationSchema = yup.object().shape({
   username: yup
     .string()
-    .trim('Cannot include leading and trailing spaces')
+    // .trim('Cannot include leading and trailing spaces')
     .strict(true)
     // .email('Email is invalid')
-    .required('Required')
+    .required('Điền tên đăng nhập để đăng nhập')
     .default(''),
   password: yup
     .string()
-    .trim('Cannot include leading and trailing spaces')
+    // .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Điền mật khẩu để đăng nhập')
     .default(''),
 });
 
@@ -53,9 +50,10 @@ const Login = () => {
     try {
       setLoading(true);
       const response = await login(data);
+
       if (!response.success) {
         setNotification({
-          error: 'Login failure',
+          error: 'Tên đăng nhập hoặc mật khẩu sai',
         });
       }
     } catch (error) {
@@ -68,90 +66,86 @@ const Login = () => {
   };
 
   return (
-    <Page title="Transpora | Login">
-      <Grid container sx={{ height: 1 }}>
+    <Page title="HK Care | Login">
+      <Grid
+        container
+        sx={{
+          height: 1,
+          backgroundColor: '#137b3e',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
         <Grid
           item
-          xs={false}
-          sm={4}
+          xs={12}
+          sm={8}
           md={6}
-          lg={8}
+          lg={7}
           sx={{
-            backgroundImage: 'url(/static/register.jpg)',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundColor: '#ffffff',
+            display: 'flex',
+            justifyContent: 'center',
           }}
-        />
-        <Grid item xs={12} sm={8} md={6} lg={4}>
-          <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-            <Typography variant="h3" align="center">
-              Transpora
-            </Typography>
-            <Typography align="center" variant="body2" sx={{ my: 3 }}>
-              Log in with your user Email-Adress and your password
-            </Typography>
-            <FormGroup fullWidth>
-              <ControllerTextField
-                name="username"
-                control={control}
-                label="Email"
-                placeholder="Email"
-                required
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
+        >
+          <Grid item xs={8}>
+            <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+              <Box
+                component="img"
+                sx={{
+                  width: '60%',
+                  mb: 3,
                 }}
+                alt="hk care logo"
+                src="/static/logo.png"
               />
-            </FormGroup>
-            <FormGroup fullWidth>
-              <ControllerTextField
-                name="password"
-                control={control}
-                type="password"
-                label="Password"
-                required
+
+              <FormGroup fullWidth>
+                <ControllerTextField
+                  name="username"
+                  control={control}
+                  label="Tên đăng nhập"
+                  // placeholder="Email"
+                  required
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </FormGroup>
+              <FormGroup fullWidth>
+                <ControllerTextField
+                  name="password"
+                  control={control}
+                  type="password"
+                  label="Mật khẩu"
+                  required
+                  fullWidth
+                  // placeholder="Password"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <LockIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </FormGroup>
+              <LoadingButton
+                loading={loading}
                 fullWidth
-                placeholder="Password"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <LockIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </FormGroup>
-            <LoadingButton
-              loading={loading}
-              loadingPosition="start"
-              fullWidth
-              type="submit"
-              sx={{ mt: 3, mb: 1.5 }}
-              startIcon={<LoginIcon />}
-            >
-              Login
-            </LoadingButton>
-            <Divider sx={{ my: 3 }} />
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <RouteLink to="/forgot-password" variant="body2" gutterBottom>
-                Forgot password
-              </RouteLink>
-              <RouteLink to="/register" variant="body2">
-                Create new account
-              </RouteLink>
-            </Box>
-          </Form>
+                type="submit"
+                sx={{ mt: 3, mb: 1.5 }}
+              >
+                Đăng nhập
+              </LoadingButton>
+              <Divider sx={{ my: 3 }} />
+            </Form>
+          </Grid>
         </Grid>
       </Grid>
     </Page>

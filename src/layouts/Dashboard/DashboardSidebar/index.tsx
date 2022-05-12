@@ -1,4 +1,5 @@
 import PersonIcon from '@mui/icons-material/Person';
+import { Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -31,9 +32,9 @@ const DashboardSidebar: FC<Props> = (props) => {
   }, [pathname, onCloseMobileSidebar, openMobileSidebar, prevPathName]);
 
   const userInfo = {
-    companyName: 'Company name',
-    userName: user ? user.fullName : "Default name",
-    image: user ? user.image : '',
+    role: 'HK Group',
+    userName: user?.fullName || 'Default name',
+    image: user?.image || '',
   };
 
   const content = (
@@ -61,21 +62,26 @@ const DashboardSidebar: FC<Props> = (props) => {
               py: 1.5,
             }}
           >
-            <Typography
-              variant="h4"
-              sx={{ mb: 2, fontWeight: 600, userSelect: 'none' }}
-            >
-              LOGO
-            </Typography>
-            <RouteLink to="/user/profile">
-              <UserAvatar src={userInfo.image} />
-            </RouteLink>
-            <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
-              <Typography variant="subtitle2">{userInfo.userName}</Typography>
-              <Typography color="text.secondary" variant="caption">
-                {userInfo.companyName}
-              </Typography>
-            </Box>
+            <Box
+              component="img"
+              sx={{
+                width: '100%',
+                mb: 2,
+              }}
+              alt="hk care logo"
+              src="/static/logo.png"
+            />
+            <Stack flexDirection={'row'} alignItems="center">
+              <RouteLink to="/user/profile" sx={{ mr: 1 }}>
+                <UserAvatar src={userInfo.image} />
+              </RouteLink>
+              <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
+                <Typography variant="subtitle2">{userInfo.userName}</Typography>
+                <Typography color="text.secondary" variant="caption">
+                  {userInfo.role}
+                </Typography>
+              </Box>
+            </Stack>
           </Box>
         </Box>
         <Sidebar />

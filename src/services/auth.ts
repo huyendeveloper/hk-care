@@ -36,7 +36,7 @@ export const getUserDetails = async () => {
       userRole: {
         id: 1,
         name: 'Admin',
-        code: 'admin',
+        code: 'hkl3',
       },
     },
   });

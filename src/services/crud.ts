@@ -1,7 +1,8 @@
-import { mockCRUDList } from 'mock-axios';
+import { mockCRUDList, mockDangDungList } from 'mock-axios';
 import { CommonResponse, FilterParams } from 'types/common';
 import HttpClient, { mock } from 'utils/HttpClient';
 import LocalStorage from 'utils/LocalStorage';
+import { DangDung } from 'views/HK_Group/SanPham/Loai/DangDung/type';
 
 export interface ExampleCRUD {
   id: number;
@@ -42,6 +43,58 @@ export const getListExampleCRUD = async (params: FilterParams) => {
   return HttpClient.post<typeof params, CommonResponse<ExampleCRUD[]>>(
     '/Example/CRUD/ListCRUD',
     params
+  );
+};
+
+export const getListDangDung = async (params: FilterParams) => {
+  //Start Mock
+  const mockDangDung = LocalStorage.get('mockDangDung');
+  if (!mockDangDung) {
+    LocalStorage.set('mockDangDung', JSON.stringify(mockDangDungList));
+  }
+  const mockResponse: CommonResponse<DangDung[]> = JSON.parse(
+    LocalStorage.get('mockDangDung')
+  ) || {
+    data: [],
+    total: 0,
+  };
+
+  const { pageIndex, pageSize } = params;
+
+  mock.onPost('/hk_group/san_pham/loai/dang_dung').reply(200, {
+    data: mockResponse.data?.splice(
+      (pageIndex - 1) * pageSize,
+      pageIndex * pageSize
+    ),
+    total: mockResponse.total,
+  });
+  //End Mock
+
+  return HttpClient.post<typeof params, CommonResponse<DangDung[]>>(
+    '/hk_group/san_pham/loai/dang_dung',
+    params
+  );
+};
+
+export const getDangDungDetails = async (id: string) => {
+  //start mock
+  const mockDangDungString = LocalStorage.get('mockDangDung');
+
+  const mockDangDungObject: CommonResponse<DangDung[]> =
+    JSON.parse(mockDangDungString);
+
+  const mockList = mockDangDungObject.data ?? [];
+
+  const mockDetails = mockList.find((crud) => crud.id === +id);
+
+  mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
+    data: mockDetails ?? null,
+    success: true,
+  });
+  //end mock
+
+  return HttpClient.get<string, CommonResponse>(
+    `/hk_group/san_pham/loai/dang_dung/${id}`
   );
 };
 
@@ -150,8 +203,6 @@ export const editExampleCRUD = async (params: CreateParams) => {
   const mockList = mockCRUDObject.data ?? [];
 
   const newList = mockList.filter((crud) => crud.id !== params.id);
-
-  console.log('newList', newList);
 
   LocalStorage.set(
     'mockCRUD',

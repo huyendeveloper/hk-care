@@ -49,7 +49,7 @@ const TablePagination = (props: Props) => {
           color="text.secondary"
           sx={{ whiteSpace: 'nowrap' }}
         >
-          Row per page
+          Số dòng mỗi trang
         </Typography>
         <FormControl sx={{ ml: 1, mr: 2 }}>
           <Select

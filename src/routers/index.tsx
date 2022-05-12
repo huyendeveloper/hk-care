@@ -5,6 +5,7 @@ import MainLayout from 'layouts/Main';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 import CRUDRoutes from "./CRUDExample";
+import HKGroupRoutes from "./HKGroup";
 import Loadable from './Loadable';
 import UserRoutes from "./User";
 
@@ -36,7 +37,8 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: <Home /> },
       CRUDRoutes,
-      UserRoutes
+      UserRoutes,
+      HKGroupRoutes
       //if has other Routes, push it in here
     ]
   },

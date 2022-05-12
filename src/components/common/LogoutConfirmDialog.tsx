@@ -18,7 +18,7 @@ interface Props {
   onSubmit: () => Promise<void>;
   content: {
     label: string;
-    description: string;
+    description?: string;
     icon: SvgIconComponent;
   };
 }
@@ -57,12 +57,17 @@ const LogoutConfirmDialog = (props: Props) => {
       >
         {<Icon sx={{ fontSize: 70, color: 'text.secondary' }} />}
       </Box>
-      <Divider />
-      <DialogContent>
-        <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>
-          {description}
-        </Typography>
-      </DialogContent>
+      {description && (
+        <>
+          {' '}
+          <Divider />
+          <DialogContent>
+            <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>
+              {description}
+            </Typography>
+          </DialogContent>
+        </>
+      )}
       <Divider />
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 2, py: 2 }}>
         <Stack direction="row" spacing={1}>
@@ -71,7 +76,7 @@ const LogoutConfirmDialog = (props: Props) => {
             startIcon={<ClearIcon />}
             onClick={onClose}
           >
-            cancel
+            Hủy
           </Button>
           <LoadingButton
             loading={loading}

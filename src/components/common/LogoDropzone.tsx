@@ -57,7 +57,7 @@ const LogoDropzone: FC<FileDropzoneProps> = (props) => {
         }}
       >
         <AddPhotoAlternateIcon fontSize="medium" color="action" />
-        <Typography variant="caption" sx={{ mt: 1 }} color="text.secondary">
+        <Typography variant="caption" sx={{ mt: 1 }} >
           Upload file
         </Typography>
       </Box>

@@ -98,7 +98,6 @@ class DateFns {
   //not on dateFns
   public get30DayPriorCurrent() {
     const today = new Date();
-    console.log('new Date', new Date(new Date().setDate(today.getDate() - 30)));
     return new Date(new Date().setDate(today.getDate() - 30));
   }
 
