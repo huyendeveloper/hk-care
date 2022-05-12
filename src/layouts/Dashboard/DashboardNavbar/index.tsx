@@ -1,6 +1,7 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
+import { Button, Typography } from '@mui/material';
 import type { AppBarProps } from '@mui/material/AppBar';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -66,7 +67,8 @@ const DashboardNavbar: FC<Props> = (props) => {
               </IconButton>
             </LinkIconButton>
             <IconButton onClick={handleOpenLogoutDialog}>
-              <LogoutIcon />
+              <LogoutIcon sx={{ mr: 1 }} />
+              <Typography color="text.secondary">Đăng xuất</Typography>
             </IconButton>
           </Stack>
           <LogoutConfirmDialog
@@ -74,8 +76,7 @@ const DashboardNavbar: FC<Props> = (props) => {
             onClose={handleCloseLogoutDialog}
             onSubmit={handleLogout}
             content={{
-              label: "Logout",
-              description: "Are you sure you want to logout now?",
+              label: 'Đăng xuất',
               icon: LogoutIcon,
             }}
           />

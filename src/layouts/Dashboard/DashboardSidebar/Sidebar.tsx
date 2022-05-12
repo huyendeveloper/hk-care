@@ -1,11 +1,6 @@
 import CodeIcon from '@mui/icons-material/Code';
-import LogoutIcon from '@mui/icons-material/Logout';
-import PersonIcon from '@mui/icons-material/Person';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import LogoutConfirmDialog from 'components/common/LogoutConfirmDialog';
 import useAuth from 'hooks/useAuth';
 import useMounted from 'hooks/useMounted';
 import { ReactNode, useMemo, useState } from 'react';
@@ -26,48 +21,176 @@ interface SectionItem {
 const getSections = (): SectionItem[] => [
   {
     title: 'Example',
-    path: '/example', //path need to be the same as route to be highlighted
+    path: '/example/crud', //path need to be the same as route to be highlighted
     icon: <CodeIcon />,
-    roles: ['user', 'admin'], //role user and admin can see this menu
+    roles: ['hkl1'], //role user and admin can see this menu
+  },
+  {
+    title: 'HK_Group',
+    roles: ['hkl1', 'hkl2', 'hkl3', 'hkl2_1'],
     children: [
       {
-        title: 'Form',
-        path: '/example/form',
+        title: 'Quản lý sản phẩm',
+        path: '/404',
+        roles: ['hkl3'],
         children: [
           {
-            title: 'Create',
-            path: '/example/form/create',
+            title: 'Danh sách sản phẩm',
+            path: '/404',
+            roles: ['hkl3'],
           },
           {
-            title: 'Update',
-            path: '/example/form/update',
+            title: 'Loại sản phẩm',
+            path: '/404',
+            roles: ['hkl3'],
+            children: [
+              { title: 'Nhóm sản phẩm', path: '/404', roles: ['hkl3'] },
+              { title: 'Dạng điều trị', path: '/404', roles: ['hkl3'] },
+              {
+                title: 'Dạng dùng',
+                path: '/hk_group/san_pham/loai/dang_dung',
+                roles: ['hkl3'],
+              },
+            ],
           },
           {
-            title: 'Details',
-            path: '/example/form/details',
+            title: 'Đơn vị đo lường',
+            path: '/404',
+            roles: ['hkl3'],
+          },
+          {
+            title: 'Nhà cung cấp',
+            path: '/404',
+            roles: ['hkl3'],
+          },
+          {
+            title: 'Giá tham chiếu',
+            path: '/404',
+            roles: ['hkl3'],
           },
         ],
       },
       {
-        title: 'Example CRUD',
-        path: '/example/crud',
+        title: 'Thông tin điểm bán',
+        path: '/404',
+        roles: ['hkl2'],
       },
-
       {
-        title: 'Tab',
-        path: '/tab',
+        title: 'Quản trị người dùng',
+        path: '/404',
+        roles: ['hkl1', 'hkl2', 'hkl2_1'],
       },
     ],
   },
   {
-    title: 'User',
-    path: '/user', //path need to be the same as route to be highlighted
-    icon: <PersonIcon />,
-    roles: ['user', 'admin'], //role user and admin can see this menu
+    title: 'HK_Care',
+    roles: ['hkl2_1', 'hkl2_1_1', 'hkl2_1_2', 'hkl2_1_3', 'hkl2_1_4'],
     children: [
       {
-        title: 'User profile',
-        path: '/user/profile',
+        title: 'Quản lý sản phẩm',
+        path: '/404',
+        roles: ['hkl2_1_1'],
+        children: [
+          {
+            title: 'Danh sách sản phẩm',
+            path: '/404',
+            roles: ['hkl2_1_1'],
+          },
+          {
+            title: 'Định mức lưu trữ',
+            path: '/404',
+            roles: ['hkl2_1_1'],
+          },
+        ],
+      },
+      {
+        title: 'Quản lý kho',
+        path: '/404',
+        roles: ['hkl2_1_2'],
+        children: [
+          {
+            title: 'Nhập kho',
+            path: '/404',
+            roles: ['hkl2_1_2'],
+            children: [
+              {
+                title: 'Hoá đơn nhập kho',
+                path: '/404',
+                roles: ['hkl2_1_2'],
+              },
+              {
+                title: 'Biên bản nhập kho',
+                path: '/404',
+                roles: ['hkl2_1_2'],
+              },
+            ],
+          },
+          {
+            title: 'Xuất kho',
+            path: '/404',
+            roles: [],
+          },
+          {
+            title: 'Lập dự trù nhập kho',
+            path: '/404',
+            roles: [],
+          },
+          {
+            title: 'Biên bản kiểm kê kho',
+            path: '/404',
+            roles: [],
+          },
+        ],
+      },
+      {
+        title: 'Quản lý bán hàng',
+        path: '/404',
+        roles: ['hkl2_1_3'],
+      },
+      {
+        title: 'Quản lý vận hành',
+        path: '/404',
+        roles: ['hkl2_1_4'],
+        children: [
+          {
+            title: 'Danh sách nhân viên',
+            path: '/404',
+            roles: ['hkl2_1_3', 'hkl2_1_4'],
+          },
+        ],
+      },
+      {
+        title: 'Báo cáo/Thống kê (Tại điểm bán)',
+        path: '/404',
+        roles: ['hkl2_1'],
+        children: [
+          {
+            title: 'Báo cáo doanh thu nhà thuốc',
+            path: '/404',
+            roles: ['hkl2_1'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'HK_Trading',
+    roles: ['hkl4'],
+    children: [
+      {
+        title: 'Tổng hợp yêu cầu nhập',
+        path: '/404',
+        roles: ['hkl4'],
+      },
+      {
+        title: 'Kế hoạch nhập kho',
+        path: '/404',
+        roles: [],
+      },
+      {
+        title: 'Kế hoạch phân phối',
+        path: '/404',
+        roles: [],
       },
     ],
   },
@@ -141,28 +264,11 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
 
 const Sidebar = () => {
   const location = useLocation();
-  const { user, logout } = useAuth();
-  const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
-  const mounted = useMounted();
-
-  const handleOpenLogoutDialog = () => {
-    setOpenLogoutDialog(true);
-  };
-
-  const handleCloseLogoutDialog = () => {
-    if (mounted.current) {
-      setOpenLogoutDialog(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await sleep(350);
-    logout();
-  };
+  const { user } = useAuth();
 
   const sections = useMemo(() => getSections(), []);
 
-  const role: Role = user ? user.userRole.code : 'user';
+  const role: Role = user?.userRole.code || 'empty';
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -171,36 +277,6 @@ const Sidebar = () => {
         pathname: location.pathname,
         role,
       })}
-      <List disablePadding>
-        <ListItem disableGutters disablePadding>
-          <Button
-            variant="text"
-            startIcon={<LogoutIcon />}
-            onClick={handleOpenLogoutDialog}
-            sx={{
-              color: 'text.secondary',
-              justifyContent: 'flex-start',
-              p: 1.5,
-              pl: 3,
-              textAlign: 'left',
-              width: '100%',
-              fontWeight: 'medium',
-            }}
-          >
-            Logout
-          </Button>
-        </ListItem>
-      </List>
-      <LogoutConfirmDialog
-        open={openLogoutDialog}
-        onClose={handleCloseLogoutDialog}
-        onSubmit={handleLogout}
-        content={{
-          label: 'Logout',
-          description: 'Are you sure you want to logout now?',
-          icon: LogoutIcon,
-        }}
-      />
     </Box>
   );
 };

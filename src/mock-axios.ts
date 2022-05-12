@@ -49,6 +49,29 @@ export const mockCRUDList = {
   total: 3,
 };
 
+export const mockDangDungList = {
+  data: [
+    {
+      id: randomIntFromInterval(),
+      name: `John`,
+      note: 'note John',
+    },
+
+    {
+      id: randomIntFromInterval(),
+      name: `Bentley`,
+      note: 'note Bentley',
+    },
+
+    {
+      id: randomIntFromInterval(),
+      name: `Hello`,
+      note: 'note Hello',
+    },
+  ],
+  total: 3,
+};
+
 export const mockSelectFieldOptions = [
   {
     id: 1,

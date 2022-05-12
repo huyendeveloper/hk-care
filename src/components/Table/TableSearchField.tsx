@@ -25,11 +25,6 @@ const TableSearchField = (props: Props) => {
   } = props;
   return (
     <Wrapper {...rest}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Stack direction="row" spacing={1}>
-          {children}
-        </Stack>
-      </Box>
       {headerTitle && (
         <Typography
           variant="h6"
@@ -44,7 +39,13 @@ const TableSearchField = (props: Props) => {
         placeHolder={placeHolder}
         onSearch={onSearch}
         searchText={searchText}
-      />
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Stack direction="row" spacing={1}>
+            {children}
+          </Stack>
+        </Box>
+      </SearchField>
     </Wrapper>
   );
 };

@@ -5,8 +5,9 @@ import Typography from '@mui/material/Typography';
 import { memo, useState } from 'react';
 import { useDebounce } from 'react-use';
 import type { ChangeEvent, KeyDownEvent } from 'types';
+import type { BoxProps } from '@mui/material/Box';
 
-interface Props {
+interface Props extends BoxProps {
   title?: string;
   placeHolder: string;
   onSearch: (searchTerm: string) => void;
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const SearchField = (props: Props) => {
-  const { title, searchText, placeHolder, onSearch } = props;
+  const { title, searchText, placeHolder, onSearch, children } = props;
   const [value, setValue] = useState<string>('');
 
   const handleChange: ChangeEvent = (event) => {
@@ -39,14 +40,24 @@ const SearchField = (props: Props) => {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {title ? (
-        <FormLabel htmlFor="search">
-          <Typography variant="body2" gutterBottom sx={{ ml: 0.5 }}>
-            {title}
-          </Typography>
-        </FormLabel>
-      ) : null}
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 2,
+          justifyContent: 'space-between',
+        }}
+      >
+        {title ? (
+          <FormLabel htmlFor="search">
+            <Typography variant="h6" gutterBottom sx={{ mb: 0 }}>
+              {title}
+            </Typography>
+          </FormLabel>
+        ) : null}
+        {children}
+      </Box>
       <TextField
         id="search"
         fullWidth
@@ -55,7 +66,7 @@ const SearchField = (props: Props) => {
         onKeyDown={handleKeyDown}
         sx={{ mr: 1, flexGrow: 1 }}
       />
-    </Box>
+    </>
   );
 };
 
