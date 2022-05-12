@@ -73,20 +73,20 @@ const DetailsForm = () => {
   };
 
   return (
-    <PageWrapper title="Dạng dùng">
+    <PageWrapper title="Đơn vị đo lường">
       <FormPaperGrid noValidate>
-        <FormHeader title="Xem chi tiết dạng dùng" />
+        <FormHeader title="Xem chi tiết đơn vị đo lường" />
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12}>
-                <FormLabel title="Mã dạng dùng" name="id" />
+                <FormLabel title="Mã đơn vị đo lường" name="id" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField name="id" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel required title="Tên dạng dùng" name="name" />
+                <FormLabel required title="Tên đơn vị đo lường" name="name" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField disabled name="name" control={control} />
@@ -107,9 +107,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/san_pham/loai/dang_dung">
-            Quay lại
-          </LinkButton>
+          <LinkButton to="/hk_group/san_pham/don_vi">Quay lại</LinkButton>
 
           <Button variant="contained" onClick={handleOpenUpdateDialog}>
             Chỉnh sửa thông tin

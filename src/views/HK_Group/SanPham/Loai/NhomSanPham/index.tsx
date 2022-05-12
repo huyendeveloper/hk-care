@@ -3,7 +3,7 @@ import TableData from './TableData';
 
 const DangDung = () => {
   return (
-    <PageWrapper title="Dạng dùng">
+    <PageWrapper title="Nhóm sản phẩm">
       <TableData />
     </PageWrapper>
   );

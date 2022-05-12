@@ -15,11 +15,6 @@ const CreateCRUD = () => {
 
   return (
     <PageWrapper title="Example CRUD | Create">
-      <PageBreadcrumbs
-        category="Example"
-        title="Create"
-        breadcrumbs={breadcrumbs}
-      />
       <CreateCRUDForm />
     </PageWrapper>
   );

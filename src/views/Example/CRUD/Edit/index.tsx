@@ -15,11 +15,6 @@ const EditCRUD = () => {
 
   return (
     <PageWrapper title="Example CRUD | Edit">
-      <PageBreadcrumbs
-        category="Example"
-        title="Edit"
-        breadcrumbs={breadcrumbs}
-      />
       <EditCRUDForm />
     </PageWrapper>
   );

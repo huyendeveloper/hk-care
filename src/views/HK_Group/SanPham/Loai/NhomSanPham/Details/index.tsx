@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Grid } from '@mui/material';
-import { LinkButton, LoadingScreen } from 'components/common';
+import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerTextarea,
   ControllerTextField,
@@ -28,7 +28,7 @@ const validationSchema = yup.object().shape({
 const DetailsForm = () => {
   const { id: crudId } = useParams();
   const mounted = useMounted();
-  const [dangDung, setDangDung] = useState<DangDung>();
+  const [nhomSanPham, setNhomSanPham] = useState<DangDung>();
   const [taskQueue, setTaskQueue] = useState<number>(0);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
@@ -44,7 +44,7 @@ const DetailsForm = () => {
     setTaskQueue((task) => task + 1);
     getDangDungDetails(crudId)
       .then((res) => {
-        setDangDung(res.data);
+        setNhomSanPham(res.data);
       })
       .catch((err) => console.log(err))
       .finally(() => {
@@ -55,14 +55,14 @@ const DetailsForm = () => {
   }, [crudId, mounted]);
 
   useEffect(() => {
-    if (!dangDung) return;
+    if (!nhomSanPham) return;
 
-    const { name, note } = dangDung;
+    const { name, note } = nhomSanPham;
 
     setValue('id', Number(crudId));
     setValue('name', name);
     setValue('note', note);
-  }, [dangDung]);
+  }, [nhomSanPham]);
 
   if (taskQueue > 0) {
     return <LoadingScreen />;
@@ -73,20 +73,20 @@ const DetailsForm = () => {
   };
 
   return (
-    <>
+    <PageWrapper title="Nhóm sản phẩm">
       <FormPaperGrid noValidate>
-        <FormHeader title="Xem chi tiết dạng dùng" />
+        <FormHeader title="Xem chi tiết nhóm sản phẩm" />
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12}>
-                <FormLabel title="Mã dạng dùng" name="id" />
+                <FormLabel title="Mã nhóm sản phẩm" name="id" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField name="id" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel required title="Tên dạng dùng" name="name" />
+                <FormLabel required title="Tên nhóm sản phẩm" name="name" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField disabled name="name" control={control} />
@@ -107,7 +107,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/san_pham/loai/dang_dung">
+          <LinkButton to="/hk_group/san_pham/loai/nhom_san_pham">
             Quay lại
           </LinkButton>
 
@@ -117,12 +117,12 @@ const DetailsForm = () => {
         </FormFooter>
       </FormPaperGrid>
       <FormDialog
-        currentID={dangDung?.id}
-        data={dangDung}
+        currentID={nhomSanPham?.id}
+        data={nhomSanPham}
         open={openFormDialog}
         handleClose={() => setOpenFormDialog(false)}
       />
-    </>
+    </PageWrapper>
   );
 };
 

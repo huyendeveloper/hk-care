@@ -44,8 +44,16 @@ const getSections = (): SectionItem[] => [
             path: '/404',
             roles: ['hkl3'],
             children: [
-              { title: 'Nhóm sản phẩm', path: '/404', roles: ['hkl3'] },
-              { title: 'Dạng điều trị', path: '/404', roles: ['hkl3'] },
+              {
+                title: 'Nhóm sản phẩm',
+                path: '/hk_group/san_pham/loai/nhom_san_pham',
+                roles: ['hkl3'],
+              },
+              {
+                title: 'Nhóm điều trị',
+                path: '/hk_group/san_pham/loai/nhom_dieu_tri',
+                roles: ['hkl3'],
+              },
               {
                 title: 'Dạng dùng',
                 path: '/hk_group/san_pham/loai/dang_dung',
@@ -55,7 +63,7 @@ const getSections = (): SectionItem[] => [
           },
           {
             title: 'Đơn vị đo lường',
-            path: '/404',
+            path: '/hk_group/san_pham/don_vi',
             roles: ['hkl3'],
           },
           {

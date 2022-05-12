@@ -2,10 +2,11 @@ import Container from '@mui/material/Container';
 import type { FC, ReactNode } from 'react';
 import { Fragment } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { PageBreadcrums } from '.';
 
 interface Props {
   title?: string;
-  children: [ReactNode, ReactNode];
+  children: ReactNode;
 }
 
 const PageWrapper: FC<Props> = (props) => {
@@ -26,6 +27,7 @@ const PageWrapper: FC<Props> = (props) => {
         }}
         maxWidth={false}
       >
+        <PageBreadcrums />
         {children}
       </Container>
     </Fragment>

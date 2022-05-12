@@ -73,20 +73,20 @@ const DetailsForm = () => {
   };
 
   return (
-    <PageWrapper title="Dạng dùng">
+    <PageWrapper title="Nhóm điều trị">
       <FormPaperGrid noValidate>
-        <FormHeader title="Xem chi tiết dạng dùng" />
+        <FormHeader title="Xem chi tiết nhóm điều trị" />
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12}>
-                <FormLabel title="Mã dạng dùng" name="id" />
+                <FormLabel title="Mã nhóm điều trị" name="id" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField name="id" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel required title="Tên dạng dùng" name="name" />
+                <FormLabel required title="Tên nhóm điều trị" name="name" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField disabled name="name" control={control} />
@@ -107,7 +107,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/san_pham/loai/dang_dung">
+          <LinkButton to="/hk_group/san_pham/loai/nhom_dieu_tri">
             Quay lại
           </LinkButton>
 

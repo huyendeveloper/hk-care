@@ -5,11 +5,6 @@ import UserProfileTab from './UserProfileTab';
 const UserProfile = () => {
   return (
     <PageWrapper title="User">
-      <PageBreadcrumbs
-        category="User"
-        title="User profile"
-        breadcrumbs={[]}
-      />
       <UserProfileTab />
     </PageWrapper>
   );
