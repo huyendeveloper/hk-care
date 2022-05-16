@@ -15,9 +15,9 @@ const CRUDRoutes: RouteObject = {
       path: 'crud',
       children: [
         { index: true, element: <CRUDExample /> },
-        { path: 'create', element: <CreateCRUD /> },
-        { path: ':id', element: <DetailsCRUD /> },
-        { path: ':id/edit', element: <EditCRUD /> },
+        // { path: 'create', element: <CreateCRUD /> },
+        // { path: ':id', element: <DetailsCRUD /> },
+        // { path: ':id/edit', element: <EditCRUD /> },
       ],
     },
   ],

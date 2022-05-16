@@ -7,7 +7,7 @@ const PublicRoute: FC = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to="/example/crud" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Fragment>{children}</Fragment>;

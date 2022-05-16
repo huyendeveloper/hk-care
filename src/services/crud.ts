@@ -1,7 +1,8 @@
-import { mockCRUDList, mockDangDungList } from 'mock-axios';
+import { mockCRUDList, mockDangDungList, mockSanPhamList } from 'mock-axios';
 import { CommonResponse, FilterParams } from 'types/common';
-import HttpClient, { mock } from 'utils/HttpClient';
+import HttpClient from 'utils/HttpClient';
 import LocalStorage from 'utils/LocalStorage';
+import { SanPham } from 'views/HK_Group/SanPham/DanhSach/type';
 import { DangDung } from 'views/HK_Group/SanPham/Loai/DangDung/type';
 
 export interface ExampleCRUD {
@@ -31,13 +32,13 @@ export const getListExampleCRUD = async (params: FilterParams) => {
 
   const { pageIndex, pageSize } = params;
 
-  mock.onPost('/Example/CRUD/ListCRUD').reply(200, {
-    data: mockResponse.data?.splice(
-      (pageIndex - 1) * pageSize,
-      pageIndex * pageSize
-    ),
-    total: mockResponse.total,
-  });
+  // mock.onPost('/Example/CRUD/ListCRUD').reply(200, {
+  //   data: mockResponse.data?.splice(
+  //     (pageIndex - 1) * pageSize,
+  //     pageIndex * pageSize
+  //   ),
+  //   total: mockResponse.total,
+  // });
   //End Mock
 
   return HttpClient.post<typeof params, CommonResponse<ExampleCRUD[]>>(
@@ -61,17 +62,44 @@ export const getListDangDung = async (params: FilterParams) => {
 
   const { pageIndex, pageSize } = params;
 
-  mock.onPost('/hk_group/san_pham/loai/dang_dung').reply(200, {
-    data: mockResponse.data?.splice(
-      (pageIndex - 1) * pageSize,
-      pageIndex * pageSize
-    ),
-    total: mockResponse.total,
-  });
+  // mock.onPost('/hk_group/san_pham/loai/dang_dung').reply(200, {
+  //   data: mockResponse.data?.splice(
+  //     (pageIndex - 1) * pageSize,
+  //     pageIndex * pageSize
+  //   ),
+  //   total: mockResponse.total,
+  // });
   //End Mock
 
   return HttpClient.post<typeof params, CommonResponse<DangDung[]>>(
     '/hk_group/san_pham/loai/dang_dung',
+    params
+  );
+};
+
+export const getListSanPham = async (params: FilterParams) => {
+  //Start Mock
+  const mockSanPham = LocalStorage.get('mockSanPham');
+  if (!mockSanPham) {
+    LocalStorage.set('mockSanPham', JSON.stringify(mockSanPhamList));
+  }
+  const mockResponse: CommonResponse<SanPham[]> = JSON.parse(
+    LocalStorage.get('mockSanPham')
+  ) || {
+    data: [],
+    total: 0,
+  };
+
+  const { pageIndex, pageSize } = params;
+
+  // mock.onPost('/hk_group/san_pham/danh_sach').reply(200, {
+  //   data: mockResponse,
+  //   total: 3,
+  // });
+  //End Mock
+
+  return HttpClient.post<typeof params, CommonResponse<SanPham[]>>(
+    '/hk_group/san_pham/danh_sach',
     params
   );
 };
@@ -87,10 +115,32 @@ export const getDangDungDetails = async (id: string) => {
 
   const mockDetails = mockList.find((crud) => crud.id === +id);
 
-  mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
-    data: mockDetails ?? null,
-    success: true,
-  });
+  // mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
+  //   data: mockDetails ?? null,
+  //   success: true,
+  // });
+  //end mock
+
+  return HttpClient.get<string, CommonResponse>(
+    `/hk_group/san_pham/loai/dang_dung/${id}`
+  );
+};
+
+export const getSanPhamDetails = async (id: string) => {
+  //start mock
+  const mockSanPhamString = LocalStorage.get('mockSanPham');
+
+  const mockSanPhamObject: CommonResponse<SanPham[]> =
+    JSON.parse(mockSanPhamString);
+
+  const mockList = mockSanPhamObject.data ?? [];
+
+  const mockDetails = mockList.find((crud) => crud.id === +id);
+
+  // mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
+  //   data: mockDetails ?? null,
+  //   success: true,
+  // });
   //end mock
 
   return HttpClient.get<string, CommonResponse>(
@@ -117,9 +167,9 @@ export const deleteExampleCRUD = async (id: number) => {
     })
   );
 
-  mock.onDelete(`/Example/CRUD/Delete?id=${id}`).reply(200, {
-    success: true,
-  });
+  // mock.onDelete(`/Example/CRUD/Delete?id=${id}`).reply(200, {
+  //   success: true,
+  // });
   //end mock
 
   return HttpClient.delete<number, CommonResponse<ExampleCRUD[]>>(
@@ -160,9 +210,9 @@ export const createExampleCRUD = async (params: CreateParams) => {
     })
   );
 
-  mock.onPost('/Example/CRUD/Create').reply(200, {
-    success: true,
-  });
+  // mock.onPost('/Example/CRUD/Create').reply(200, {
+  //   success: true,
+  // });
   //end mock
 
   return HttpClient.post<typeof params, CommonResponse>(
@@ -182,10 +232,10 @@ export const getCRUDDetails = async (id: string) => {
 
   const mockDetails = mockList.find((crud) => crud.id === +id);
 
-  mock.onGet(`/Example/CRUD/Detail?id=${id}`).reply(200, {
-    data: mockDetails ?? null,
-    success: true,
-  });
+  // mock.onGet(`/Example/CRUD/Detail?id=${id}`).reply(200, {
+  //   data: mockDetails ?? null,
+  //   success: true,
+  // });
   //end mock
 
   return HttpClient.get<string, CommonResponse>(
@@ -212,9 +262,9 @@ export const editExampleCRUD = async (params: CreateParams) => {
     })
   );
 
-  mock.onPut('/Example/CRUD/Edit').reply(200, {
-    success: true,
-  });
+  // mock.onPut('/Example/CRUD/Edit').reply(200, {
+  //   success: true,
+  // });
   //end mock
 
   return HttpClient.put<CreateParams, CommonResponse>('/Example/CRUD/Edit');

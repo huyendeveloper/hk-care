@@ -1,21 +1,19 @@
 import SplashScreen from 'components/common/SplashScreen';
 import useForceUpdate from 'hooks/useForceUpdate';
 import { createContext, FC, useEffect, useState } from 'react';
-import {
-  apiLogin,
-  getUserDetails,
-  LoginParams,
-  LoginResponse
-} from 'services/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateRoles } from 'redux/slices';
+import { RootState } from 'redux/store';
+import userService from 'services/user.service';
 import { UserInfo } from 'types/user';
 import LocalStorage from 'utils/LocalStorage';
+
 interface State {
   user: UserInfo | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
 }
 export interface AuthContextValue extends State {
-  login: (data: LoginParams) => Promise<LoginResponse>;
   logout: () => void;
   onForceUpdate: () => void;
 }
@@ -35,39 +33,34 @@ if (process.env.NODE_ENV === 'development') {
 const AuthProvider: FC = ({ children }) => {
   const [state, setState] = useState<State>(initialAuthState);
   const [rerender, forceUpdate] = useForceUpdate();
-
-  const login = async (params: LoginParams) => {
-    const { username, password } = params;
-
-    //call api to get accessToken, refreshToken
-    const res = await apiLogin({
-      username,
-      password,
-    });
-
-    if (res.success && res.accessToken) {
-      const { accessToken, refreshToken } = res;
-      LocalStorage.set('accessToken', accessToken, forceUpdate);
-      LocalStorage.set('refreshToken', refreshToken);
-    }
-
-    return res;
-  };
+  const auth = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
 
   const logout = () => {
-    LocalStorage.remove('accessToken', forceUpdate);
-    LocalStorage.remove('refreshToken');
+    LocalStorage.remove('access_Token');
+    LocalStorage.remove('logged', forceUpdate);
   };
 
   //get user from accessToken
   useEffect(() => {
     const onAuthStateChanged = async () => {
       try {
-        const accessToken = LocalStorage.get('accessToken');
-        if (accessToken) {
-          const { data } = await getUserDetails();
+        const accessToken = LocalStorage.get('access_Token');
+
+        if (accessToken && auth.userId) {
+          const { data } = await userService.getRoles(auth.userId);
+
+          dispatch(updateRoles(data));
+
           setState({
-            user: data,
+            user: {
+              firstName: 'John',
+              lastName: 'Smith',
+              userName: 'johndoe',
+              fullName: 'John Smith',
+              image: null,
+              userRole: data,
+            },
             isAuthenticated: true,
             isInitialized: true,
           });
@@ -79,7 +72,6 @@ const AuthProvider: FC = ({ children }) => {
           });
         }
       } catch (error) {
-        console.log(error);
         setState({
           user: null,
           isAuthenticated: false,
@@ -99,7 +91,6 @@ const AuthProvider: FC = ({ children }) => {
     <AuthContext.Provider
       value={{
         ...state,
-        login,
         logout,
         onForceUpdate: forceUpdate,
       }}
@@ -110,4 +101,3 @@ const AuthProvider: FC = ({ children }) => {
 };
 
 export { AuthContext as default, AuthProvider };
-

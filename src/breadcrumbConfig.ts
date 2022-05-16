@@ -13,6 +13,14 @@ const breadcrumbConfig = [
     path: '/hk_group/san_pham/loai',
   },
   {
+    breadcrumb: 'Danh sách sản phẩm',
+    path: '/hk_group/san_pham/danh_sach',
+  },
+  {
+    breadcrumb: 'Chi tiết danh sách sản phẩm',
+    path: '/hk_group/san_pham/danh_sach/:id',
+  },
+  {
     breadcrumb: 'Nhóm sản phẩm',
     path: '/hk_group/san_pham/loai/nhom_san_pham',
   },

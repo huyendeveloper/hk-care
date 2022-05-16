@@ -5,7 +5,6 @@ import type {
   AxiosResponse,
 } from 'axios';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import { baseURL } from 'config';
 import LocalStorage from './LocalStorage';
 
@@ -26,6 +25,7 @@ class Axios {
     httpInstance.interceptors.request.use(
       (config: AxiosRequestConfig) => {
         const accessToken = LocalStorage.get('accessToken');
+
         if (config.headers) {
           if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
@@ -33,9 +33,12 @@ class Axios {
             delete config.headers.Authorization;
           }
         }
+
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        Promise.reject(error);
+      }
     );
 
     // Response interceptor
@@ -76,6 +79,6 @@ class Axios {
 
 const { HttpClient } = new Axios();
 
-export const mock = new MockAdapter(HttpClient, { delayResponse: 1000 });
+// export const mock = new MockAdapter(HttpClient, { delayResponse: 1000 });
 
 export default HttpClient;

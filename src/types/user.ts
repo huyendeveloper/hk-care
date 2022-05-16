@@ -1,12 +1,11 @@
-import { Role } from "./common";
+import { Role } from './common';
 export interface UserInfo {
   firstName: string;
   lastName: string;
   fullName: string;
   image: string | null;
   userName: string;
-  userRole: UserRole;
-
+  userRole: string[];
 }
 export interface UserRole {
   id: number;

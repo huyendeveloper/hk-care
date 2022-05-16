@@ -1,11 +1,11 @@
-import PageBreadcrumbs from 'components/common/PageBreadcrums';
 import PageWrapper from 'components/common/PageWrapper';
 import CRUDTable from './CRUDTable';
 
 const CRUD = () => {
   return (
     <PageWrapper title="Example CRUD">
-      <CRUDTable />
+      <div>haha</div>
+      {/* <CRUDTable /> */}
     </PageWrapper>
   );
 };
