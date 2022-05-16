@@ -10,35 +10,41 @@ import { styled } from '@mui/material/styles';
 import Page from 'components/common/Page';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import FormGroup from 'components/Form/FormGroup';
+import { useForceUpdate } from 'hooks';
 import useAuth from 'hooks/useAuth';
 import useMounted from 'hooks/useMounted';
 import useNotification from 'hooks/useNotification';
+import { ILogin } from 'interface';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { login } from 'redux/slices';
+import { AppDispatch } from 'redux/store';
 import { LoginParams } from 'services/auth';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({
-  username: yup
+  userName: yup
     .string()
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
     // .email('Email is invalid')
-    .required('Điền tên đăng nhập để đăng nhập')
+    .required('Điền tên đăng nhập để đăng nhập.')
     .default(''),
-  password: yup
+  passWord: yup
     .string()
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Điền mật khẩu để đăng nhập')
+    .required('Điền mật khẩu để đăng nhập.')
     .default(''),
 });
 
 const Login = () => {
   const setNotification = useNotification();
   const [loading, setLoading] = useState<boolean>(false);
-  const { login } = useAuth();
+  const dispatch: AppDispatch = useDispatch();
   const isMounted = useMounted();
+  const [rerender, forceUpdate] = useForceUpdate();
 
   const { control, handleSubmit } = useForm<LoginParams>({
     mode: 'onChange',
@@ -46,14 +52,14 @@ const Login = () => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (data: LoginParams) => {
+  const onSubmit = async (data: ILogin) => {
     try {
       setLoading(true);
-      const response = await login(data);
+      const res = await dispatch(login(data));
 
-      if (!response.success) {
+      if (res.type.includes('rejected')) {
         setNotification({
-          error: 'Tên đăng nhập hoặc mật khẩu sai',
+          error: 'Tên đăng nhập hoặc mật khẩu sai!',
         });
       }
     } catch (error) {
@@ -102,10 +108,9 @@ const Login = () => {
 
               <FormGroup fullWidth>
                 <ControllerTextField
-                  name="username"
+                  name="userName"
                   control={control}
                   label="Tên đăng nhập"
-                  // placeholder="Email"
                   required
                   fullWidth
                   InputProps={{
@@ -119,7 +124,7 @@ const Login = () => {
               </FormGroup>
               <FormGroup fullWidth>
                 <ControllerTextField
-                  name="password"
+                  name="passWord"
                   control={control}
                   type="password"
                   label="Mật khẩu"

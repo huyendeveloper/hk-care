@@ -72,6 +72,37 @@ export const mockDangDungList = {
   total: 3,
 };
 
+export const mockSanPhamList = [
+  {
+    id: 1,
+    code: 'string code',
+    name: 'string name',
+    group: 'string group',
+    priceBuy: 1,
+    priceSale: 1,
+    active: true,
+  },
+
+  {
+    id: 2,
+    code: 'string code',
+    name: 'string name',
+    group: 'string group',
+    priceBuy: 2,
+    priceSale: 2,
+    active: true,
+  },
+  {
+    id: 3,
+    code: 'string code',
+    name: 'string name',
+    group: 'string group',
+    priceBuy: 3,
+    priceSale: 3,
+    active: true,
+  },
+];
+
 export const mockSelectFieldOptions = [
   {
     id: 1,

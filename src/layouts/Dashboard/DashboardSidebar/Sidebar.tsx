@@ -1,12 +1,11 @@
-import CodeIcon from '@mui/icons-material/Code';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import useAuth from 'hooks/useAuth';
-import useMounted from 'hooks/useMounted';
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import { RootState } from 'redux/store';
 import type { Role } from 'types/common';
-import sleep from 'utils/sleep';
 import SidebarItem from './SidebarItem';
 
 interface SectionItem {
@@ -20,12 +19,6 @@ interface SectionItem {
 
 const getSections = (): SectionItem[] => [
   {
-    title: 'Example',
-    path: '/example/crud', //path need to be the same as route to be highlighted
-    icon: <CodeIcon />,
-    roles: ['hkl1'], //role user and admin can see this menu
-  },
-  {
     title: 'HK_Group',
     roles: ['hkl1', 'hkl2', 'hkl3', 'hkl2_1'],
     children: [
@@ -36,7 +29,7 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Danh sách sản phẩm',
-            path: '/404',
+            path: '/hk_group/san_pham/danh_sach',
             roles: ['hkl3'],
           },
           {
@@ -208,15 +201,17 @@ interface NavItemsProps {
   items: SectionItem[];
   pathname: string;
   depth?: number;
-  role: Role;
+  roleUser: string[];
 }
 
 const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
-  const { depth = 0, items, role, pathname } = props;
+  const { depth = 0, items, roleUser, pathname } = props;
 
   const itemsFiltered =
     depth === 0
-      ? items.filter((item) => item.roles && item.roles.includes(role))
+      ? items.filter(
+          (item) => item.roles && item.roles.some((r) => roleUser.includes(r))
+        )
       : items;
 
   return (
@@ -229,7 +224,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
         if (children) {
           const items = children.filter((item) => {
             const { roles } = item;
-            return !roles || (roles && roles.includes(role));
+            return !roles || (roles && roles.some((r) => roleUser.includes(r)));
           });
           acc.push(
             <SidebarItem
@@ -246,7 +241,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
                 depth: depth + 1,
                 items,
                 pathname,
-                role,
+                roleUser,
               })}
             </SidebarItem>
           );
@@ -275,15 +270,14 @@ const Sidebar = () => {
   const { user } = useAuth();
 
   const sections = useMemo(() => getSections(), []);
-
-  const role: Role = user?.userRole.code || 'empty';
+  const auth = useSelector((state: RootState) => state.auth);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       {renderNavSectionItems({
         items: sections,
         pathname: location.pathname,
-        role,
+        roleUser: auth.userRoles,
       })}
     </Box>
   );

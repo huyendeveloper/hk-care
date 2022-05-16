@@ -5,7 +5,10 @@ import { AuthProvider } from 'contexts/AuthContext';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { PersistGate } from 'redux-persist/integration/react';
+import store, { persistor } from 'redux/store';
 import { createTheme } from 'theme';
 import App from './App';
 import './index.css';
@@ -13,17 +16,21 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <HelmetProvider>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <ThemeProvider theme={createTheme()}>
-          <AuthProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </AuthProvider>
-        </ThemeProvider>
-      </LocalizationProvider>
-    </HelmetProvider>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <HelmetProvider>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <ThemeProvider theme={createTheme()}>
+              <AuthProvider>
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+              </AuthProvider>
+            </ThemeProvider>
+          </LocalizationProvider>
+        </HelmetProvider>
+      </PersistGate>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
