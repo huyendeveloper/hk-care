@@ -3,11 +3,17 @@ export interface ILogin {
   passWord: string;
 }
 
-export interface LoginResponse {
+export interface ILoginResponse {
   access_Token: string;
   userId: string;
 }
 
 export interface IUser {
   token: string;
+}
+
+export interface IProductGroup {
+  name: string;
+  description: string;
+  id: number;
 }

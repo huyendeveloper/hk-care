@@ -107,7 +107,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/san_pham/don_vi">Quay lại</LinkButton>
+          <LinkButton to="/hk_group/product/don_vi">Quay lại</LinkButton>
 
           <Button variant="contained" onClick={handleOpenUpdateDialog}>
             Chỉnh sửa thông tin

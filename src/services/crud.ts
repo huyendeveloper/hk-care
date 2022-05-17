@@ -62,7 +62,7 @@ export const getListDangDung = async (params: FilterParams) => {
 
   const { pageIndex, pageSize } = params;
 
-  // mock.onPost('/hk_group/san_pham/loai/dang_dung').reply(200, {
+  // mock.onPost('/hk_group/product/type/dang_dung').reply(200, {
   //   data: mockResponse.data?.splice(
   //     (pageIndex - 1) * pageSize,
   //     pageIndex * pageSize
@@ -72,7 +72,7 @@ export const getListDangDung = async (params: FilterParams) => {
   //End Mock
 
   return HttpClient.post<typeof params, CommonResponse<DangDung[]>>(
-    '/hk_group/san_pham/loai/dang_dung',
+    '/hk_group/product/type/dang_dung',
     params
   );
 };
@@ -92,14 +92,14 @@ export const getListSanPham = async (params: FilterParams) => {
 
   const { pageIndex, pageSize } = params;
 
-  // mock.onPost('/hk_group/san_pham/danh_sach').reply(200, {
+  // mock.onPost('/hk_group/product/danh_sach').reply(200, {
   //   data: mockResponse,
   //   total: 3,
   // });
   //End Mock
 
   return HttpClient.post<typeof params, CommonResponse<SanPham[]>>(
-    '/hk_group/san_pham/danh_sach',
+    '/hk_group/product/danh_sach',
     params
   );
 };
@@ -115,14 +115,14 @@ export const getDangDungDetails = async (id: string) => {
 
   const mockDetails = mockList.find((crud) => crud.id === +id);
 
-  // mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
+  // mock.onGet(`/hk_group/product/type/dang_dung/${id}`).reply(200, {
   //   data: mockDetails ?? null,
   //   success: true,
   // });
   //end mock
 
   return HttpClient.get<string, CommonResponse>(
-    `/hk_group/san_pham/loai/dang_dung/${id}`
+    `/hk_group/product/type/dang_dung/${id}`
   );
 };
 
@@ -137,14 +137,14 @@ export const getSanPhamDetails = async (id: string) => {
 
   const mockDetails = mockList.find((crud) => crud.id === +id);
 
-  // mock.onGet(`/hk_group/san_pham/loai/dang_dung/${id}`).reply(200, {
+  // mock.onGet(`/hk_group/product/type/dang_dung/${id}`).reply(200, {
   //   data: mockDetails ?? null,
   //   success: true,
   // });
   //end mock
 
   return HttpClient.get<string, CommonResponse>(
-    `/hk_group/san_pham/loai/dang_dung/${id}`
+    `/hk_group/product/type/dang_dung/${id}`
   );
 };
 

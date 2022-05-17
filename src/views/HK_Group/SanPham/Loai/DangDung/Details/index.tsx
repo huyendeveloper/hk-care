@@ -107,7 +107,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/san_pham/loai/dang_dung">
+          <LinkButton to="/hk_group/product/type/dang_dung">
             Quay lại
           </LinkButton>
 

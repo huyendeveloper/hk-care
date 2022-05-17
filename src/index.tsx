@@ -21,11 +21,11 @@ ReactDOM.render(
         <HelmetProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={createTheme()}>
-              <AuthProvider>
+              {/* <AuthProvider> */}
                 <BrowserRouter>
                   <App />
                 </BrowserRouter>
-              </AuthProvider>
+              {/* </AuthProvider> */}
             </ThemeProvider>
           </LocalizationProvider>
         </HelmetProvider>

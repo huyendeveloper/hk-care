@@ -10,14 +10,13 @@ import { styled } from '@mui/material/styles';
 import Page from 'components/common/Page';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import FormGroup from 'components/Form/FormGroup';
-import { useForceUpdate } from 'hooks';
-import useAuth from 'hooks/useAuth';
 import useMounted from 'hooks/useMounted';
 import useNotification from 'hooks/useNotification';
 import { ILogin } from 'interface';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { login } from 'redux/slices';
 import { AppDispatch } from 'redux/store';
 import { LoginParams } from 'services/auth';
@@ -29,13 +28,13 @@ const validationSchema = yup.object().shape({
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
     // .email('Email is invalid')
-    .required('Điền tên đăng nhập để đăng nhập.')
+    .required('Vui lòng điền tên đăng nhập.')
     .default(''),
   passWord: yup
     .string()
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Điền mật khẩu để đăng nhập.')
+    .required('Vui lòng điền mật khẩu.')
     .default(''),
 });
 
@@ -44,7 +43,7 @@ const Login = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch: AppDispatch = useDispatch();
   const isMounted = useMounted();
-  const [rerender, forceUpdate] = useForceUpdate();
+  const navigate = useNavigate();
 
   const { control, handleSubmit } = useForm<LoginParams>({
     mode: 'onChange',
@@ -55,9 +54,13 @@ const Login = () => {
   const onSubmit = async (data: ILogin) => {
     try {
       setLoading(true);
-      const res = await dispatch(login(data));
+      const { type } = await dispatch(login(data));
 
-      if (res.type.includes('rejected')) {
+      if (type.includes('fulfilled')) {
+        return navigate('/');
+      }
+
+      if (type.includes('rejected')) {
         setNotification({
           error: 'Tên đăng nhập hoặc mật khẩu sai!',
         });

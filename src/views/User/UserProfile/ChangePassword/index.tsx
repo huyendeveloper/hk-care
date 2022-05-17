@@ -34,7 +34,7 @@ const validationSchema = yup.object().shape({
     .required('Required')
     .trim('Cannot include leading and trailing spaces')
     .default('')
-    .oneOf([yup.ref('newPassword')], "Password does not match"),
+    .oneOf([yup.ref('newPassword')], 'Password does not match'),
 });
 
 interface FormData {
@@ -44,20 +44,14 @@ interface FormData {
 }
 
 const ChangePassword = () => {
-
-  const {
-    control,
-    handleSubmit,
-    watch,
-    trigger,
-  } = useForm<FormData>({
+  const { control, handleSubmit, watch, trigger } = useForm<FormData>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log("Change password", data);
+    // handle change password
   };
 
   const [newPassword, retypeNewPassword] = watch([
@@ -78,11 +72,7 @@ const ChangePassword = () => {
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12} sm={4} md={2}>
-                <FormLabel
-                  required
-                  title="Old password"
-                  name="oldPassword"
-                />
+                <FormLabel required title="Old password" name="oldPassword" />
               </Grid>
               <Grid item xs={12} sm={8} md={4}>
                 <ControllerTextField
@@ -96,11 +86,7 @@ const ChangePassword = () => {
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12} sm={4} md={2}>
-                <FormLabel
-                  required
-                  title="New password"
-                  name="newPassword"
-                />
+                <FormLabel required title="New password" name="newPassword" />
               </Grid>
               <Grid item xs={12} sm={8} md={4}>
                 <ControllerTextField

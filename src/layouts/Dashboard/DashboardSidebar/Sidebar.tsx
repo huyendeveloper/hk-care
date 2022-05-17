@@ -29,7 +29,7 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Danh sách sản phẩm',
-            path: '/hk_group/san_pham/danh_sach',
+            path: '/hk_group/product/danh_sach',
             roles: ['hkl3'],
           },
           {
@@ -39,24 +39,24 @@ const getSections = (): SectionItem[] => [
             children: [
               {
                 title: 'Nhóm sản phẩm',
-                path: '/hk_group/san_pham/loai/nhom_san_pham',
+                path: '/hk_group/product/type/product_group',
                 roles: ['hkl3'],
               },
               {
                 title: 'Nhóm điều trị',
-                path: '/hk_group/san_pham/loai/nhom_dieu_tri',
+                path: '/hk_group/product/type/nhom_dieu_tri',
                 roles: ['hkl3'],
               },
               {
                 title: 'Dạng dùng',
-                path: '/hk_group/san_pham/loai/dang_dung',
+                path: '/hk_group/product/type/dang_dung',
                 roles: ['hkl3'],
               },
             ],
           },
           {
             title: 'Đơn vị đo lường',
-            path: '/hk_group/san_pham/don_vi',
+            path: '/hk_group/product/don_vi',
             roles: ['hkl3'],
           },
           {
@@ -267,7 +267,6 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
 
 const Sidebar = () => {
   const location = useLocation();
-  const { user } = useAuth();
 
   const sections = useMemo(() => getSections(), []);
   const auth = useSelector((state: RootState) => state.auth);

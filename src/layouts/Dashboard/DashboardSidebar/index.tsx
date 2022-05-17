@@ -21,7 +21,6 @@ interface Props {
 
 const DashboardSidebar: FC<Props> = (props) => {
   const { onCloseMobileSidebar, openMobileSidebar } = props;
-  const { user } = useAuth();
   const { pathname } = useLocation();
   const prevPathName = usePrevious(pathname);
 
@@ -33,8 +32,8 @@ const DashboardSidebar: FC<Props> = (props) => {
 
   const userInfo = {
     role: 'HK Group',
-    userName: user?.fullName || 'Default name',
-    image: user?.image || '',
+    userName:   'Default name',
+    image:   '',
   };
 
   const content = (

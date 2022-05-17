@@ -5,10 +5,10 @@ export interface CommonResponse<D = any> {
   total: number;
 }
 export interface FilterParams {
+  sortDirection: Order;
   pageIndex: number;
   pageSize: number;
   sortBy: string;
-  sortDirection: Order;
   searchText: string;
 }
 export interface Dictionary<T = any> {

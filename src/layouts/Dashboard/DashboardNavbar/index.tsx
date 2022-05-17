@@ -17,6 +17,9 @@ import useAuth from 'hooks/useAuth';
 import useMounted from 'hooks/useMounted';
 import { FC, useState } from 'react';
 import sleep from 'utils/sleep';
+import { logout } from 'redux/slices';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 interface Props extends AppBarProps {
   onToggleMobileSidebar: () => void;
@@ -26,9 +29,11 @@ interface Props extends AppBarProps {
 
 const DashboardNavbar: FC<Props> = (props) => {
   const { onToggleMobileSidebar, openDrawer } = props;
-  const { logout } = useAuth();
+  // const { logout } = useAuth();
   const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
   const mounted = useMounted();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleOpenLogoutDialog = () => {
     setOpenLogoutDialog(true);
@@ -41,8 +46,8 @@ const DashboardNavbar: FC<Props> = (props) => {
   };
 
   const handleLogout = async () => {
-    await sleep(350);
-    logout();
+    await dispatch(logout());
+    return navigate('/login');
   };
 
   return (

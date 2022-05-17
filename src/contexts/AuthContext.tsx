@@ -37,15 +37,14 @@ const AuthProvider: FC = ({ children }) => {
   const dispatch = useDispatch();
 
   const logout = () => {
-    LocalStorage.remove('access_Token');
-    LocalStorage.remove('logged', forceUpdate);
+    LocalStorage.remove('accessToken');
   };
 
   //get user from accessToken
   useEffect(() => {
     const onAuthStateChanged = async () => {
       try {
-        const accessToken = LocalStorage.get('access_Token');
+        const accessToken = LocalStorage.get('accessToken');
 
         if (accessToken && auth.userId) {
           const { data } = await userService.getRoles(auth.userId);
@@ -82,10 +81,6 @@ const AuthProvider: FC = ({ children }) => {
 
     onAuthStateChanged();
   }, [rerender]);
-
-  if (!state.isInitialized) {
-    return <SplashScreen />;
-  }
 
   return (
     <AuthContext.Provider
