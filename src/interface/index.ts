@@ -23,3 +23,9 @@ export interface IUsage {
   description: string;
   id: number;
 }
+
+export interface ITreatmentGroup {
+  name: string;
+  description: string;
+  id: number;
+}

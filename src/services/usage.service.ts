@@ -1,6 +1,6 @@
 import axiosClient from 'api';
 import { baseURL } from 'config';
-import { IProductGroup } from 'interface';
+import { IUsage } from 'interface';
 import { FilterParams } from 'types';
 
 class UsageService {
@@ -17,11 +17,11 @@ class UsageService {
     return axiosClient.get(`${baseURL}/app/usage/${id}`);
   }
 
-  create(payload: IProductGroup) {
+  create(payload: IUsage) {
     return axiosClient.post(`${baseURL}/app/usage`, payload);
   }
 
-  update({ id, ...payload }: IProductGroup) {
+  update({ id, ...payload }: IUsage) {
     return axiosClient.put(`${baseURL}/app/usage/${id}`, payload);
   }
 

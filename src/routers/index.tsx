@@ -5,7 +5,7 @@ import MainLayout from 'layouts/Main';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 import CRUDRoutes from "./CRUDExample";
-import HKGroupRoutes from "./QLSanPham";
+import HKGroupRoutes from "./Product";
 import Loadable from './Loadable';
 import UserRoutes from "./User";
 

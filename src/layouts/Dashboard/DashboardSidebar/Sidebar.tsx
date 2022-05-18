@@ -44,7 +44,7 @@ const getSections = (): SectionItem[] => [
               },
               {
                 title: 'Nhóm điều trị',
-                path: '/hk_group/product/type/nhom_dieu_tri',
+                path: '/hk_group/product/type/treatment_group',
                 roles: ['hkl3'],
               },
               {

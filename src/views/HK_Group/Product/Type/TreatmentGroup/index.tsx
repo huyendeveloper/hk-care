@@ -1,7 +1,7 @@
-import { PageBreadcrums, PageWrapper } from 'components/common';
+import { PageWrapper } from 'components/common';
 import TableData from './TableData';
 
-const NhomDieuTri = () => {
+const TreatmentGroup = () => {
   return (
     <PageWrapper title="Nhóm điều trị">
       <TableData />
@@ -9,4 +9,4 @@ const NhomDieuTri = () => {
   );
 };
 
-export default NhomDieuTri;
+export default TreatmentGroup;
