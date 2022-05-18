@@ -9,50 +9,17 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useNotification } from 'hooks';
-import { useState } from 'react';
-import { deleteExampleCRUD } from 'services/crud';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   id: number | null;
-  onForceUpdate: () => void;
   name?: string;
+  handleDelete: () => void;
 }
 
 const DeleteDialog = (props: Props) => {
-  const { open, onClose, id, onForceUpdate, name = '' } = props;
-  const setNotification = useNotification();
-
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const handleUpdate = async () => {
-    setLoading(true);
-    if (id) {
-      try {
-        const res = await deleteExampleCRUD(id);
-        if (res.success) {
-          setNotification({
-            message: 'Delete success.',
-            severity: 'success',
-          });
-        } else {
-          setNotification({
-            error: 'Delete failure.',
-          });
-        }
-      } catch (error) {
-        setNotification({
-          error: 'Something went wrong.',
-        });
-      } finally {
-        onClose();
-        setLoading(false);
-        onForceUpdate();
-      }
-    }
-  };
+  const { open, onClose, name = '', handleDelete } = props;
 
   return (
     <Dialog open={open} maxWidth="xs" fullWidth onClose={onClose} scroll="body">
@@ -84,7 +51,7 @@ const DeleteDialog = (props: Props) => {
             Hủy
           </Button>
 
-          <LoadingButton loading={loading} color="error" onClick={handleUpdate}>
+          <LoadingButton color="error" onClick={handleDelete}>
             Xóa
           </LoadingButton>
         </Stack>

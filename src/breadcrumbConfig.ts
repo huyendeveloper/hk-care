@@ -6,51 +6,51 @@ const breadcrumbConfig = [
   {
     exact: true,
     breadcrumb: 'Quản lý sản phẩm',
-    path: '/hk_group/san_pham',
+    path: '/hk_group/product',
   },
   {
     breadcrumb: 'Loại sản phẩm',
-    path: '/hk_group/san_pham/loai',
+    path: '/hk_group/product/type',
   },
   {
     breadcrumb: 'Danh sách sản phẩm',
-    path: '/hk_group/san_pham/danh_sach',
+    path: '/hk_group/product/danh_sach',
   },
   {
     breadcrumb: 'Chi tiết danh sách sản phẩm',
-    path: '/hk_group/san_pham/danh_sach/:id',
+    path: '/hk_group/product/danh_sach/:id',
   },
   {
     breadcrumb: 'Nhóm sản phẩm',
-    path: '/hk_group/san_pham/loai/nhom_san_pham',
+    path: '/hk_group/product/type/product_group',
   },
   {
     breadcrumb: 'Chi tiết nhóm sản phẩm',
-    path: '/hk_group/san_pham/loai/nhom_san_pham/:id',
+    path: '/hk_group/product/type/product_group/:id',
   },
   {
     breadcrumb: 'Nhóm điều trị',
-    path: '/hk_group/san_pham/loai/nhom_dieu_tri',
+    path: '/hk_group/product/type/nhom_dieu_tri',
   },
   {
     breadcrumb: 'Chi tiết nhóm điều trị',
-    path: '/hk_group/san_pham/loai/nhom_dieu_tri/:id',
+    path: '/hk_group/product/type/nhom_dieu_tri/:id',
   },
   {
     breadcrumb: 'Dạng dùng',
-    path: '/hk_group/san_pham/loai/dang_dung',
+    path: '/hk_group/product/type/dang_dung',
   },
   {
     breadcrumb: 'Chi tiết dạng dùng',
-    path: '/hk_group/san_pham/loai/dang_dung/:id',
+    path: '/hk_group/product/type/dang_dung/:id',
   },
   {
     breadcrumb: 'Đơn vị đo lường',
-    path: '/hk_group/san_pham/don_vi',
+    path: '/hk_group/product/don_vi',
   },
   {
     breadcrumb: 'Chi tiết đơn vị đo lường',
-    path: '/hk_group/san_pham/don_vi/:id',
+    path: '/hk_group/product/don_vi/:id',
   },
 ];
 

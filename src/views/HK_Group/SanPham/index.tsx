@@ -21,10 +21,10 @@ export const TTNhomDieuTri = Loadable(
   lazy(() => import('views/HK_Group/SanPham/Loai/NhomDieuTri/Details'))
 );
 export const NhomSanPham = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/NhomSanPham'))
+  lazy(() => import('views/HK_Group/SanPham/Loai/ProductGroup'))
 );
 export const TTNhomSanPham = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/NhomSanPham/Details'))
+  lazy(() => import('views/HK_Group/SanPham/Loai/ProductGroup/Details'))
 );
 export const DonVi = Loadable(
   lazy(() => import('views/HK_Group/SanPham/DonVi'))

@@ -1,7 +1,6 @@
 import { CommonResponse } from 'types/common';
 import { UserInfo } from 'types/user';
 import HttpClient from 'utils/HttpClient';
-import { baseURL } from 'config';
 
 export interface LoginParams {
   userName: string;
@@ -23,8 +22,6 @@ export const apiLogin = async (params: LoginParams) => {
   //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMSIsInVuaXF1ZV9uYW1lIjoiMTEiLCJqdGkiOiIyYjI3Y2U4Mi0xYTY4LTQwMTEtODU2Mi1kYTM1MjZmNzEzZmQiLCJpYXQiOjE2NDczMzk1MTYsIm5iZiI6MTY0NzMzOTUxNiwiZXhwIjoxNjQ3OTg3NTE2fQ.o7Yfi6tW5Oboe6nk0Pn8Y8Sjn1V8TKHOtY-_BcSpuWA',
   //   success: true,
   // });
-
-  // console.log('baseURL', baseURL, params);
 
   const returnData = HttpClient.post<typeof params, LoginResponse>(
     '/app/account/login',

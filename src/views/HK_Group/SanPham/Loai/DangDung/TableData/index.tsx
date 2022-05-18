@@ -134,6 +134,10 @@ const TableData = () => {
     setOpenDeleteDialog(false);
   };
 
+  const handleDelete = () => {
+    // handle delete
+  };
+
   const renderAction = (row: DangDung) => {
     return (
       <>
@@ -213,7 +217,7 @@ const TableData = () => {
         name={dangDungList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
-        onForceUpdate={onForceUpdate}
+        handleDelete={handleDelete}
       />
 
       <FormDialog

@@ -4,7 +4,7 @@ import {
 } from 'views/HK_Group/SanPham';
 
 const QLSanPhamRoutes: RouteObject = {
-  path: 'hk_group/san_pham',
+  path: 'hk_group/product',
   element: <Outlet />,
   children: [
     {
@@ -15,7 +15,7 @@ const QLSanPhamRoutes: RouteObject = {
       ],
     },
     {
-      path: 'loai',
+      path: 'type',
       children: [
         {
           path: 'dang_dung',
@@ -33,7 +33,7 @@ const QLSanPhamRoutes: RouteObject = {
         },
     
         {
-          path: 'nhom_san_pham',
+          path: 'product_group',
           children: [
             { index:true, element: <NhomSanPham /> },
             { path: ':id', element: <TTNhomSanPham /> },

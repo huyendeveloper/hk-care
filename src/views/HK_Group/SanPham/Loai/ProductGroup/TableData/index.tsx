@@ -22,15 +22,15 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { useForceUpdate, useMounted } from 'hooks';
+import { useMounted } from 'hooks';
+import { IProductGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { getListDangDung } from 'services/crud';
+import productGroupService from 'services/productGroup.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialog from '../FormDialog';
-import { DangDung } from '../type';
 
-const getCells = (): Cells<DangDung> => [
+const getCells = (): Cells<IProductGroup> => [
   {
     id: 'id',
     label: 'STT',
@@ -40,7 +40,7 @@ const getCells = (): Cells<DangDung> => [
     label: 'Tên nhóm sản phẩm',
   },
   {
-    id: 'note',
+    id: 'description',
     label: 'Thao tác',
   },
 ];
@@ -55,10 +55,9 @@ const defaultFilters: FilterParams = {
 
 const TableData = () => {
   const mounted = useMounted();
-  const [rerender, onForceUpdate] = useForceUpdate();
 
   const [currentID, setCurrentID] = useState<number | null>(null);
-  const [dangDungList, setDangDungList] = useState<DangDung[]>([]);
+  const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
@@ -68,12 +67,12 @@ const TableData = () => {
 
   const cells = useMemo(() => getCells(), []);
 
-  useEffect(() => {
-    setLoading(true);
-    getListDangDung(filters)
-      .then((res) => {
-        setDangDungList(res.data ?? []);
-        setTotalRows(res.total);
+  const fetchData = () => {
+    productGroupService
+      .getAll(filters)
+      .then(({ data }) => {
+        setProductGroupList(data.items ?? []);
+        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
       })
       .catch((err) => {
         console.log(err);
@@ -81,15 +80,19 @@ const TableData = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [filters, mounted, rerender]);
+  };
+
+  useEffect(() => {
+    setLoading(true);
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const handleOnSort = (field: string) => {
-    const { sortBy, sortDirection } = filters;
-    const isAsc = sortBy === field && sortDirection === 'asc';
     setFilters((state) => ({
       ...state,
       sortBy: field,
-      sortDirection: isAsc ? 'desc' : 'asc',
     }));
   };
 
@@ -134,7 +137,25 @@ const TableData = () => {
     setOpenDeleteDialog(false);
   };
 
-  const renderAction = (row: DangDung) => {
+  const handleCloseFormDialog = (updated: boolean | undefined) => {
+    setOpenFormDialog(false);
+    if (updated) {
+      fetchData();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentID) return;
+    try {
+      await productGroupService.delete(currentID);
+      handleCloseDeleteDialog();
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const renderAction = (row: IProductGroup) => {
     return (
       <>
         <LinkIconButton to={`${row.id}`}>
@@ -171,7 +192,7 @@ const TableData = () => {
         </Button>
       </TableSearchField>
 
-      <TableContent total={dangDungList.length} loading={loading}>
+      <TableContent total={productGroupList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5 }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -183,7 +204,7 @@ const TableData = () => {
               />
 
               <TableBody>
-                {dangDungList.map((item) => {
+                {productGroupList.map((item) => {
                   const { id, name } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
@@ -200,7 +221,7 @@ const TableData = () => {
 
         <TablePagination
           pageIndex={filters.pageIndex}
-          totalPages={Math.ceil(totalRows / filters.pageSize)}
+          totalPages={totalRows}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
@@ -210,17 +231,17 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
-        name={dangDungList.find((x) => x.id === currentID)?.name}
+        name={productGroupList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
-        onForceUpdate={onForceUpdate}
+        handleDelete={handleDelete}
       />
 
       <FormDialog
         currentID={currentID}
-        data={dangDungList.find((x) => x.id === currentID)}
+        data={productGroupList.find((x) => x.id === currentID)}
         open={openFormDialog}
-        handleClose={() => setOpenFormDialog(false)}
+        handleClose={handleCloseFormDialog}
       />
     </TableWrapper>
   );
