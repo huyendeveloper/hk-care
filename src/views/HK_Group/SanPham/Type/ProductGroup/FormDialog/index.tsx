@@ -64,9 +64,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            currentID
-              ? 'Chỉnh sửa thông tin nhóm sản phẩm'
-              : 'Thêm mới nhóm sản phẩm'
+            currentID ? 'Chỉnh sửa thông tin dạng dùng' : 'Thêm mới dạng dùng'
           }
         />
         <FormContent>
@@ -75,7 +73,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               {currentID && (
                 <>
                   <Grid item xs={12}>
-                    <FormLabel title="Mã nhóm sản phẩm" name="id" />
+                    <FormLabel title="Mã dạng dùng" name="id" />
                   </Grid>
                   <Grid item xs={12}>
                     <ControllerTextField name="id" disabled control={control} />
@@ -83,7 +81,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                 </>
               )}
               <Grid item xs={12}>
-                <FormLabel required title="Tên nhóm sản phẩm" name="name" />
+                <FormLabel required title="Tên dạng dùng" name="name" />
               </Grid>
               <Grid item xs={12}>
                 <ControllerTextField name="name" control={control} />

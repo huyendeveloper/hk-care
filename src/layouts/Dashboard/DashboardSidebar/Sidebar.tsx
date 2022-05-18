@@ -49,7 +49,7 @@ const getSections = (): SectionItem[] => [
               },
               {
                 title: 'Dạng dùng',
-                path: '/hk_group/product/type/dang_dung',
+                path: '/hk_group/product/type/usage',
                 roles: ['hkl3'],
               },
             ],

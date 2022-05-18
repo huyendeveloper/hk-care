@@ -12,57 +12,62 @@ import {
   FormPaperGrid,
 } from 'components/Form';
 import { useMounted } from 'hooks';
+import { IUsage } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { getDangDungDetails } from 'services/crud';
+import usageService from 'services/usage.service';
 import * as yup from 'yup';
 import FormDialog from '../FormDialog';
-import { DangDung } from '../type';
 
 const validationSchema = yup.object().shape({
   name: yup.string().required('Required').strict(true).default(''),
-  note: yup.string().strict(true).default(''),
+  description: yup.string().strict(true).default(''),
 });
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
   const mounted = useMounted();
-  const [dangDung, setDangDung] = useState<DangDung>();
+  const [usage, setUsage] = useState<IUsage>();
   const [taskQueue, setTaskQueue] = useState<number>(0);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
-  const { control, setValue } = useForm<DangDung>({
+  const { control, setValue } = useForm<IUsage>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
-  useEffect(() => {
+  const fetchData = () => {
     if (!crudId) return;
 
     setTaskQueue((task) => task + 1);
-    getDangDungDetails(crudId)
-      .then((res) => {
-        setDangDung(res.data);
-      })
-      .catch((err) => console.log(err))
+    usageService
+      .get(Number(crudId))
+      .then(({ data }) => setUsage(data))
+      .catch((error) => console.error(error))
       .finally(() => {
         if (mounted.current) {
           setTaskQueue((task) => task - 1);
         }
       });
-  }, [crudId, mounted]);
+  };
 
   useEffect(() => {
-    if (!dangDung) return;
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [crudId]);
 
-    const { name, note } = dangDung;
+  useEffect(() => {
+    if (!usage) return;
 
-    setValue('id', Number(crudId));
+    const { id, name, description } = usage;
+
+    setValue('id', id);
     setValue('name', name);
-    setValue('note', note);
-  }, [dangDung]);
+    setValue('description', description);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usage]);
 
   if (taskQueue > 0) {
     return <LoadingScreen />;
@@ -72,33 +77,38 @@ const DetailsForm = () => {
     setOpenFormDialog(true);
   };
 
+  const handleCloseUpdateDialog = () => {
+    setOpenFormDialog(false);
+    fetchData();
+  };
+
   return (
-    <PageWrapper title="Dạng dùng">
+    <PageWrapper title="Nhóm sản phẩm">
       <FormPaperGrid noValidate>
-        <FormHeader title="Xem chi tiết dạng dùng" />
+        <FormHeader title="Xem chi tiết nhóm sản phẩm" />
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12}>
-                <FormLabel title="Mã dạng dùng" name="id" />
+                <FormLabel title="Mã nhóm sản phẩm" name="id" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField name="id" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel required title="Tên dạng dùng" name="name" />
+                <FormLabel required title="Tên nhóm sản phẩm" name="name" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextField disabled name="name" control={control} />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel title="Ghi chú" name="note" />
+                <FormLabel title="Ghi chú" name="description" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <ControllerTextarea
                   maxRows={5}
                   minRows={5}
-                  name="note"
+                  name="description"
                   control={control}
                   disabled
                 />
@@ -107,9 +117,7 @@ const DetailsForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_group/product/type/dang_dung">
-            Quay lại
-          </LinkButton>
+          <LinkButton to="/hk_group/product/type/usage">Quay lại</LinkButton>
 
           <Button variant="contained" onClick={handleOpenUpdateDialog}>
             Chỉnh sửa thông tin
@@ -117,10 +125,10 @@ const DetailsForm = () => {
         </FormFooter>
       </FormPaperGrid>
       <FormDialog
-        currentID={dangDung?.id}
-        data={dangDung}
+        currentID={usage?.id}
+        data={usage}
         open={openFormDialog}
-        handleClose={() => setOpenFormDialog(false)}
+        handleClose={handleCloseUpdateDialog}
       />
     </PageWrapper>
   );

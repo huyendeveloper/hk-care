@@ -38,11 +38,11 @@ const breadcrumbConfig = [
   },
   {
     breadcrumb: 'Dạng dùng',
-    path: '/hk_group/product/type/dang_dung',
+    path: '/hk_group/product/type/usage',
   },
   {
     breadcrumb: 'Chi tiết dạng dùng',
-    path: '/hk_group/product/type/dang_dung/:id',
+    path: '/hk_group/product/type/usage/:id',
   },
   {
     breadcrumb: 'Đơn vị đo lường',

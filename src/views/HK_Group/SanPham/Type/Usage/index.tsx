@@ -1,7 +1,7 @@
-import { PageBreadcrums, PageWrapper } from 'components/common';
+import { PageWrapper } from 'components/common';
 import TableData from './TableData';
 
-const DangDung = () => {
+const UsageGroup = () => {
   return (
     <PageWrapper title="Dạng dùng">
       <TableData />
@@ -9,4 +9,4 @@ const DangDung = () => {
   );
 };
 
-export default DangDung;
+export default UsageGroup;

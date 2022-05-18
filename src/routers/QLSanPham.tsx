@@ -18,7 +18,7 @@ const QLSanPhamRoutes: RouteObject = {
       path: 'type',
       children: [
         {
-          path: 'dang_dung',
+          path: 'usage',
           children: [
             { index:true, element: <DangDung /> },
             { path: ':id', element: <TTDangDung /> },
