@@ -1,6 +1,8 @@
 import { Outlet, RouteObject } from 'react-router-dom';
 import {
-  Usage, ProductList, TreatmentGroup, ProductGroup, UsageDetails, ProductDetails, TreatmentGroupDetails, ProductGroupDetails
+  Measure,
+  MeasureDetails,
+  ProductDetails, ProductGroup, ProductGroupDetails, ProductList, TreatmentGroup, TreatmentGroupDetails, Usage, UsageDetails
 } from 'views/HK_Group/Product';
 
 const QLSanPhamRoutes: RouteObject = {
@@ -41,14 +43,13 @@ const QLSanPhamRoutes: RouteObject = {
         },
       ],
     },
-    // {
-    //   path: 'don_vi',
-    //   children: [
-    //     { index:true, element: <DonVi /> },
-    //     { path: ':id', element: <TTDonVi /> },
-    //   ],
-    // },
-    
+    {
+      path: 'measure',
+      children: [
+        { index:true, element: <Measure /> },
+        { path: ':id', element: <MeasureDetails /> },
+      ],
+    },
   ],
 };
 

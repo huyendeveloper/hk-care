@@ -46,11 +46,11 @@ const breadcrumbConfig = [
   },
   {
     breadcrumb: 'Đơn vị đo lường',
-    path: '/hk_group/product/don_vi',
+    path: '/hk_group/product/measure',
   },
   {
     breadcrumb: 'Chi tiết đơn vị đo lường',
-    path: '/hk_group/product/don_vi/:id',
+    path: '/hk_group/product/measure/:id',
   },
 ];
 

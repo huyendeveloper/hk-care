@@ -56,7 +56,7 @@ const getSections = (): SectionItem[] => [
           },
           {
             title: 'Đơn vị đo lường',
-            path: '/hk_group/product/don_vi',
+            path: '/hk_group/product/measure',
             roles: ['hkl3'],
           },
           {

@@ -29,3 +29,9 @@ export interface ITreatmentGroup {
   description: string;
   id: number;
 }
+
+export interface IMeasure {
+  name: string;
+  description: string;
+  id: number;
+}
