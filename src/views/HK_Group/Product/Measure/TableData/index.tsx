@@ -231,6 +231,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
+        tableName="đơn vị đo lường"
         name={measureList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

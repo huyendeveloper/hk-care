@@ -16,10 +16,11 @@ interface Props {
   id: number | null;
   name?: string;
   handleDelete: () => void;
+  tableName: string;
 }
 
 const DeleteDialog = (props: Props) => {
-  const { open, onClose, name = '', handleDelete } = props;
+  const { open, onClose, name = '', handleDelete, tableName } = props;
 
   return (
     <Dialog open={open} maxWidth="xs" fullWidth onClose={onClose} scroll="body">
@@ -41,7 +42,7 @@ const DeleteDialog = (props: Props) => {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Bạn có muốn xóa "{name}"?
+          Bạn có chắc chắn bạn muốn xóa {tableName} {<strong>{name}</strong>}?
         </Typography>
       </DialogContent>
       <Divider />

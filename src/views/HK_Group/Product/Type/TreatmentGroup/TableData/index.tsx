@@ -233,6 +233,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
+        tableName="nhóm điều trị"
         name={treatmentGroupList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

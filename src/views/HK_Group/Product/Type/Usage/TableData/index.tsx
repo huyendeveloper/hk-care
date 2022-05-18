@@ -231,6 +231,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
+        tableName='dạng dùng'
         name={usageList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

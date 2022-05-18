@@ -231,6 +231,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
+        tableName="nhóm sản phẩm"
         name={productGroupList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

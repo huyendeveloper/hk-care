@@ -272,12 +272,13 @@ const ExampleCRUDTable = () => {
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
         />
       </TableContent>
-      <DeleteDialog
+      {/* <DeleteDialog
         id={currentCRUDId}
+        tableName="Tên bảng"
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         onForceUpdate={onForceUpdate}
-      />
+      /> */}
     </TableWrapper>
   );
 };

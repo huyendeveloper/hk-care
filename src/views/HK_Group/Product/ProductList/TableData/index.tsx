@@ -227,6 +227,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
+        tableName='sản phẩm'
         name={dangDungList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
