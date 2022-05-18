@@ -2,8 +2,7 @@ import { mockCRUDList, mockDangDungList, mockSanPhamList } from 'mock-axios';
 import { CommonResponse, FilterParams } from 'types/common';
 import HttpClient from 'utils/HttpClient';
 import LocalStorage from 'utils/LocalStorage';
-import { SanPham } from 'views/HK_Group/SanPham/DanhSach/type';
-import { DangDung } from 'views/HK_Group/SanPham/Type/Usage/type';
+import { SanPham } from 'views/HK_Group/Product/ProductList/type';
 
 export interface ExampleCRUD {
   id: number;
@@ -47,36 +46,6 @@ export const getListExampleCRUD = async (params: FilterParams) => {
   );
 };
 
-export const getListDangDung = async (params: FilterParams) => {
-  //Start Mock
-  const mockDangDung = LocalStorage.get('mockDangDung');
-  if (!mockDangDung) {
-    LocalStorage.set('mockDangDung', JSON.stringify(mockDangDungList));
-  }
-  const mockResponse: CommonResponse<DangDung[]> = JSON.parse(
-    LocalStorage.get('mockDangDung')
-  ) || {
-    data: [],
-    total: 0,
-  };
-
-  const { pageIndex, pageSize } = params;
-
-  // mock.onPost('/hk_group/product/type/usage').reply(200, {
-  //   data: mockResponse.data?.splice(
-  //     (pageIndex - 1) * pageSize,
-  //     pageIndex * pageSize
-  //   ),
-  //   total: mockResponse.total,
-  // });
-  //End Mock
-
-  return HttpClient.post<typeof params, CommonResponse<DangDung[]>>(
-    '/hk_group/product/type/usage',
-    params
-  );
-};
-
 export const getListSanPham = async (params: FilterParams) => {
   //Start Mock
   const mockSanPham = LocalStorage.get('mockSanPham');
@@ -104,27 +73,6 @@ export const getListSanPham = async (params: FilterParams) => {
   );
 };
 
-export const getDangDungDetails = async (id: string) => {
-  //start mock
-  const mockDangDungString = LocalStorage.get('mockDangDung');
-
-  const mockDangDungObject: CommonResponse<DangDung[]> =
-    JSON.parse(mockDangDungString);
-
-  const mockList = mockDangDungObject.data ?? [];
-
-  const mockDetails = mockList.find((crud) => crud.id === +id);
-
-  // mock.onGet(`/hk_group/product/type/usage/${id}`).reply(200, {
-  //   data: mockDetails ?? null,
-  //   success: true,
-  // });
-  //end mock
-
-  return HttpClient.get<string, CommonResponse>(
-    `/hk_group/product/type/usage/${id}`
-  );
-};
 
 export const getSanPhamDetails = async (id: string) => {
   //start mock
