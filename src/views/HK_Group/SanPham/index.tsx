@@ -9,22 +9,22 @@ export const TTDanhSach = Loadable(
 );
 
 export const DangDung = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/DangDung'))
+  lazy(() => import('views/HK_Group/SanPham/Type/Usage'))
 );
 export const TTDangDung = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/DangDung/Details'))
+  lazy(() => import('views/HK_Group/SanPham/Type/Usage/Details'))
 );
 export const NhomDieuTri = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/NhomDieuTri'))
+  lazy(() => import('views/HK_Group/SanPham/Type/NhomDieuTri'))
 );
 export const TTNhomDieuTri = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/NhomDieuTri/Details'))
+  lazy(() => import('views/HK_Group/SanPham/Type/NhomDieuTri/Details'))
 );
 export const NhomSanPham = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/ProductGroup'))
+  lazy(() => import('views/HK_Group/SanPham/Type/ProductGroup'))
 );
 export const TTNhomSanPham = Loadable(
-  lazy(() => import('views/HK_Group/SanPham/Loai/ProductGroup/Details'))
+  lazy(() => import('views/HK_Group/SanPham/Type/ProductGroup/Details'))
 );
 export const DonVi = Loadable(
   lazy(() => import('views/HK_Group/SanPham/DonVi'))

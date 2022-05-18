@@ -17,3 +17,9 @@ export interface IProductGroup {
   description: string;
   id: number;
 }
+
+export interface IUsage {
+  name: string;
+  description: string;
+  id: number;
+}
