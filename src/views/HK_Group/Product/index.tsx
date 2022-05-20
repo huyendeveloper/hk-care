@@ -5,9 +5,9 @@ export const ProductList = Loadable(
   lazy(() => import('views/HK_Group/Product/ProductList'))
 );
 
-export const ProductDetails = Loadable(
-  lazy(() => import('views/HK_Group/Product/ProductList/Details'))
-);
+// export const ProductDetails = Loadable(
+//   lazy(() => import('views/HK_Group/Product/ProductList/Details'))
+// );
 
 export const Usage = Loadable(
   lazy(() => import('views/HK_Group/Product/Type/Usage'))
@@ -40,3 +40,11 @@ export const Measure = Loadable(
 export const MeasureDetails = Loadable(
   lazy(() => import('views/HK_Group/Product/Measure/Details'))
 );
+
+export const Supplier = Loadable(
+  lazy(() => import('views/HK_Group/Product/Supplier'))
+);
+
+// export const MeasureDetails = Loadable(
+//   lazy(() => import('views/HK_Group/Product/Measure/Details'))
+// );

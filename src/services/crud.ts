@@ -1,8 +1,7 @@
-import { mockCRUDList, mockDangDungList, mockSanPhamList } from 'mock-axios';
+import { mockCRUDList } from 'mock-axios';
 import { CommonResponse, FilterParams } from 'types/common';
 import HttpClient from 'utils/HttpClient';
 import LocalStorage from 'utils/LocalStorage';
-import { SanPham } from 'views/HK_Group/Product/ProductList/type';
 
 export interface ExampleCRUD {
   id: number;
@@ -43,56 +42,6 @@ export const getListExampleCRUD = async (params: FilterParams) => {
   return HttpClient.post<typeof params, CommonResponse<ExampleCRUD[]>>(
     '/Example/CRUD/ListCRUD',
     params
-  );
-};
-
-export const getListSanPham = async (params: FilterParams) => {
-  //Start Mock
-  const mockSanPham = LocalStorage.get('mockSanPham');
-  if (!mockSanPham) {
-    LocalStorage.set('mockSanPham', JSON.stringify(mockSanPhamList));
-  }
-  const mockResponse: CommonResponse<SanPham[]> = JSON.parse(
-    LocalStorage.get('mockSanPham')
-  ) || {
-    data: [],
-    total: 0,
-  };
-
-  const { pageIndex, pageSize } = params;
-
-  // mock.onPost('/hk_group/product/danh_sach').reply(200, {
-  //   data: mockResponse,
-  //   total: 3,
-  // });
-  //End Mock
-
-  return HttpClient.post<typeof params, CommonResponse<SanPham[]>>(
-    '/hk_group/product/danh_sach',
-    params
-  );
-};
-
-
-export const getSanPhamDetails = async (id: string) => {
-  //start mock
-  const mockSanPhamString = LocalStorage.get('mockSanPham');
-
-  const mockSanPhamObject: CommonResponse<SanPham[]> =
-    JSON.parse(mockSanPhamString);
-
-  const mockList = mockSanPhamObject.data ?? [];
-
-  const mockDetails = mockList.find((crud) => crud.id === +id);
-
-  // mock.onGet(`/hk_group/product/type/usage/${id}`).reply(200, {
-  //   data: mockDetails ?? null,
-  //   success: true,
-  // });
-  //end mock
-
-  return HttpClient.get<string, CommonResponse>(
-    `/hk_group/product/type/usage/${id}`
   );
 };
 

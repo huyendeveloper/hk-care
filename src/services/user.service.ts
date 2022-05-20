@@ -1,13 +1,9 @@
-import axios, { AxiosRequestHeaders } from 'axios';
-import { baseURL } from 'config';
-import authHeader from './auth-header';
 import axiosClient from 'api';
+import { baseURL } from 'config';
 
 class UserService {
-  getRoles(id: string) {
-    return axiosClient.get(
-      `${baseURL}/identity/roles/GetRoleByUser?userId=${id}`
-    );
+  getRoles() {
+    return axiosClient.get(`${baseURL}/identity/roles/GetRoleCurrent`);
   }
 }
 

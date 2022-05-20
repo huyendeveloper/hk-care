@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
-import useAuth from 'hooks/useAuth';
 import { ReactNode, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -29,7 +28,7 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Danh sách sản phẩm',
-            path: '/hk_group/product/danh_sach',
+            path: '/hk_group/product/list',
             roles: ['hkl3'],
           },
           {
@@ -61,7 +60,7 @@ const getSections = (): SectionItem[] => [
           },
           {
             title: 'Nhà cung cấp',
-            path: '/404',
+            path: '/hk_group/product/supplier',
             roles: ['hkl3'],
           },
           {

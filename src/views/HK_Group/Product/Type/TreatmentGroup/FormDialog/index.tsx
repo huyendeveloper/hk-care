@@ -57,6 +57,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
       setValue('name', data?.name || '');
       setValue('description', data?.description || '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID]);
 
   return (

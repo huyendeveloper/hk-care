@@ -1,4 +1,3 @@
-import PageBreadcrumbs from 'components/common/PageBreadcrums';
 import PageWrapper from 'components/common/PageWrapper';
 import UserProfileTab from './UserProfileTab';
 

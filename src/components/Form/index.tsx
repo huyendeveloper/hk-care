@@ -1,3 +1,4 @@
+export { default as ControllerDatePicker } from './ControllerDatePicker';
 export { default as ControllerTextarea } from './ControllerTextarea';
 export { default as ControllerTextField } from './ControllerTextField';
 export { default as FormContent } from './FormContent';

@@ -1,4 +1,3 @@
-import SplashScreen from 'components/common/SplashScreen';
 import useForceUpdate from 'hooks/useForceUpdate';
 import { createContext, FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,8 +45,8 @@ const AuthProvider: FC = ({ children }) => {
       try {
         const accessToken = LocalStorage.get('accessToken');
 
-        if (accessToken && auth.userId) {
-          const { data } = await userService.getRoles(auth.userId);
+        if (accessToken) {
+          const { data } = await userService.getRoles();
 
           dispatch(updateRoles(data));
 
@@ -55,7 +54,7 @@ const AuthProvider: FC = ({ children }) => {
             user: {
               firstName: 'John',
               lastName: 'Smith',
-              userName: 'johndoe',
+              username: 'johndoe',
               fullName: 'John Smith',
               image: null,
               userRole: data,
@@ -96,3 +95,4 @@ const AuthProvider: FC = ({ children }) => {
 };
 
 export { AuthContext as default, AuthProvider };
+

@@ -9,28 +9,36 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Page from 'components/common/Page';
 import ControllerTextField from 'components/Form/ControllerTextField';
+import EntitySelecter from 'components/Form/EntitySelecter';
 import FormGroup from 'components/Form/FormGroup';
 import useMounted from 'hooks/useMounted';
 import useNotification from 'hooks/useNotification';
-import { ILogin } from 'interface';
-import { useState } from 'react';
+import { ILogin, ITenant } from 'interface';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login } from 'redux/slices';
 import { AppDispatch } from 'redux/store';
-import { LoginParams } from 'services/auth';
+import tenantService from 'services/tenant.service';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({
-  userName: yup
+  __tenant: yup
+    .string()
+    // .trim('Cannot include leading and trailing spaces')
+    .strict(true)
+    .required('Required')
+    .nullable()
+    .default(null),
+  username: yup
     .string()
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
     // .email('Email is invalid')
     .required('Vui lòng điền tên đăng nhập.')
     .default(''),
-  passWord: yup
+  password: yup
     .string()
     // .trim('Cannot include leading and trailing spaces')
     .strict(true)
@@ -44,12 +52,19 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const isMounted = useMounted();
   const navigate = useNavigate();
+  const [tenantList, setTenantList] = useState<ITenant[]>([]);
 
-  const { control, handleSubmit } = useForm<LoginParams>({
+  const { control, handleSubmit } = useForm<ILogin>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
+
+  useEffect(() => {
+    tenantService.getAll().then(({ data }) => {
+      setTenantList(data);
+    });
+  }, []);
 
   const onSubmit = async (data: ILogin) => {
     try {
@@ -108,10 +123,20 @@ const Login = () => {
                 alt="hk care logo"
                 src="/static/logo.png"
               />
-
+              <FormGroup fullWidth>
+                <EntitySelecter
+                  name="__tenant"
+                  required
+                  control={control}
+                  options={tenantList}
+                  renderLabel={(field) => field.name}
+                  placeholder=""
+                  label="Điểm bán"
+                />
+              </FormGroup>
               <FormGroup fullWidth>
                 <ControllerTextField
-                  name="userName"
+                  name="username"
                   control={control}
                   label="Tên đăng nhập"
                   required
@@ -127,7 +152,7 @@ const Login = () => {
               </FormGroup>
               <FormGroup fullWidth>
                 <ControllerTextField
-                  name="passWord"
+                  name="password"
                   control={control}
                   type="password"
                   label="Mật khẩu"

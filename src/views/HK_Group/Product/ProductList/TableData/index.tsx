@@ -1,12 +1,12 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Button,
   IconButton,
   Paper,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -14,8 +14,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
-import { DeleteDialog } from 'components/Dialog';
-import ControllerSwitch from 'components/Form/ControllerSwitch';
+import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TableHeader,
@@ -24,24 +23,16 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { useForceUpdate, useMounted } from 'hooks';
+import { useMounted } from 'hooks';
+import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { getListSanPham } from 'services/crud';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialog from '../FormDialog';
-import { SanPham } from '../type';
 
-const getCells = (): Cells<SanPham> => [
-  {
-    id: 'id',
-    label: 'STT',
-  },
-  { id: 'code', label: 'Mã sản phẩm' },
-  {
-    id: 'name',
-    label: 'Tên sản phẩm',
-  },
+const getCells = (): Cells<IProduct> => [
+  { id: 'id', label: 'STT' },
+  { id: 'name', label: 'Tên sản phẩm' },
   { id: 'group', label: 'Nhóm sản phẩm' },
   { id: 'priceBuy', label: 'Giá nhập' },
   { id: 'priceSale', label: 'Giá bán' },
@@ -59,11 +50,11 @@ const defaultFilters: FilterParams = {
 
 const TableData = () => {
   const mounted = useMounted();
-  const [rerender, onForceUpdate] = useForceUpdate();
 
   const [currentID, setCurrentID] = useState<number | null>(null);
-  const [dangDungList, setSanPhamList] = useState<SanPham[]>([]);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [productList, setProductList] = useState<IProduct[]>([]);
+  const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
+  const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
   const [totalRows, setTotalRows] = useState<number>(0);
@@ -72,28 +63,59 @@ const TableData = () => {
 
   const cells = useMemo(() => getCells(), []);
 
+  const fetchData = () => {
+    setProductList([
+      {
+        id: 1,
+        name: 'name1',
+        group: 'group1',
+        priceBuy: 1,
+        priceSale: 2,
+        active: true,
+      },
+      {
+        id: 2,
+        name: 'name2',
+        group: 'group2',
+        priceBuy: 2,
+        priceSale: 2,
+        active: false,
+      },
+      {
+        id: 3,
+        name: 'name3',
+        group: 'group3',
+        priceBuy: 3,
+        priceSale: 3,
+        active: true,
+      },
+    ]);
+    setLoading(false);
+    // productService
+    //   .getAll(filters)
+    //   .then(({ data }) => {
+    //     setProductList(data.items ?? []);
+    //     setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   })
+    //   .finally(() => {
+    //     setLoading(false);
+    //   });
+  };
+
   useEffect(() => {
     setLoading(true);
-    getListSanPham(filters)
-      .then((res) => {
-        setSanPhamList(res.data ?? []);
-        setTotalRows(res.total);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [filters, mounted, rerender]);
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const handleOnSort = (field: string) => {
-    const { sortBy, sortDirection } = filters;
-    const isAsc = sortBy === field && sortDirection === 'asc';
     setFilters((state) => ({
       ...state,
       sortBy: field,
-      sortDirection: isAsc ? 'desc' : 'asc',
     }));
   };
 
@@ -129,20 +151,54 @@ const TableData = () => {
     setOpenFormDialog(true);
   };
 
-  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenBlockDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
-    setOpenDeleteDialog(true);
+    setOpenBlockDialog(true);
   };
 
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
+  const handleOpenUnBlockDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenUnBlockDialog(true);
   };
 
-  const handleDelete = () => {
-    // handle delete
+  const handleCloseBlockDialog = () => {
+    setOpenBlockDialog(false);
   };
 
-  const renderAction = (row: SanPham) => {
+  const handleCloseUnBlockDialog = () => {
+    setOpenUnBlockDialog(false);
+  };
+
+  const handleCloseFormDialog = (updated: boolean | undefined) => {
+    setOpenFormDialog(false);
+    if (updated) {
+      fetchData();
+    }
+  };
+
+  const handleBlock = async () => {
+    if (!currentID) return;
+    try {
+      //   await productService.delete(currentID);
+      handleCloseBlockDialog();
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnBlock = async () => {
+    if (!currentID) return;
+    try {
+      //   await productService.delete(currentID);
+      handleCloseUnBlockDialog();
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const renderAction = (row: IProduct) => {
     return (
       <>
         <LinkIconButton to={`${row.id}`}>
@@ -155,9 +211,15 @@ const TableData = () => {
           <EditIcon />
         </IconButton>
 
-        <IconButton onClick={handleOpenDeleteDialog(row.id)}>
-          <DeleteIcon />
-        </IconButton>
+        {row.active ? (
+          <IconButton onClick={handleOpenBlockDialog(row.id)}>
+            <BlockIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+            <CheckIcon />
+          </IconButton>
+        )}
       </>
     );
   };
@@ -179,7 +241,7 @@ const TableData = () => {
         </Button>
       </TableSearchField>
 
-      <TableContent total={dangDungList.length} loading={loading}>
+      <TableContent total={productList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5 }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -191,20 +253,21 @@ const TableData = () => {
               />
 
               <TableBody>
-                {dangDungList.map((item) => {
-                  const { id, code, name, group, priceBuy, priceSale, active } =
-                    item;
+                {productList.map((item) => {
+                  const { id, name, group, priceBuy, priceSale, active } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>{id}</TableCell>
-                      <TableCell>{code}</TableCell>
                       <TableCell>{name}</TableCell>
                       <TableCell>{group}</TableCell>
                       <TableCell>{priceBuy}</TableCell>
                       <TableCell>{priceSale}</TableCell>
                       <TableCell>
-                        <Switch checked={active} />
-                        {active ? 'Có' : 'Không có'}
+                        {active ? (
+                          <Button>Có</Button>
+                        ) : (
+                          <Button color="error">Không</Button>
+                        )}
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
@@ -217,7 +280,7 @@ const TableData = () => {
 
         <TablePagination
           pageIndex={filters.pageIndex}
-          totalPages={Math.ceil(totalRows / filters.pageSize)}
+          totalPages={totalRows}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
@@ -225,20 +288,29 @@ const TableData = () => {
         />
       </TableContent>
 
-      <DeleteDialog
+      <BlockDialog
         id={currentID}
-        tableName='sản phẩm'
-        name={dangDungList.find((x) => x.id === currentID)?.name}
-        onClose={handleCloseDeleteDialog}
-        open={openDeleteDialog}
-        handleDelete={handleDelete}
+        tableName="sản phẩm"
+        name={productList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseBlockDialog}
+        open={openBlockDialog}
+        handleBlock={handleBlock}
+      />
+
+      <UnBlockDialog
+        id={currentID}
+        tableName="sản phẩm"
+        name={productList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseUnBlockDialog}
+        open={openUnBlockDialog}
+        handleUnBlock={handleUnBlock}
       />
 
       <FormDialog
         currentID={currentID}
-        data={dangDungList.find((x) => x.id === currentID)}
+        data={productList.find((x) => x.id === currentID)}
         open={openFormDialog}
-        handleClose={() => setOpenFormDialog(false)}
+        handleClose={handleCloseFormDialog}
       />
     </TableWrapper>
   );
