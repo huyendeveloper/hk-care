@@ -3,8 +3,8 @@ import { UserInfo } from 'types/user';
 import HttpClient from 'utils/HttpClient';
 
 export interface LoginParams {
-  userName: string;
-  passWord: string;
+  username: string;
+  password: string;
   remember: boolean;
 }
 
@@ -36,7 +36,7 @@ export const getUserDetails = async () => {
   //   data: {
   //     firstName: 'John',
   //     lastName: 'Smith',
-  //     userName: 'johndoe',
+  //     username: 'johndoe',
   //     fullName: 'John Smith',
   //     image: null,
   //     userRole: {

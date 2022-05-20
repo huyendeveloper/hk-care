@@ -2,7 +2,7 @@ import { Outlet, RouteObject } from 'react-router-dom';
 import {
   Measure,
   MeasureDetails,
-  ProductDetails, ProductGroup, ProductGroupDetails, ProductList, TreatmentGroup, TreatmentGroupDetails, Usage, UsageDetails
+   ProductGroup, ProductGroupDetails, ProductList, TreatmentGroup, TreatmentGroupDetails, Usage, UsageDetails, Supplier
 } from 'views/HK_Group/Product';
 
 const QLSanPhamRoutes: RouteObject = {
@@ -10,10 +10,10 @@ const QLSanPhamRoutes: RouteObject = {
   element: <Outlet />,
   children: [
     {
-      path: 'danh_sach',
+      path: 'list',
       children: [
         { index:true, element: <ProductList /> },
-        { path: ':id', element: <ProductDetails /> },
+        // { path: ':id', element: <ProductDetails /> },
       ],
     },
     {
@@ -48,6 +48,13 @@ const QLSanPhamRoutes: RouteObject = {
       children: [
         { index:true, element: <Measure /> },
         { path: ':id', element: <MeasureDetails /> },
+      ],
+    },
+    {
+      path: 'supplier',
+      children: [
+        { index:true, element: <Supplier /> },
+        // { path: ':id', element: <SupplierDetails /> },
       ],
     },
   ],

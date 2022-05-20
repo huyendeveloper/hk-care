@@ -32,8 +32,8 @@ const DashboardSidebar: FC<Props> = (props) => {
 
   const userInfo = {
     role: 'HK Group',
-    userName:   'Default name',
-    image:   '',
+    username: 'Default name',
+    image: '',
   };
 
   const content = (
@@ -75,7 +75,7 @@ const DashboardSidebar: FC<Props> = (props) => {
                 <UserAvatar src={userInfo.image} />
               </RouteLink>
               <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
-                <Typography variant="subtitle2">{userInfo.userName}</Typography>
+                <Typography variant="subtitle2">{userInfo.username}</Typography>
                 <Typography color="text.secondary" variant="caption">
                   {userInfo.role}
                 </Typography>

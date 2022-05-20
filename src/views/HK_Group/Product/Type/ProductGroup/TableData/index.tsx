@@ -22,7 +22,6 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { useMounted } from 'hooks';
 import { IProductGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import productGroupService from 'services/productGroup.service';
@@ -54,8 +53,6 @@ const defaultFilters: FilterParams = {
 };
 
 const TableData = () => {
-  const mounted = useMounted();
-
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);

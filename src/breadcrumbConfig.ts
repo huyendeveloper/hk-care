@@ -14,11 +14,11 @@ const breadcrumbConfig = [
   },
   {
     breadcrumb: 'Danh sách sản phẩm',
-    path: '/hk_group/product/danh_sach',
+    path: '/hk_group/product/list',
   },
   {
     breadcrumb: 'Chi tiết danh sách sản phẩm',
-    path: '/hk_group/product/danh_sach/:id',
+    path: '/hk_group/product/list/:id',
   },
   {
     breadcrumb: 'Nhóm sản phẩm',
@@ -51,6 +51,10 @@ const breadcrumbConfig = [
   {
     breadcrumb: 'Chi tiết đơn vị đo lường',
     path: '/hk_group/product/measure/:id',
+  },
+  {
+    breadcrumb: 'Nhà cung cấp',
+    path: '/hk_group/product/supplier',
   },
 ];
 

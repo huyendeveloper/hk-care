@@ -10,7 +10,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
@@ -19,10 +19,9 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { useMounted } from 'hooks';
 import { IUsage } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import usageService from 'services/usage.service';
@@ -54,8 +53,6 @@ const defaultFilters: FilterParams = {
 };
 
 const TableData = () => {
-  const mounted = useMounted();
-
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [usageList, setUsageList] = useState<IUsage[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
@@ -231,7 +228,7 @@ const TableData = () => {
 
       <DeleteDialog
         id={currentID}
-        tableName='dạng dùng'
+        tableName="dạng dùng"
         name={usageList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

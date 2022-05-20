@@ -6,21 +6,17 @@ import { UserInfo } from 'types';
 import LocalStorage from 'utils/LocalStorage';
 
 interface IInitialState {
-  userId: string | null;
   userRoles: string[];
   user: UserInfo | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
-  accessToken: string | null;
 }
 
 const initialState: IInitialState = {
-  userId: null,
   userRoles: [],
   user: null,
   isAuthenticated: false,
   isInitialized: false,
-  accessToken: null,
 };
 
 export const login = createAsyncThunk(
@@ -29,18 +25,19 @@ export const login = createAsyncThunk(
     try {
       const res = await authService.login(body);
 
-      if (res.data.access_Token) {
-        const access_Token = res.data.access_Token as string;
-        const userId = res.data.userId as string;
+      if (res.data.access_token) {
+        const access_Token = res.data.access_token as string;
+
         LocalStorage.set('accessToken', access_Token);
-        const { data } = await userService.getRoles(userId);
+        const { data } = await userService.getRoles();
 
         return {
           access_Token,
-          userId,
+
           userRoles: data,
         };
       }
+
       return rejectWithValue('Login fail');
     } catch (error) {
       return rejectWithValue(error);
@@ -58,6 +55,7 @@ const authSlice = createSlice({
     logout: (state) => {
       LocalStorage.remove('accessToken');
       state.isAuthenticated = false;
+      state.userRoles = [];
     },
   },
   extraReducers: (builder) => {
@@ -67,16 +65,12 @@ const authSlice = createSlice({
         state,
         action: PayloadAction<{
           access_Token: string;
-          userId: string;
+
           userRoles: string[];
         }>
       ) => {
-        const access_Token = action.payload.access_Token;
-        const userId = action.payload.userId;
         const userRoles = action.payload.userRoles;
 
-        state.accessToken = access_Token;
-        state.userId = userId;
         state.userRoles = userRoles;
         state.isAuthenticated = true;
         state.isInitialized = true;
@@ -84,9 +78,6 @@ const authSlice = createSlice({
     );
 
     builder.addCase(login.rejected, (state) => {
-      state.accessToken = null;
-      state.userId = null;
-      // state.isAuthenticated = false;
       state.isInitialized = true;
     });
   },

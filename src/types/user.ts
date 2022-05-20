@@ -4,7 +4,7 @@ export interface UserInfo {
   lastName: string;
   fullName: string;
   image: string | null;
-  userName: string;
+  username: string;
   userRole: string[];
 }
 export interface UserRole {
