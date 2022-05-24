@@ -38,17 +38,21 @@ export interface IMeasure {
 }
 
 export interface ISupplier {
-  id: number;
   name: string;
-  address?: string;
-  contactName?: string;
-  phone: string;
-  status: boolean;
-  phone2?: string;
-  description?: string;
-  fax?: string;
-  taxCode?: string;
-  certificate: string;
+  address: string;
+  nameContact: string;
+  telephoneNumber: string;
+  mobileNumber: string;
+  fax: string;
+  taxCode: string;
+  bussinessLicense: any;
+  description: string;
+  active: number;
+  lastModificationTime: Date;
+  lastModifierId: Date;
+  creationTime: string;
+  creatorId: string;
+  id: number;
 }
 
 export interface IProduct {
@@ -59,6 +63,10 @@ export interface IProduct {
   priceSale: number;
   active: boolean;
   date?: Date;
+  productGroup?: number;
+  treatmentGroup?: number;
+  usage?: number;
+  phone?: number;
 }
 
 export interface ITenant {

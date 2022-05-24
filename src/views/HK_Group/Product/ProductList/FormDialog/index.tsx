@@ -1,17 +1,19 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import AddIcon from '@mui/icons-material/Add';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
+  Box,
+  Button,
   Dialog,
   Grid,
-  Button,
-  Box,
-  useMediaQuery,
-  useTheme,
   IconButton,
   Stack,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   ControllerDatePicker,
+  ControllerImageField,
   ControllerTextarea,
   ControllerTextField,
   FormContent,
@@ -21,14 +23,18 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { IProduct } from 'interface';
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import AddIcon from '@mui/icons-material/Add';
 import EntitySelecter from 'components/Form/EntitySelecter';
+import { defaultFilters } from 'constants/defaultFilters';
+import { typeNumber } from 'constants/typeInput';
+import { IProduct, IProductGroup, ITreatmentGroup, IUsage } from 'interface';
 import { mockSelectFieldOptions } from 'mock-axios';
-import cropConfig from 'constants/cropConfig';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import productGroupService from 'services/productGroup.service';
+import treatmentGroupService from 'services/treatmentGroup.service';
+import usageService from 'services/usage.service';
+import { FilterParams } from 'types';
+import * as yup from 'yup';
 
 interface Props {
   open: boolean;
@@ -45,13 +51,19 @@ const validationSchema = yup.object().shape({
 const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [images, setImages] = React.useState({});
+  const [image, setImage] = useState<Blob | null | undefined>();
+  const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
+  const [treatmentGroupList, setTreatmentGroupList] = useState<
+    ITreatmentGroup[]
+  >([]);
+  const [usageList, setUsageList] = useState<IUsage[]>([]);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
     reset,
   } = useForm<IProduct>({
     mode: 'onChange',
@@ -61,11 +73,6 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
 
   const onSubmit = async (payload: IProduct) => {
     try {
-      // if (payload.id) {
-      //   await measureService.update(payload);
-      // } else {
-      //   await measureService.create(payload);
-      // }
       reset();
       handleClose(true);
     } catch (error) {
@@ -82,8 +89,52 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
       setValue('priceBuy', data?.priceBuy || 0);
       setValue('priceSale', data?.priceSale || 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID]);
+
+  const fetchProductGroupList = (value: string) => {
+    const filters: FilterParams = {
+      ...defaultFilters,
+      searchText: value,
+    };
+
+    productGroupService
+      .getAll(filters)
+      .then(({ data }) => {
+        setProductGroupList(data.items);
+      })
+      .catch((err) => {})
+      .finally(() => {});
+  };
+
+  const fetchTreatmentGroupList = (value: string) => {
+    const filters: FilterParams = {
+      ...defaultFilters,
+      searchText: value,
+    };
+
+    treatmentGroupService
+      .getAll(filters)
+      .then(({ data }) => {
+        setTreatmentGroupList(data.items);
+      })
+      .catch((err) => {})
+      .finally(() => {});
+  };
+
+  const fetchUsageList = (value: string) => {
+    const filters: FilterParams = {
+      ...defaultFilters,
+      searchText: value,
+    };
+
+    usageService
+      .getAll(filters)
+      .then(({ data }) => {
+        setUsageList(data.items);
+      })
+      .catch((err) => {})
+      .finally(() => {});
+  };
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -96,17 +147,6 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
-              {currentID && (
-                <Grid item xs={12} md={6}>
-                  <Grid item xs={12}>
-                    <FormLabel title="Mã sản phẩm" name="id" />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ControllerTextField name="id" disabled control={control} />
-                  </Grid>
-                </Grid>
-              )}
-              {!mobile && !currentID && <Grid item xs={12} md={6}></Grid>}
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel required title="Tên sản phẩm" name="name" />
@@ -115,67 +155,75 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                   <ControllerTextField name="name" control={control} />
                 </Grid>
               </Grid>
+              <Grid item xs={12} md={6}></Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Nhóm sản phẩm" name="priceBuy" />
+                  <FormLabel
+                    required
+                    title="Nhóm sản phẩm"
+                    name="productGroup"
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <EntitySelecter
-                    name="priceBuy"
+                    name="productGroup"
                     control={control}
-                    options={mockSelectFieldOptions}
+                    options={productGroupList}
                     renderLabel={(field) => field.name}
+                    handleChangeInput={fetchProductGroupList}
                     placeholder=""
                   />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Số đăng ký" name="name" />
+                  <FormLabel title="Số đăng ký" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Nhóm điều trị" name="name" />
+                  <FormLabel required title="Nhóm điều trị" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
                   <EntitySelecter
-                    name="priceBuy"
+                    name="treatmentGroup"
                     control={control}
-                    options={mockSelectFieldOptions}
+                    options={treatmentGroupList}
                     renderLabel={(field) => field.name}
+                    handleChangeInput={fetchTreatmentGroupList}
                     placeholder=""
                   />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Số lô" name="name" />
+                  <FormLabel title="Số lô" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Dạng dùng" name="name" />
+                  <FormLabel required title="Dạng dùng" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
                   <EntitySelecter
-                    name="priceBuy"
+                    name="usage"
                     control={control}
-                    options={mockSelectFieldOptions}
+                    options={usageList}
                     renderLabel={(field) => field.name}
+                    handleChangeInput={fetchUsageList}
                     placeholder=""
                   />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Hạn sử dụng" name="name" />
+                  <FormLabel title="Hạn sử dụng" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerDatePicker
@@ -187,40 +235,40 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               </Grid>
               <Grid item xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Đơn vị" name="name" />
+                  <FormLabel required title="Đơn vị" name="phone" />
                 </Grid>
                 <Grid container spacing={2}>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                   <Grid item xs={2}>
-                    <ControllerTextField name="name" control={control} />
+                    <ControllerTextField name="phone" control={control} />
                   </Grid>
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Nhà sản xuất" name="name" />
+                  <FormLabel title="Nhà sản xuất" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Ngày sản xuất" name="name" />
+                  <FormLabel title="Ngày sản xuất" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerDatePicker
@@ -232,31 +280,32 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Giá nhập" name="name" />
+                  <FormLabel title="Giá nhập" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Giá bán" name="name" />
+                  <FormLabel title="Giá bán" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel title="Nhà cung cấp" name="name" />
+                  <FormLabel title="Nhà cung cấp" name="phone" />
                 </Grid>
                 <Stack flexDirection={'row'}>
                   <Box sx={{ width: '100%' }}>
                     <EntitySelecter
-                      name="priceBuy"
+                      name="usage"
                       control={control}
-                      options={mockSelectFieldOptions}
+                      options={usageList}
                       renderLabel={(field) => field.name}
+                      handleChangeInput={fetchUsageList}
                       placeholder=""
                     />
                   </Box>
@@ -267,57 +316,53 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               </Grid>
               <Grid item xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel title="Quy cách đóng gói" name="name" />
+                  <FormLabel title="Quy cách đóng gói" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid item xs={12}>
-                  <FormLabel title="Hoạt chất" name="name" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Hàm lượng" name="name" />
+                  <FormLabel title="Hoạt chất" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12}>
                 <Grid item xs={12}>
-                  <FormLabel required title="Liều dùng" name="name" />
+                  <FormLabel required title="Hàm lượng" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="name" control={control} />
+                  <ControllerTextField name="phone" control={control} />
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <Grid item xs={12}>
+                  <FormLabel required title="Liều dùng" name="phone" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField name="phone" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Hình ảnh sản phẩm" name="name" />
+                  <FormLabel title="Hình ảnh sản phẩm" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField
-                    type="file"
-                    name="name"
-                    control={control}
-                  />
+                  <ControllerImageField image={image} setImage={setImage} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Ghi chú" name="name" />
+                  <FormLabel title="Ghi chú" name="phone" />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerTextarea
-                    maxRows={5}
-                    minRows={5}
-                    name="name"
+                    maxRows={11}
+                    minRows={11}
+                    name="phone"
                     control={control}
                   />
                 </Grid>

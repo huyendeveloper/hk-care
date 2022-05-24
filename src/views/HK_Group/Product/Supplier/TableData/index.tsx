@@ -23,8 +23,10 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import supplierService from 'services/supplier.service';
 // import supplierService from 'services/supplier.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
@@ -34,19 +36,11 @@ const getCells = (): Cells<ISupplier> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Tên nhà cung cấp' },
   { id: 'address', label: 'Địa chỉ' },
-  { id: 'contactName', label: 'Người liên hệ' },
-  { id: 'phone', label: 'Số điện thoại' },
-  { id: 'status', label: 'Trạng thái' },
-  { id: 'status', label: 'Thao tác' },
+  { id: 'nameContact', label: 'Người liên hệ' },
+  { id: 'telephoneNumber', label: 'Số điện thoại' },
+  { id: 'active', label: 'Trạng thái' },
+  { id: 'active', label: 'Thao tác' },
 ];
-
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
 
 const TableData = () => {
   const [currentID, setCurrentID] = useState<number | null>(null);
@@ -62,52 +56,17 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = () => {
-    setSupplierList([
-      {
-        id: 1,
-        name: 'name1',
-        address: 'address1',
-        contactName: 'contactName1',
-        phone: 'phone1',
-        phone2: 'phone2',
-        status: true,
-        description: 'description1',
-        fax: 'fax1',
-        taxCode: 'taxCode1',
-        certificate: 'certificate1',
-      },
-      {
-        id: 2,
-        name: 'name2',
-        address: 'address2',
-        contactName: 'contactName2',
-        phone: 'phone2',
-        status: false,
-        certificate: 'certificate2',
-      },
-      {
-        id: 3,
-        name: 'name3',
-        address: 'address3',
-        contactName: 'contactName3',
-        phone: 'phone3',
-        status: true,
-        certificate: 'certificate3',
-      },
-    ]);
     setLoading(false);
-    // supplierService
-    //   .getAll(filters)
-    //   .then(({ data }) => {
-    //     setSupplierList(data.items ?? []);
-    //     setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
+    supplierService
+      .getAll(filters)
+      .then(({ data }) => {
+        setSupplierList(data.items ?? []);
+        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
+      })
+      .catch((err) => {})
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -184,7 +143,7 @@ const TableData = () => {
   const handleBlock = async () => {
     if (!currentID) return;
     try {
-      //   await productService.delete(currentID);
+      await supplierService.changeStatus(currentID, 2);
       handleCloseBlockDialog();
       fetchData();
     } catch (error) {
@@ -195,7 +154,7 @@ const TableData = () => {
   const handleUnBlock = async () => {
     if (!currentID) return;
     try {
-      //   await productService.delete(currentID);
+      await supplierService.changeStatus(currentID, 1);
       handleCloseUnBlockDialog();
       fetchData();
     } catch (error) {
@@ -216,7 +175,7 @@ const TableData = () => {
           <EditIcon />
         </IconButton>
 
-        {row.status ? (
+        {row.active === 1 ? (
           <IconButton onClick={handleOpenBlockDialog(row.id)}>
             <BlockIcon />
           </IconButton>
@@ -259,17 +218,23 @@ const TableData = () => {
 
               <TableBody>
                 {supplierList.map((item) => {
-                  const { id, name, address, contactName, phone, status } =
-                    item;
+                  const {
+                    id,
+                    name,
+                    address,
+                    nameContact,
+                    telephoneNumber,
+                    active,
+                  } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>{id}</TableCell>
                       <TableCell>{name}</TableCell>
                       <TableCell>{address}</TableCell>
-                      <TableCell>{contactName}</TableCell>
-                      <TableCell>{phone}</TableCell>
+                      <TableCell>{nameContact}</TableCell>
+                      <TableCell>{telephoneNumber}</TableCell>
                       <TableCell>
-                        {status ? (
+                        {active === 1 ? (
                           <Button>Hoạt động</Button>
                         ) : (
                           <Button color="error">Không hoạt động</Button>

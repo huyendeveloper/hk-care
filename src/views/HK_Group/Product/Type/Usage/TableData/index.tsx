@@ -10,7 +10,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
@@ -19,9 +19,10 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
 import { IUsage } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import usageService from 'services/usage.service';
@@ -43,14 +44,6 @@ const getCells = (): Cells<IUsage> => [
     label: 'Thao tác',
   },
 ];
-
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
 
 const TableData = () => {
   const [currentID, setCurrentID] = useState<number | null>(null);

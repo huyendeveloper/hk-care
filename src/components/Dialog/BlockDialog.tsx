@@ -55,7 +55,7 @@ const BlockDialog = (props: Props) => {
           </Button>
 
           <LoadingButton color="error" onClick={handleBlock}>
-            Xóa
+            Xác nhận
           </LoadingButton>
         </Stack>
       </Box>

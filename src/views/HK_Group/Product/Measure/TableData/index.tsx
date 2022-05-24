@@ -22,9 +22,13 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { useMounted } from 'hooks';
+import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { IMeasure } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllMeasure } from 'redux/slices/measure';
+import { RootState } from 'redux/store';
 import measureService from 'services/measure.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
@@ -45,46 +49,35 @@ const getCells = (): Cells<IMeasure> => [
   },
 ];
 
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
-
 const TableData = () => {
-  const mounted = useMounted();
-
+  const setNotification = useNotification();
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading } = useSelector((state: RootState) => state.measure);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const dispatch = useDispatch();
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    measureService
-      .getAll(filters)
-      .then(({ data }) => {
-        setMeasureList(data.items ?? []);
-        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllMeasure(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Tên đăng nhập hoặc mật khẩu sai!',
       });
+      return;
+    }
+
+    setMeasureList(payload.measureList);
+    setTotalRows(Math.ceil(payload.totalCount / filters.pageSize));
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);

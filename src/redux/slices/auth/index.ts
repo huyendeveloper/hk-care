@@ -10,6 +10,7 @@ interface IInitialState {
   user: UserInfo | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
+  loading: boolean;
 }
 
 const initialState: IInitialState = {
@@ -17,6 +18,7 @@ const initialState: IInitialState = {
   user: null,
   isAuthenticated: false,
   isInitialized: false,
+  loading: false,
 };
 
 export const login = createAsyncThunk(
@@ -27,13 +29,11 @@ export const login = createAsyncThunk(
 
       if (res.data.access_token) {
         const access_Token = res.data.access_token as string;
-
         LocalStorage.set('accessToken', access_Token);
         const { data } = await userService.getRoles();
 
         return {
           access_Token,
-
           userRoles: data,
         };
       }
@@ -59,26 +59,30 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(login.pending, (state) => {
+      state.loading = true;
+    });
+
     builder.addCase(
       login.fulfilled,
       (
         state,
         action: PayloadAction<{
           access_Token: string;
-
           userRoles: string[];
         }>
       ) => {
         const userRoles = action.payload.userRoles;
-
         state.userRoles = userRoles;
         state.isAuthenticated = true;
         state.isInitialized = true;
+        state.loading = false;
       }
     );
 
     builder.addCase(login.rejected, (state) => {
       state.isInitialized = true;
+      state.loading = false;
     });
   },
 });
