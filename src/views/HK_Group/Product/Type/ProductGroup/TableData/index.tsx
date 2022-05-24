@@ -22,6 +22,7 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
 import { IProductGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import productGroupService from 'services/productGroup.service';
@@ -43,14 +44,6 @@ const getCells = (): Cells<IProductGroup> => [
     label: 'Thao tác',
   },
 ];
-
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
 
 const TableData = () => {
   const [currentID, setCurrentID] = useState<number | null>(null);

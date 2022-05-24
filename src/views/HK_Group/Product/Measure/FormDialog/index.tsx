@@ -14,6 +14,7 @@ import {
 import { IMeasure } from 'interface';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import measureService from 'services/measure.service';
 import * as yup from 'yup';
 
@@ -25,11 +26,17 @@ interface Props {
 }
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Required').strict(true).default(''),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên đơn vị đo lường.')
+    .strict(true)
+    .default(''),
   description: yup.string().strict(true).default(''),
 });
 
 const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
+  const dispatch = useDispatch();
+
   const { control, handleSubmit, setValue, reset } = useForm<IMeasure>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -65,8 +72,8 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
         <FormHeader
           title={
             currentID
-              ? 'Chỉnh sửa thông tin nhóm sản phẩm'
-              : 'Thêm mới nhóm sản phẩm'
+              ? 'Chỉnh sửa thông tin đơn vị đo lường'
+              : 'Thêm mới đơn vị đo lường'
           }
         />
         <FormContent>
@@ -75,7 +82,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               {currentID && (
                 <>
                   <Grid item xs={12}>
-                    <FormLabel title="Mã nhóm sản phẩm" name="id" />
+                    <FormLabel title="Mã đơn vị đo lường" name="id" />
                   </Grid>
                   <Grid item xs={12}>
                     <ControllerTextField name="id" disabled control={control} />
@@ -83,7 +90,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                 </>
               )}
               <Grid item xs={12}>
-                <FormLabel required title="Tên nhóm sản phẩm" name="name" />
+                <FormLabel required title="Tên đơn vị đo lường" name="name" />
               </Grid>
               <Grid item xs={12}>
                 <ControllerTextField name="name" control={control} />

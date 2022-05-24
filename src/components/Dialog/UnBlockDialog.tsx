@@ -55,7 +55,7 @@ const UnBlockDialog = (props: Props) => {
           </Button>
 
           <LoadingButton color="error" onClick={handleUnBlock}>
-            Xóa
+            Xác nhận
           </LoadingButton>
         </Stack>
       </Box>

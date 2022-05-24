@@ -1,10 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
+  Box,
+  Button,
   Dialog,
   Grid,
-  Button,
-  Box,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -18,9 +18,11 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
 
 interface Props {
@@ -33,11 +35,14 @@ interface Props {
 const validationSchema = yup.object().shape({
   name: yup.string().required('Required').strict(true).default(''),
   description: yup.string().strict(true).default(''),
+  telephoneNumber: yup.string().required('Required').strict(true).default(''),
 });
 
 const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [fileValue, setFileValue] = React.useState<File | object>();
+  const setNotification = useNotification();
 
   const { control, handleSubmit, setValue, reset } = useForm<ISupplier>({
     mode: 'onChange',
@@ -45,36 +50,60 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
+  const handleChangeFile = (e: any) => {
+    const file = e?.target.files[0];
+    setFileValue(file);
+  };
+
   const onSubmit = async (payload: ISupplier) => {
+    // @ts-ignore
+    if (!fileValue?.name) {
+      setNotification({
+        message: 'Chưa có giấy chứng nhận',
+        severity: 'warning',
+      });
+      return;
+    }
     try {
-      // if (payload.id) {
-      //   await measureService.update(payload);
-      // } else {
-      //   await measureService.create(payload);
-      // }
+      if (payload.id) {
+        await supplierService.update(payload, fileValue);
+      } else {
+        await supplierService.create(payload, fileValue);
+      }
       reset();
+      setFileValue(undefined);
       handleClose(true);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const getFile = async (bussinessLicense: string) => {
+    const { data } = await supplierService.getFile(bussinessLicense);
+    setFileValue({ name: data });
+
+    setValue('bussinessLicense', { name: data });
+  };
+
   useEffect(() => {
     reset();
+    setFileValue(undefined);
     if (currentID) {
       setValue('id', currentID);
       setValue('name', data?.name || '');
       setValue('address', data?.address || '');
-      setValue('contactName', data?.contactName || '');
-      setValue('phone', data?.phone || '');
-      setValue('phone2', data?.phone2 || '');
+      setValue('nameContact', data?.nameContact || '');
+      setValue('telephoneNumber', data?.telephoneNumber || '');
+      setValue('mobileNumber', data?.mobileNumber || '');
       setValue('description', data?.description || '');
       setValue('fax', data?.fax || '');
       setValue('taxCode', data?.taxCode || '');
-      setValue('certificate', data?.certificate || '');
+      if (data?.bussinessLicense) {
+        getFile(data?.bussinessLicense);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID]);
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -89,16 +118,6 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
-              {currentID && (
-                <Grid item xs={12} md={6}>
-                  <Grid item xs={12}>
-                    <FormLabel title="Mã nhà cung cấp" name="id" />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ControllerTextField name="id" disabled control={control} />
-                  </Grid>
-                </Grid>
-              )}
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel required title="Tên nhà cung cấp" name="name" />
@@ -107,7 +126,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                   <ControllerTextField name="name" control={control} />
                 </Grid>
               </Grid>
-              {!mobile && !currentID && <Grid item xs={12} md={6}></Grid>}
+              {!mobile && <Grid item xs={12} md={6}></Grid>}
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel title="Địa chỉ" name="address" />
@@ -118,28 +137,35 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Người liên hệ" name="contactName" />
+                  <FormLabel title="Người liên hệ" name="nameContact" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="contactName" control={control} />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel required title="Điện thoại" name="phone" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField name="phone" control={control} />
+                  <ControllerTextField name="nameContact" control={control} />
                 </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Di động" name="phone2" />
+                  <FormLabel
+                    required
+                    title="Điện thoại"
+                    name="telephoneNumber"
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="phone2" control={control} />
+                  <ControllerTextField
+                    name="telephoneNumber"
+                    control={control}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Grid item xs={12}>
+                  <FormLabel title="Di động" name="mobileNumber" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField name="mobileNumber" control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -164,13 +190,23 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                     <FormLabel
                       required
                       title="Đính kèm giấy chứng nhận"
-                      name="certificate"
+                      name="bussinessLicense"
                     />
                   </Grid>
                 </Box>
 
                 <Grid item xs={12}>
-                  <ControllerTextField name="certificate" control={control} />
+                  <Button variant="contained" fullWidth component="label">
+                    {/* @ts-ignore */}
+                    {fileValue?.name ? fileValue.name : 'Chọn file'}
+                    <input
+                      type="file"
+                      onChange={handleChangeFile}
+                      name="bussinessLicense"
+                      accept="application/pdf"
+                      hidden
+                    />
+                  </Button>
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>

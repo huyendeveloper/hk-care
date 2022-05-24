@@ -23,6 +23,7 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
 import { useMounted } from 'hooks';
 import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
@@ -40,17 +41,7 @@ const getCells = (): Cells<IProduct> => [
   { id: 'active', label: 'Thao tác' },
 ];
 
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
-
 const TableData = () => {
-  const mounted = useMounted();
-
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [productList, setProductList] = useState<IProduct[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);

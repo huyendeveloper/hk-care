@@ -56,6 +56,10 @@ const breadcrumbConfig = [
     breadcrumb: 'Nhà cung cấp',
     path: '/hk_group/product/supplier',
   },
+  {
+    breadcrumb: 'Chi tiết nhà cung cấp',
+    path: '/hk_group/product/supplier/:id',
+  },
 ];
 
 export default breadcrumbConfig;

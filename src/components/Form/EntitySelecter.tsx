@@ -3,8 +3,10 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+import { useDebounce } from 'react-use';
 
 export interface Label extends FieldValues {
   name: string;
@@ -24,6 +26,7 @@ interface Props<T, O extends FieldValues[]>
   placeholder: string;
   forcePopupIcon?: boolean;
   noOptionsText?: string;
+  handleChangeInput?: (value: string) => void;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -42,8 +45,11 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     forcePopupIcon,
     noOptionsText,
     getOptionDisabled,
+    handleChangeInput,
     ...rest
   } = props;
+
+  const [valueInput, setValueInput] = useState<string>('');
 
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.id;
@@ -51,6 +57,14 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     acc[id] = { id, name: renderLabel(option), caption };
     return acc;
   }, {});
+
+  useDebounce(
+    () => {
+      handleChangeInput && handleChangeInput(valueInput);
+    },
+    1500,
+    [valueInput]
+  );
 
   return (
     <Controller
@@ -71,6 +85,9 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
               error={Boolean(error)}
               helperText={error?.message && error.message}
               placeholder={placeholder}
+              onChange={(e) => {
+                setValueInput(e.target.value);
+              }}
               {...params}
               {...rest}
             />
