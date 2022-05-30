@@ -22,7 +22,7 @@ const TableContent: FC<Props> = (props) => {
       {total === 0 ? (
         <Box sx={{ display: 'grid', placeContent: 'center' }}>
           <Typography variant="h6" color="text.secondary">
-            No records to display
+            Không tìm thấy thông tin tìm kiếm
           </Typography>
         </Box>
       ) : (

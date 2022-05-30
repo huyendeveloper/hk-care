@@ -31,26 +31,30 @@ const validationSchema = yup.object().shape({
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   lastName: yup
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   email: yup
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   mobileNumber: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .matches(Regexs.phone, 'yupErrorMessage.onlyNumber')
     .default(''),
-  roleId: yup.number().required('Required').nullable().default(null),
+  roleId: yup
+    .number()
+    .required('Vui lòng nhập trường này.')
+    .nullable()
+    .default(null),
 });
 
 interface FormData {

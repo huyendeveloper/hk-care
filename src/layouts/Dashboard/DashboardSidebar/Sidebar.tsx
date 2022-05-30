@@ -19,7 +19,7 @@ interface SectionItem {
 const getSections = (): SectionItem[] => [
   {
     title: 'HK_Group',
-    roles: ['hkl1', 'hkl2', 'hkl3', 'hkl2_1'],
+    roles: ['hkl1', 'hkl2', 'hkl3'],
     children: [
       {
         title: 'Quản lý sản phẩm',
@@ -78,7 +78,7 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Quản trị người dùng',
         path: '/404',
-        roles: ['hkl1', 'hkl2', 'hkl2_1'],
+        roles: ['hkl1', 'hkl2'],
       },
     ],
   },
@@ -128,17 +128,17 @@ const getSections = (): SectionItem[] => [
           {
             title: 'Xuất kho',
             path: '/404',
-            roles: [],
+            roles: ['hkl2_1_2'],
           },
           {
             title: 'Lập dự trù nhập kho',
             path: '/404',
-            roles: [],
+            roles: ['hkl2_1_2'],
           },
           {
             title: 'Biên bản kiểm kê kho',
             path: '/404',
-            roles: [],
+            roles: ['hkl2_1_2'],
           },
         ],
       },
@@ -146,16 +146,28 @@ const getSections = (): SectionItem[] => [
         title: 'Quản lý bán hàng',
         path: '/404',
         roles: ['hkl2_1_3'],
+        children: [
+          {
+            title: 'Hóa đơn bán hàng',
+            path: '/404',
+            roles: ['hkl2_1_3'],
+          },
+          {
+            title: 'Danh sách khách hàng',
+            path: '/404',
+            roles: ['hkl2_1_3'],
+          },
+        ],
       },
       {
         title: 'Quản lý vận hành',
         path: '/404',
-        roles: ['hkl2_1_4'],
+        roles: ['hkl2_1_4', 'hkl2_1_1', 'hkl2_1'],
         children: [
           {
             title: 'Danh sách nhân viên',
             path: '/404',
-            roles: ['hkl2_1_3', 'hkl2_1_4'],
+            roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
           },
         ],
       },

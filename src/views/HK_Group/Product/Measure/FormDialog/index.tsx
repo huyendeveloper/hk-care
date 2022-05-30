@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Dialog, Grid, Button } from '@mui/material';
+import { Button, Dialog, Grid } from '@mui/material';
 import {
   ControllerTextarea,
   ControllerTextField,
@@ -11,11 +11,13 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import { useNotification } from 'hooks';
 import { IMeasure } from 'interface';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import measureService from 'services/measure.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { createMeasure, updateMeasure } from 'redux/slices/measure';
+import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 interface Props {
@@ -23,19 +25,23 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   data?: IMeasure;
+  disable: boolean;
 }
 
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên đơn vị đo lường.')
+    .max(100, 'Tên đơn vị đo lường không quá 100 ký tự.')
     .strict(true)
     .default(''),
   description: yup.string().strict(true).default(''),
 });
 
-const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
+const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
   const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const { loading } = useSelector((state: RootState) => state.measure);
 
   const { control, handleSubmit, setValue, reset } = useForm<IMeasure>({
     mode: 'onChange',
@@ -43,18 +49,34 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (payload: IMeasure) => {
-    try {
-      if (payload.id) {
-        await measureService.update(payload);
-      } else {
-        await measureService.create(payload);
+  const onSubmit = async (data: IMeasure) => {
+    if (data.id) {
+      // @ts-ignore
+      const { error, payload } = await dispatch(updateMeasure(data));
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi cập nhật đơn vị đo lường!',
+        });
+        return;
       }
-      reset();
-      handleClose(true);
-    } catch (error) {
-      console.error(error);
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+    } else {
+      // @ts-ignore
+      const { error, payload } = await dispatch(createMeasure(data));
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi thêm đơn vị đo lường!',
+        });
+        return;
+      }
+      setNotification({ message: 'Thêm thành công', severity: 'success' });
     }
+
+    reset();
+    handleClose(true);
   };
 
   useEffect(() => {
@@ -64,14 +86,17 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
       setValue('name', data?.name || '');
       setValue('description', data?.description || '');
     }
-  }, [currentID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} onClose={() => handleClose()}>
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            currentID
+            disable
+              ? 'Xem chi tiết đơn vị đo lường'
+              : currentID
               ? 'Chỉnh sửa thông tin đơn vị đo lường'
               : 'Thêm mới đơn vị đo lường'
           }
@@ -79,21 +104,15 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
-              {currentID && (
-                <>
-                  <Grid item xs={12}>
-                    <FormLabel title="Mã đơn vị đo lường" name="id" />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ControllerTextField name="id" disabled control={control} />
-                  </Grid>
-                </>
-              )}
               <Grid item xs={12}>
                 <FormLabel required title="Tên đơn vị đo lường" name="name" />
               </Grid>
               <Grid item xs={12}>
-                <ControllerTextField name="name" control={control} />
+                <ControllerTextField
+                  disabled={disable}
+                  name="name"
+                  control={control}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Ghi chú" name="description" />
@@ -102,6 +121,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                 <ControllerTextarea
                   maxRows={5}
                   minRows={5}
+                  disabled={disable}
                   name="description"
                   control={control}
                 />
@@ -112,9 +132,13 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
 
         <FormFooter>
           <Button variant="outlined" onClick={() => handleClose()}>
-            Hủy
+            {disable ? 'Đóng' : 'Hủy'}
           </Button>
-          <LoadingButton type="submit">Lưu</LoadingButton>
+          {!disable && (
+            <LoadingButton loading={loading} type="submit">
+              Lưu
+            </LoadingButton>
+          )}
         </FormFooter>
       </FormPaperGrid>
     </Dialog>

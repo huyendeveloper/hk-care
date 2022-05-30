@@ -24,9 +24,12 @@ import {
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useMounted } from 'hooks';
+import { useNotification } from 'hooks';
 import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeStatus, getAllProduct } from 'redux/slices/product';
+import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialog from '../FormDialog';
@@ -34,71 +37,51 @@ import FormDialog from '../FormDialog';
 const getCells = (): Cells<IProduct> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Tên sản phẩm' },
-  { id: 'group', label: 'Nhóm sản phẩm' },
-  { id: 'priceBuy', label: 'Giá nhập' },
-  { id: 'priceSale', label: 'Giá bán' },
-  { id: 'active', label: 'Hoạt động' },
-  { id: 'active', label: 'Thao tác' },
+  { id: 'productGroup', label: 'Nhóm sản phẩm' },
+  { id: 'importPrice', label: 'Giá nhập' },
+  { id: 'price', label: 'Giá bán' },
+  { id: 'hidden', label: 'Hoạt động' },
+  { id: 'hidden', label: 'Thao tác' },
 ];
 
-const TableData = () => {
+interface IProps {
+  supplierId?: number;
+  active?: number;
+}
+
+const TableData = ({ supplierId, active = 1 }: IProps) => {
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
+
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [productList, setProductList] = useState<IProduct[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const { loading } = useSelector((state: RootState) => state.product);
+  const [filters, setFilters] = useState<FilterParams>({
+    ...defaultFilters,
+    supplierId,
+  });
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    setProductList([
-      {
-        id: 1,
-        name: 'name1',
-        group: 'group1',
-        priceBuy: 1,
-        priceSale: 2,
-        active: true,
-      },
-      {
-        id: 2,
-        name: 'name2',
-        group: 'group2',
-        priceBuy: 2,
-        priceSale: 2,
-        active: false,
-      },
-      {
-        id: 3,
-        name: 'name3',
-        group: 'group3',
-        priceBuy: 3,
-        priceSale: 3,
-        active: true,
-      },
-    ]);
-    setLoading(false);
-    // productService
-    //   .getAll(filters)
-    //   .then(({ data }) => {
-    //     setProductList(data.items ?? []);
-    //     setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllProduct(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách sản phẩm!',
+      });
+      return;
+    }
+    setProductList(payload.productList);
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -169,24 +152,42 @@ const TableData = () => {
 
   const handleBlock = async () => {
     if (!currentID) return;
-    try {
-      //   await productService.delete(currentID);
-      handleCloseBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: true })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi khi vô hiệu hóa sản phẩm!' });
+      return;
     }
+    setNotification({
+      message: 'Vô hiệu hóa thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const handleUnBlock = async () => {
     if (!currentID) return;
-    try {
-      //   await productService.delete(currentID);
-      handleCloseUnBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseUnBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: false })
+    );
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi kích hoạt hoạt động sản phẩm!',
+      });
+      return;
     }
+    setNotification({
+      message: 'Kích hoạt thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const renderAction = (row: IProduct) => {
@@ -202,13 +203,13 @@ const TableData = () => {
           <EditIcon />
         </IconButton>
 
-        {row.active ? (
-          <IconButton onClick={handleOpenBlockDialog(row.id)}>
-            <BlockIcon />
-          </IconButton>
-        ) : (
+        {row.hidden ? (
           <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
             <CheckIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleOpenBlockDialog(row.id)}>
+            <BlockIcon />
           </IconButton>
         )}
       </>
@@ -223,13 +224,16 @@ const TableData = () => {
         onSearch={handleSearch}
         searchText={filters.searchText}
       >
-        <Button
-          variant="outlined"
-          startIcon={<AddIcon />}
-          onClick={handleOpenCreateDialog}
-        >
-          Thêm mới sản phẩm
-        </Button>
+        {active === 1 && (
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={handleOpenCreateDialog}
+            sx={{ fontSize: '1rem' }}
+          >
+            Thêm mới sản phẩm
+          </Button>
+        )}
       </TableSearchField>
 
       <TableContent total={productList.length} loading={loading}>
@@ -244,20 +248,23 @@ const TableData = () => {
               />
 
               <TableBody>
-                {productList.map((item) => {
-                  const { id, name, group, priceBuy, priceSale, active } = item;
+                {productList.map((item, index) => {
+                  const { id, name, productGroup, importPrice, price, hidden } =
+                    item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell>{group}</TableCell>
-                      <TableCell>{priceBuy}</TableCell>
-                      <TableCell>{priceSale}</TableCell>
                       <TableCell>
-                        {active ? (
-                          <Button>Có</Button>
-                        ) : (
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
+                      <TableCell>{name}</TableCell>
+                      <TableCell>{productGroup}</TableCell>
+                      <TableCell>{importPrice}</TableCell>
+                      <TableCell>{price}</TableCell>
+                      <TableCell>
+                        {hidden ? (
                           <Button color="error">Không</Button>
+                        ) : (
+                          <Button>Có</Button>
                         )}
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
@@ -299,7 +306,6 @@ const TableData = () => {
 
       <FormDialog
         currentID={currentID}
-        data={productList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
       />

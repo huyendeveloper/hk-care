@@ -1,7 +1,6 @@
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
-import { AuthProvider } from 'contexts/AuthContext';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -22,9 +21,9 @@ ReactDOM.render(
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={createTheme()}>
               {/* <AuthProvider> */}
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
               {/* </AuthProvider> */}
             </ThemeProvider>
           </LocalizationProvider>

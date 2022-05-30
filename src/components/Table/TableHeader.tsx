@@ -38,22 +38,29 @@ const TableHeader = <T extends Dictionary>(props: Props<T>) => {
           const { id, label, align } = cell;
           return (
             <TableCell key={i} align={align}>
-              <TableSortLabel
-                active={sortBy === id}
-                direction={
-                  sortBy === id && sortDirection ? sortDirection : undefined
-                }
-                onClick={handleOnSort(id)}
-              >
-                {label}
-                {sortBy === id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {sortDirection === 'desc'
-                      ? 'sorted descending'
-                      : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
+              {/* {label === 'Thao tác' ||
+              label === 'Hoạt động' ||
+              label === 'STT' ? ( */}
+              <div style={{ fontSize: '1.125rem' }}>{label}</div>
+              {/* ) : (
+                <TableSortLabel
+                  active={sortBy === id}
+                  direction={
+                    sortBy === id && sortDirection ? sortDirection : undefined
+                  }
+                  onClick={handleOnSort(id)}
+                  sx={{ display: 'flex', justifyContent: 'start' }}
+                >
+                  <div style={{ fontSize: '1rem' }}>{label}</div>
+                  {sortBy === id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {sortDirection === 'desc'
+                        ? 'sorted descending'
+                        : 'sorted ascending'}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              )} */}
             </TableCell>
           );
         })}

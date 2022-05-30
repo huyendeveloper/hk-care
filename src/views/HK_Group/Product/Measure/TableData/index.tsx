@@ -27,9 +27,8 @@ import { useNotification } from 'hooks';
 import { IMeasure } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllMeasure } from 'redux/slices/measure';
+import { deleteMeasure, getAllMeasure } from 'redux/slices/measure';
 import { RootState } from 'redux/store';
-import measureService from 'services/measure.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialog from '../FormDialog';
@@ -58,6 +57,7 @@ const TableData = () => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const { loading } = useSelector((state: RootState) => state.measure);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [disableView, setDisableView] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const cells = useMemo(() => getCells(), []);
@@ -68,13 +68,13 @@ const TableData = () => {
 
     if (error) {
       setNotification({
-        error: 'Tên đăng nhập hoặc mật khẩu sai!',
+        error: 'Lỗi khi tải danh sách đơn vị đo lường!',
       });
       return;
     }
 
     setMeasureList(payload.measureList);
-    setTotalRows(Math.ceil(payload.totalCount / filters.pageSize));
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
@@ -114,10 +114,18 @@ const TableData = () => {
   const handleOpenCreateDialog = () => {
     setCurrentID(null);
     setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
+    setOpenFormDialog(true);
+    setDisableView(false);
+  };
+
+  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setDisableView(true);
     setOpenFormDialog(true);
   };
 
@@ -139,23 +147,29 @@ const TableData = () => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-    try {
-      await measureService.delete(currentID);
-      handleCloseDeleteDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteMeasure(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi khi xóa đơn vị đo lường này!' });
+      return;
     }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+
+    setMeasureList(measureList.filter((x) => x.id !== currentID));
   };
 
   const renderAction = (row: IMeasure) => {
     return (
       <>
-        <LinkIconButton to={`${row.id}`}>
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        </LinkIconButton>
+        {/* <LinkIconButton to={`${row.id}`}> */}
+        <IconButton onClick={handleOpenViewDialog(row.id)}>
+          <VisibilityIcon />
+        </IconButton>
+        {/* </LinkIconButton> */}
 
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
@@ -180,6 +194,7 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenCreateDialog}
+          sx={{ fontSize: '1rem' }}
         >
           Thêm mới đơn vị đo lường
         </Button>
@@ -197,13 +212,17 @@ const TableData = () => {
               />
 
               <TableBody>
-                {measureList.map((item) => {
+                {measureList.map((item, index) => {
                   const { id, name } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell align="left">{renderAction(item)}</TableCell>
+                      <TableCell sx={{ width: '44%' }}>
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
+                      <TableCell sx={{ width: '44%' }}>{name}</TableCell>
+                      <TableCell sx={{ width: '12%' }} align="left">
+                        {renderAction(item)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -236,6 +255,7 @@ const TableData = () => {
         data={measureList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        disable={disableView}
       />
     </TableWrapper>
   );

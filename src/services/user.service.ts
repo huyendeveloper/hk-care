@@ -1,9 +1,9 @@
 import axiosClient from 'api';
-import { baseURL } from 'config';
+import { connectURL } from 'config';
 
 class UserService {
   getRoles() {
-    return axiosClient.get(`${baseURL}/identity/roles/GetRoleCurrent`);
+    return axiosClient.get(`${connectURL}/api/identity/roles/GetRoleCurrent`);
   }
 }
 

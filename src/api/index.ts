@@ -2,7 +2,7 @@ import axios from 'axios';
 import LocalStorage from 'utils/LocalStorage';
 
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',

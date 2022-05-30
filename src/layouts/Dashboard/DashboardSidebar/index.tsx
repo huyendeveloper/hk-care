@@ -30,12 +30,6 @@ const DashboardSidebar: FC<Props> = (props) => {
     }
   }, [pathname, onCloseMobileSidebar, openMobileSidebar, prevPathName]);
 
-  const userInfo = {
-    role: 'HK Group',
-    username: 'Default name',
-    image: '',
-  };
-
   const content = (
     <Scrollbar
       sx={{
@@ -70,17 +64,6 @@ const DashboardSidebar: FC<Props> = (props) => {
               alt="hk care logo"
               src="/static/logo.png"
             />
-            <Stack flexDirection={'row'} alignItems="center">
-              <RouteLink to="/user/profile" sx={{ mr: 1 }}>
-                <UserAvatar src={userInfo.image} />
-              </RouteLink>
-              <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
-                <Typography variant="subtitle2">{userInfo.username}</Typography>
-                <Typography color="text.secondary" variant="caption">
-                  {userInfo.role}
-                </Typography>
-              </Box>
-            </Stack>
           </Box>
         </Box>
         <Sidebar />
