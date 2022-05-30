@@ -51,7 +51,7 @@ const SearchField = (props: Props) => {
       >
         {title ? (
           <FormLabel htmlFor="search">
-            <Typography variant="h6" gutterBottom sx={{ mb: 0 }}>
+            <Typography gutterBottom sx={{ mb: 0, fontSize: '1.74rem' }}>
               {title}
             </Typography>
           </FormLabel>

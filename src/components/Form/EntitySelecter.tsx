@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { useDebounce } from 'react-use';
@@ -27,6 +27,7 @@ interface Props<T, O extends FieldValues[]>
   forcePopupIcon?: boolean;
   noOptionsText?: string;
   handleChangeInput?: (value: string) => void;
+  defaultValue?: string;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -46,6 +47,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     noOptionsText,
     getOptionDisabled,
     handleChangeInput,
+    defaultValue,
     ...rest
   } = props;
 
@@ -76,28 +78,34 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           options={options.map((option) => {
             return renderValue ? option[renderValue] : option.id;
           })}
-          getOptionLabel={(option) => labels[option]?.name || 'Not available'}
+          getOptionLabel={(option) =>
+            labels[option]?.name || defaultValue || ''
+          }
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
-          renderInput={(params) => (
-            <TextField
-              error={Boolean(error)}
-              helperText={error?.message && error.message}
-              placeholder={placeholder}
-              onChange={(e) => {
-                setValueInput(e.target.value);
-              }}
-              {...params}
-              {...rest}
-            />
-          )}
+          renderInput={(params) => {
+            // @ts-ignore
+            params.inputProps.value = params.inputProps.value || defaultValue;
+            return (
+              <TextField
+                error={Boolean(error)}
+                helperText={error?.message && error.message}
+                placeholder={placeholder}
+                onChange={(e) => {
+                  setValueInput(e.target.value);
+                }}
+                {...params}
+                {...rest}
+              />
+            );
+          }}
           renderOption={(props, option: number) => {
             const { name, caption } = labels[option];
             return (
               <Box component="li" {...props} key={option}>
                 <Box>
-                  {name || 'Not available'}
+                  {name || defaultValue}
                   {caption && (
                     <Typography variant="caption" display="block">
                       {caption}

@@ -5,28 +5,31 @@ import { FilterParams } from 'types';
 
 class MeasureService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.post(`${baseURL}/app/measure/search-all`, {
-      maxResultCount: pageSize,
-      skipCount: (pageIndex - 1) * pageSize,
-      sorting: sortBy,
-      keyword: searchText,
-    });
+    return axiosClient.get(
+      `${baseURL}/measure/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+  }
+
+  getAllMeasure() {
+    return axiosClient.get(`${baseURL}/measure/search-all`);
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/app/measure/${id}`);
+    return axiosClient.get(`${baseURL}/measure/${id}`);
   }
 
   create(payload: IMeasure) {
-    return axiosClient.post(`${baseURL}/app/measure`, payload);
+    return axiosClient.post(`${baseURL}/measure/Create`, payload);
   }
 
   update({ id, ...payload }: IMeasure) {
-    return axiosClient.put(`${baseURL}/app/measure/${id}`, payload);
+    return axiosClient.put(`${baseURL}/measure/Update/${id}`, payload);
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/app/measure/${id}`);
+    return axiosClient.delete(`${baseURL}/measure/${id}`);
   }
 }
 

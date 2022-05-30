@@ -220,7 +220,7 @@ const ExampleCRUDTable = () => {
                 sortBy={filters.sortBy}
               />
               <TableBody>
-                {exampleCRUDList.map((CRUD) => {
+                {exampleCRUDList.map((CRUD, index) => {
                   const {
                     id,
                     textField,
@@ -234,7 +234,9 @@ const ExampleCRUDTable = () => {
                   } = CRUD;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
+                      <TableCell>
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
                       <TableCell>
                         <TableAvatar src={image} placeholderIcon={PersonIcon} />
                       </TableCell>

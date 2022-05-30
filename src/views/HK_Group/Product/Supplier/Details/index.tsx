@@ -1,16 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { Box, Tab, useMediaQuery, useTheme } from '@mui/material';
+import { getValue } from '@testing-library/user-event/dist/utils';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
-import {
-  ControllerTextarea,
-  ControllerTextField,
-  FormContent,
-  FormFooter,
-  FormGroup,
-  FormHeader,
-  FormLabel,
-  FormPaperGrid,
-} from 'components/Form';
+import { FormFooter, FormHeader, FormPaperGrid } from 'components/Form';
 import { useMounted } from 'hooks';
 import { ISupplier } from 'interface';
 import React, { useEffect, useState } from 'react';
@@ -18,10 +11,16 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
+import TableData from '../../ProductList/TableData';
 import FormDialog from '../FormDialog';
+import Details from './Details';
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Required').strict(true).default(''),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên nhà cung cấp.')
+    .strict(true)
+    .default(''),
   description: yup.string().strict(true).default(''),
 });
 
@@ -34,8 +33,9 @@ const DetailsForm = () => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const [fileValue, setFileValue] = useState<File | object>();
+  const [tab, setTab] = useState<string>('1');
 
-  const { control, setValue } = useForm<ISupplier>({
+  const { control, setValue, getValues } = useForm<ISupplier>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -80,6 +80,7 @@ const DetailsForm = () => {
       fax,
       taxCode,
       bussinessLicense,
+      active,
     } = supplier;
 
     setValue('id', id);
@@ -91,6 +92,7 @@ const DetailsForm = () => {
     setValue('description', description);
     setValue('fax', fax);
     setValue('taxCode', taxCode);
+    setValue('active', active);
     if (bussinessLicense) {
       getFile(bussinessLicense);
     }
@@ -110,99 +112,43 @@ const DetailsForm = () => {
     fetchData();
   };
 
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setTab(newValue);
+  };
+
   return (
     <PageWrapper title="Nhà cung cấp">
       <FormPaperGrid noValidate>
         <FormHeader title="Xem chi tiết nhà cung cấp" />
-        <FormContent>
-          <FormGroup>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <FormLabel required title="Tên nhà cung cấp" name="name" />
-                <ControllerTextField disabled name="name" control={control} />
-              </Grid>
-              {!mobile && <Grid item xs={12} md={6}></Grid>}
-              <Grid item xs={6}>
-                <FormLabel title="Địa chỉ" name="address" />
-                <ControllerTextField
-                  disabled
-                  name="address"
-                  control={control}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel title="Người liên hệ" name="nameContact" />
-                <ControllerTextField
-                  disabled
-                  name="nameContact"
-                  control={control}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel required title="Điện thoại" name="telephoneNumber" />
-                <ControllerTextField
-                  disabled
-                  name="telephoneNumber"
-                  control={control}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel title="Di động" name="mobileNumber" />
-                <ControllerTextField
-                  disabled
-                  name="mobileNumber"
-                  control={control}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel title="Fax" name="fax" />
-                <ControllerTextField disabled name="fax" control={control} />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel title="Mã số thuế" name="taxCode" />
-                <ControllerTextField
-                  disabled
-                  name="taxCode"
-                  control={control}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel
-                  required
-                  title="Đính kèm giấy chứng nhận"
-                  name="bussinessLicense"
-                />
-                <Button variant="contained" fullWidth component="label">
-                  {/* @ts-ignore */}
-                  {fileValue?.name ? fileValue.name : 'Không có chứng nhận'}
-                  <input
-                    disabled
-                    type="file"
-                    name="bussinessLicense"
-                    accept="application/pdf"
-                    hidden
-                  />
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <FormLabel title="Ghi chú" name="description" />
-                <ControllerTextarea
-                  maxRows={5}
-                  minRows={5}
-                  name="description"
-                  control={control}
-                  disabled
-                />
-              </Grid>
-            </Grid>
-          </FormGroup>
-        </FormContent>
-        <FormFooter>
-          <LinkButton to="/hk_group/product/supplier">Quay lại</LinkButton>
+        <Box sx={{ width: '100%' }}>
+          <TabContext value={tab}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+              >
+                <Tab label="Thông tin nhà cung cấp" value="1" />
+                <Tab label="Danh sách sản phẩm" value="2" />
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <Details control={control} fileValue={fileValue} />
+            </TabPanel>
+            <TabPanel value="2" sx={{ height: 1 }}>
+              <TableData
+                supplierId={Number(crudId)}
+                active={getValues('active')}
+              />
+            </TabPanel>
+          </TabContext>
+        </Box>
 
-          <Button variant="contained" onClick={handleOpenUpdateDialog}>
+        <FormFooter>
+          <LinkButton to="/hk_group/product/supplier">Đóng</LinkButton>
+
+          {/* <Button variant="contained" onClick={handleOpenUpdateDialog}>
             Chỉnh sửa thông tin
-          </Button>
+          </Button> */}
         </FormFooter>
       </FormPaperGrid>
       <FormDialog

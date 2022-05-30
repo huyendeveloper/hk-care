@@ -24,7 +24,7 @@ const SplashScreen = () => {
               theme.palette.getContrastText(theme.palette.background.paper),
           }}
         >
-          Product name
+          Đang tải . . .
         </Typography>
         <Box sx={{ width: 400 }}>
           <LinearProgress />

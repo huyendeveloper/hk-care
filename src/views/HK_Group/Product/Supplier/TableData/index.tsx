@@ -12,6 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { BlockDialog, UnBlockDialog } from 'components/Dialog';
@@ -24,12 +25,15 @@ import {
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import supplierService from 'services/supplier.service';
-// import supplierService from 'services/supplier.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeStatus, getAllSupplier } from 'redux/slices/supplier';
+import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
+import FormDialogSupplier from '../FormDialog';
 import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<ISupplier> => [
@@ -43,35 +47,35 @@ const getCells = (): Cells<ISupplier> => [
 ];
 
 const TableData = () => {
+  const setNotification = useNotification();
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-
+  const { loading } = useSelector((state: RootState) => state.supplier);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const dispatch = useDispatch();
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    setLoading(false);
-    supplierService
-      .getAll(filters)
-      .then(({ data }) => {
-        setSupplierList(data.items ?? []);
-        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-      })
-      .catch((err) => {})
-      .finally(() => {
-        setLoading(false);
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllSupplier(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách nhà cung cấp!',
       });
+      return;
+    }
+
+    setSupplierList(payload.supplierList);
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -142,24 +146,42 @@ const TableData = () => {
 
   const handleBlock = async () => {
     if (!currentID) return;
-    try {
-      await supplierService.changeStatus(currentID, 2);
-      handleCloseBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: 2 })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi khi vô hiệu hóa nhà cung cấp này!' });
+      return;
     }
+    setNotification({
+      message: 'Vô hiệu hóa thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const handleUnBlock = async () => {
     if (!currentID) return;
-    try {
-      await supplierService.changeStatus(currentID, 1);
-      handleCloseUnBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseUnBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: 1 })
+    );
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi kích hoạt hoạt động nhà cung cấp này!',
+      });
+      return;
     }
+    setNotification({
+      message: 'Kích hoạt thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const renderAction = (row: ISupplier) => {
@@ -200,6 +222,7 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenCreateDialog}
+          sx={{ fontSize: '1rem' }}
         >
           Thêm mới nhà cung cấp
         </Button>
@@ -217,7 +240,7 @@ const TableData = () => {
               />
 
               <TableBody>
-                {supplierList.map((item) => {
+                {supplierList.map((item, index) => {
                   const {
                     id,
                     name,
@@ -226,11 +249,27 @@ const TableData = () => {
                     telephoneNumber,
                     active,
                   } = item;
+
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
+                      <TableCell>
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
                       <TableCell>{name}</TableCell>
-                      <TableCell>{address}</TableCell>
+                      {/* @ts-ignore */}
+                      <Tooltip title={address} placement="bottom">
+                        <TableCell
+                          sx={{
+                            maxWidth: '240px',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {address}
+                        </TableCell>
+                      </Tooltip>
+
                       <TableCell>{nameContact}</TableCell>
                       <TableCell>{telephoneNumber}</TableCell>
                       <TableCell>
@@ -277,7 +316,7 @@ const TableData = () => {
         handleUnBlock={handleUnBlock}
       />
 
-      <FormDialog
+      <FormDialogSupplier
         currentID={currentID}
         data={supplierList.find((x) => x.id === currentID)}
         open={openFormDialog}

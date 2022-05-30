@@ -10,6 +10,7 @@ export interface FilterParams {
   pageSize: number;
   sortBy: string;
   searchText: string;
+  supplierId?: number;
 }
 export interface Dictionary<T = any> {
   [key: string]: T;

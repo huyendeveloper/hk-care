@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Dialog, Grid, Button } from '@mui/material';
+import { Button, Dialog, Grid } from '@mui/material';
 import {
   ControllerTextarea,
   ControllerTextField,
@@ -11,10 +11,13 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import { useNotification } from 'hooks';
 import { IUsage } from 'interface';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import usageService from 'services/usage.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { createUsage, updateUsage } from 'redux/slices/usage';
+import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 interface Props {
@@ -22,32 +25,68 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   data?: IUsage;
+  disable?: boolean;
 }
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Required').strict(true).default(''),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên dạng dùng.')
+    .max(100, 'Tên dạng dùng không quá 100 ký tự.')
+    .strict(true)
+    .default(''),
   description: yup.string().strict(true).default(''),
 });
 
-const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
+const FormDialog = ({
+  open,
+  handleClose,
+  currentID,
+  data,
+  disable = false,
+}: Props) => {
+  const { loading } = useSelector((state: RootState) => state.usage);
+  const setNotification = useNotification();
+  const dispatch = useDispatch();
+  const [disabled, setDisabled] = useState<boolean>(disable);
   const { control, handleSubmit, setValue, reset } = useForm<IUsage>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (payload: IUsage) => {
-    try {
-      if (payload.id) {
-        await usageService.update(payload);
-      } else {
-        await usageService.create(payload);
+  useEffect(() => {
+    setDisabled(disable);
+  }, [disable]);
+
+  const onSubmit = async (data: IUsage) => {
+    if (data.id) {
+      // @ts-ignore
+      const { error, payload } = await dispatch(updateUsage(data));
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi cập nhật dạng dùng!',
+        });
+        return;
       }
-      reset();
-      handleClose(true);
-    } catch (error) {
-      console.error(error);
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+    } else {
+      // @ts-ignore
+      const { error, payload } = await dispatch(createUsage(data));
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi thêm dạng dùng!',
+        });
+        return;
+      }
+      setNotification({ message: 'Thêm thành công', severity: 'success' });
     }
+
+    reset();
+    handleClose(true);
   };
 
   useEffect(() => {
@@ -58,36 +97,32 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
       setValue('description', data?.description || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID]);
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} onClose={() => handleClose()}>
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            currentID
-              ? 'Chỉnh sửa thông tin nhóm sản phẩm'
-              : 'Thêm mới nhóm sản phẩm'
+            disabled
+              ? 'Xem chi tiết dạng dùng'
+              : currentID
+              ? 'Chỉnh sửa thông tin dạng dùng'
+              : 'Thêm mới dạng dùng'
           }
         />
         <FormContent>
           <FormGroup>
             <Grid container alignItems="center" spacing={2}>
-              {currentID && (
-                <>
-                  <Grid item xs={12}>
-                    <FormLabel title="Mã nhóm sản phẩm" name="id" />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ControllerTextField name="id" disabled control={control} />
-                  </Grid>
-                </>
-              )}
               <Grid item xs={12}>
-                <FormLabel required title="Tên nhóm sản phẩm" name="name" />
+                <FormLabel required title="Tên dạng dùng" name="name" />
               </Grid>
               <Grid item xs={12}>
-                <ControllerTextField name="name" control={control} />
+                <ControllerTextField
+                  name="name"
+                  disabled={disabled}
+                  control={control}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Ghi chú" name="description" />
@@ -97,6 +132,7 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                   maxRows={5}
                   minRows={5}
                   name="description"
+                  disabled={disabled}
                   control={control}
                 />
               </Grid>
@@ -106,9 +142,18 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
 
         <FormFooter>
           <Button variant="outlined" onClick={() => handleClose()}>
-            Hủy
+            {disabled ? 'Quay lại' : 'Hủy'}
           </Button>
-          <LoadingButton type="submit">Lưu</LoadingButton>
+          {disabled && (
+            <Button onClick={() => setDisabled(false)}>
+              Chỉnh sửa thông tin
+            </Button>
+          )}
+          {!disabled && (
+            <LoadingButton loading={loading} type="submit">
+              Lưu
+            </LoadingButton>
+          )}
         </FormFooter>
       </FormPaperGrid>
     </Dialog>

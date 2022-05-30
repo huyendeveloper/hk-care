@@ -8,6 +8,7 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Page from 'components/common/Page';
+import { FormLabel } from 'components/Form';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import EntitySelecter from 'components/Form/EntitySelecter';
 import FormGroup from 'components/Form/FormGroup';
@@ -66,7 +67,7 @@ const Login = () => {
 
     if (error) {
       setNotification({
-        error: 'Tên đăng nhập hoặc mật khẩu sai!',
+        error: 'Vui lòng kiểm tra lại thông tin đăng nhập.',
       });
       return;
     }
@@ -109,6 +110,7 @@ const Login = () => {
                 src="/static/logo.png"
               />
               <FormGroup fullWidth>
+                <FormLabel required title="Điểm bán" name="__tenant" />
                 <EntitySelecter
                   name="__tenant"
                   required
@@ -116,14 +118,16 @@ const Login = () => {
                   options={tenantList}
                   renderLabel={(field) => field.name}
                   placeholder=""
-                  label="Điểm bán"
+                  noOptionsText="Không tìm thấy điểm bán"
+                  // label="Điểm bán"
                 />
               </FormGroup>
               <FormGroup fullWidth>
+                <FormLabel required title="Tên đăng nhập" name="username" />
                 <ControllerTextField
                   name="username"
                   control={control}
-                  label="Tên đăng nhập"
+                  // label="Tên đăng nhập"
                   required
                   fullWidth
                   InputProps={{
@@ -136,11 +140,12 @@ const Login = () => {
                 />
               </FormGroup>
               <FormGroup fullWidth>
+                <FormLabel required title="Mật khẩu" name="password" />
                 <ControllerTextField
                   name="password"
                   control={control}
                   type="password"
-                  label="Mật khẩu"
+                  // label="Mật khẩu"
                   required
                   fullWidth
                   InputProps={{

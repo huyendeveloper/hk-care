@@ -5,28 +5,31 @@ import { FilterParams } from 'types';
 
 class ProductGroupService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.post(`${baseURL}/app/product-group/search-all`, {
-      maxResultCount: pageSize,
-      skipCount: (pageIndex - 1) * pageSize,
-      sorting: sortBy,
-      keyword: searchText,
-    });
+    return axiosClient.get(
+      `${baseURL}/product-group/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+  }
+
+  getAllProductGroupp() {
+    return axiosClient.get(`${baseURL}/product-group/search-all`);
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/app/product-group/${id}`);
+    return axiosClient.get(`${baseURL}/product-group/${id}`);
   }
 
   create(payload: IProductGroup) {
-    return axiosClient.post(`${baseURL}/app/product-group`, payload);
+    return axiosClient.post(`${baseURL}/productgroup/Create`, payload);
   }
 
   update({ id, ...payload }: IProductGroup) {
-    return axiosClient.put(`${baseURL}/app/product-group/${id}`, payload);
+    return axiosClient.put(`${baseURL}/productgroup/Update/${id}`, payload);
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/app/product-group/${id}`);
+    return axiosClient.delete(`${baseURL}/product-group/${id}`);
   }
 }
 

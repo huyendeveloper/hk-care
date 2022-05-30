@@ -5,8 +5,8 @@ import {
   isPending,
   isRejected,
 } from '@reduxjs/toolkit';
-import { IMeasure } from 'interface';
-import measureService from 'services/measure.service';
+import { IUsage } from 'interface';
+import usageService from 'services/usage.service';
 import { FilterParams } from 'types';
 
 interface IInitialState {
@@ -15,18 +15,18 @@ interface IInitialState {
 
 const initialState: IInitialState = { loading: false };
 
-export const getAllMeasure = createAsyncThunk(
-  'measure/getAll',
+export const getAllUsage = createAsyncThunk(
+  'usage/getAll',
   async (filters: FilterParams, { rejectWithValue }) => {
     try {
-      const { data } = await measureService.getAll(filters);
+      const { data } = await usageService.getAll(filters);
 
       if (data.items) {
-        const measureList = data.items;
+        const usageList = data.items;
         const totalCount = data.totalCount;
 
         return {
-          measureList,
+          usageList,
           totalCount,
         };
       }
@@ -38,54 +38,54 @@ export const getAllMeasure = createAsyncThunk(
   }
 );
 
-export const deleteMeasure = createAsyncThunk(
-  'measure/delete',
+export const deleteUsage = createAsyncThunk(
+  'usage/delete',
   async (id: number, { rejectWithValue }) => {
     try {
-      await measureService.delete(id);
+      await usageService.delete(id);
     } catch (error) {
       return rejectWithValue(error);
     }
   }
 );
 
-export const createMeasure = createAsyncThunk(
-  'measure/create',
-  async (payload: IMeasure, { rejectWithValue }) => {
+export const createUsage = createAsyncThunk(
+  'usage/create',
+  async (payload: IUsage, { rejectWithValue }) => {
     try {
-      await measureService.create(payload);
+      await usageService.create(payload);
     } catch (error) {
       return rejectWithValue(error);
     }
   }
 );
 
-export const updateMeasure = createAsyncThunk(
-  'measure/update',
-  async (payload: IMeasure, { rejectWithValue }) => {
+export const updateUsage = createAsyncThunk(
+  'usage/update',
+  async (payload: IUsage, { rejectWithValue }) => {
     try {
-      await measureService.update(payload);
+      await usageService.update(payload);
     } catch (error) {
       return rejectWithValue(error);
     }
   }
 );
 
-const measureSlice = createSlice({
-  name: 'measure',
+const usageSlice = createSlice({
+  name: 'usage',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getAllMeasure.pending, (state) => {
+    builder.addCase(getAllUsage.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getAllMeasure.fulfilled, (state) => {
+    builder.addCase(getAllUsage.fulfilled, (state) => {
       state.loading = false;
     });
-    builder.addCase(getAllMeasure.rejected, (state) => {
+    builder.addCase(getAllUsage.rejected, (state) => {
       state.loading = false;
     });
   },
 });
 
-export default measureSlice.reducer;
+export default usageSlice.reducer;

@@ -3,7 +3,7 @@ import { baseURL } from 'config';
 
 class TenantService {
   getAll() {
-    return axiosClient.get(`${baseURL}/app/GetTenants`);
+    return axiosClient.get(`${baseURL}/GetTenants`);
   }
 }
 

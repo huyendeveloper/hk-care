@@ -5,28 +5,31 @@ import { FilterParams } from 'types';
 
 class TreatmentGroupService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.post(`${baseURL}/app/treatment-group/search-all`, {
-      maxResultCount: pageSize,
-      skipCount: (pageIndex - 1) * pageSize,
-      sorting: sortBy,
-      keyword: searchText,
-    });
+    return axiosClient.get(
+      `${baseURL}/treatment-group/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+  }
+
+  getAllTreatmentGroup() {
+    return axiosClient.get(`${baseURL}/treatment-group/search-all`);
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/app/treatment-group/${id}`);
+    return axiosClient.get(`${baseURL}/treatment-group/${id}`);
   }
 
   create(payload: ITreatmentGroup) {
-    return axiosClient.post(`${baseURL}/app/treatment-group`, payload);
+    return axiosClient.post(`${baseURL}/treatmentgroup/Create`, payload);
   }
 
   update({ id, ...payload }: ITreatmentGroup) {
-    return axiosClient.put(`${baseURL}/app/treatment-group/${id}`, payload);
+    return axiosClient.put(`${baseURL}/treatmentgroup/Update/${id}`, payload);
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/app/treatment-group/${id}`);
+    return axiosClient.delete(`${baseURL}/treatment-group/${id}`);
   }
 }
 

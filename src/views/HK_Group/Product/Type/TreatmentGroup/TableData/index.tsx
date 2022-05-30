@@ -23,8 +23,15 @@ import {
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { ITreatmentGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  deleteTreatmentGroup,
+  getAllTreatmentGroup,
+} from 'redux/slices/treatmentGroup';
+import { RootState } from 'redux/store';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
@@ -37,7 +44,7 @@ const getCells = (): Cells<ITreatmentGroup> => [
   },
   {
     id: 'name',
-    label: 'Tên nhóm sản phẩm',
+    label: 'Tên nhóm điều trị',
   },
   {
     id: 'description',
@@ -46,6 +53,9 @@ const getCells = (): Cells<ITreatmentGroup> => [
 ];
 
 const TableData = () => {
+  const [disableView, setDisableView] = useState<boolean>(false);
+  const setNotification = useNotification();
+  const dispatch = useDispatch();
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
     ITreatmentGroup[]
@@ -54,29 +64,27 @@ const TableData = () => {
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading } = useSelector((state: RootState) => state.treatmentGroup);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    treatmentGroupService
-      .getAll(filters)
-      .then(({ data }) => {
-        setTreatmentGroupList(data.items ?? []);
-        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllTreatmentGroup(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách nhóm điều trị!',
       });
+      return;
+    }
+
+    setTreatmentGroupList(payload.treatmentGroupList);
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -110,14 +118,22 @@ const TableData = () => {
     }));
   };
 
+  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setDisableView(true);
+    setOpenFormDialog(true);
+  };
+
   const handleOpenCreateDialog = () => {
     setCurrentID(null);
     setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
     setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
@@ -138,23 +154,27 @@ const TableData = () => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-    try {
-      await treatmentGroupService.delete(currentID);
-      handleCloseDeleteDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteTreatmentGroup(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi khi xóa nhóm điều trị!' });
+      return;
     }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+
+    setTreatmentGroupList(treatmentGroupList.filter((x) => x.id !== currentID));
   };
 
   const renderAction = (row: ITreatmentGroup) => {
     return (
       <>
-        <LinkIconButton to={`${row.id}`}>
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        </LinkIconButton>
+        <IconButton onClick={handleOpenViewDialog(row.id)}>
+          <VisibilityIcon />
+        </IconButton>
 
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
@@ -170,8 +190,8 @@ const TableData = () => {
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
       <TableSearchField
-        title="Danh sách nhóm sản phẩm"
-        placeHolder="Tìm kiếm nhóm sản phẩm"
+        title="Danh sách nhóm điều trị"
+        placeHolder="Tìm kiếm nhóm điều trị"
         onSearch={handleSearch}
         searchText={filters.searchText}
       >
@@ -179,8 +199,9 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenCreateDialog}
+          sx={{ fontSize: '1rem' }}
         >
-          Thêm mới nhóm sản phẩm
+          Thêm mới nhóm điều trị
         </Button>
       </TableSearchField>
 
@@ -196,13 +217,17 @@ const TableData = () => {
               />
 
               <TableBody>
-                {treatmentGroupList.map((item) => {
+                {treatmentGroupList.map((item, index) => {
                   const { id, name } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell align="left">{renderAction(item)}</TableCell>
+                      <TableCell sx={{ width: '44%' }}>
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
+                      <TableCell sx={{ width: '44%' }}>{name}</TableCell>
+                      <TableCell sx={{ width: '12%' }} align="left">
+                        {renderAction(item)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -235,6 +260,7 @@ const TableData = () => {
         data={treatmentGroupList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        disable={disableView}
       />
     </TableWrapper>
   );

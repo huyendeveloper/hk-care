@@ -90,7 +90,7 @@ const NotificationProvider: FC = ({ children }) => {
         onClose={handleClose}
         message={message}
         action={action}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         {content}
       </Snackbar>

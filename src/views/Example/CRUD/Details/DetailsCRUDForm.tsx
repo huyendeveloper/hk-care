@@ -9,7 +9,7 @@ import ControllerRadio from 'components/Form/ControllerRadio';
 import ControllerSwitch from 'components/Form/ControllerSwitch';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import ControllerTimePicker from 'components/Form/ControllerTimePicker';
-import EntityMultipleSelecter from 'components/Form/EntityMultipleSelecter';
+import { EntityMultipleSelecter } from 'components/Form';
 import EntitySelecter from 'components/Form/EntitySelecter';
 import FormContent from 'components/Form/FormContent';
 import FormFooter from 'components/Form/FormFooter';
@@ -21,7 +21,7 @@ import useMounted from 'hooks/useMounted';
 import {
   mockMutipleSelectOptions,
   mockRadioOptions,
-  mockSelectFieldOptions
+  mockSelectFieldOptions,
 } from 'mock-axios';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -42,27 +42,41 @@ interface FormData {
 const validationSchema = yup.object().shape({
   textField: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
     .default(''),
-  selectField: yup.number().required('Required').nullable().default(null),
+  selectField: yup
+    .number()
+    .required('Vui lòng nhập trường này.')
+    .nullable()
+    .default(null),
   mutipleSelectField: yup
     .array()
-    .of(yup.number().required('Required').nullable().default(null))
-    .min(1, 'Required')
+    .of(
+      yup
+        .number()
+        .required('Vui lòng nhập trường này.')
+        .nullable()
+        .default(null)
+    )
+    .min(1, 'Vui lòng nhập trường này.')
     .default([]),
-  radioField: yup.number().required('Required').nullable().default(null),
+  radioField: yup
+    .number()
+    .required('Vui lòng nhập trường này.')
+    .nullable()
+    .default(null),
   switchField: yup.bool().default(false),
   date: yup
     .date()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .nullable()
     .typeError('Invalid date')
     .default(null),
   time: yup
     .date()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .nullable()
     .typeError('Invalid time')
     .default(null),

@@ -72,6 +72,7 @@ const SidebarItem: FC<Props> = (props) => {
             textTransform: 'none',
             width: '100%',
             borderRadius: 0,
+            fontSize: '1rem',
           }}
           variant="text"
         >
@@ -102,6 +103,7 @@ const SidebarItem: FC<Props> = (props) => {
           width: '100%',
           fontWeight: 'medium',
           borderRadius: 0,
+          fontSize: '1rem',
           ...(active && {
             color: 'primary.main',
             bgcolor: (theme) =>

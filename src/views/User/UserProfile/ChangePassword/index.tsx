@@ -19,19 +19,19 @@ import * as yup from 'yup';
 const validationSchema = yup.object().shape({
   oldPassword: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
     .default(''),
   newPassword: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
     .default(''),
   retypeNewPassword: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .trim('Cannot include leading and trailing spaces')
     .default('')
     .oneOf([yup.ref('newPassword')], 'Password does not match'),

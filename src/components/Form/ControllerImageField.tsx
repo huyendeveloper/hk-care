@@ -3,12 +3,18 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useNotification } from 'hooks';
 
 interface IProps {
-  image: Blob | null | undefined;
+  image: Blob | null | string | undefined;
   setImage: (blob: Blob | null) => void;
   initPreview?: string | ArrayBuffer | null;
+  disabled?: boolean;
 }
 
-const ControllerImageField = ({ image, setImage, initPreview }: IProps) => {
+const ControllerImageField = ({
+  image,
+  setImage,
+  initPreview,
+  disabled,
+}: IProps) => {
   const inputRef = useRef();
   const setNotification = useNotification();
   const [preview, setPreview] = useState<string | ArrayBuffer | null>(
@@ -16,6 +22,10 @@ const ControllerImageField = ({ image, setImage, initPreview }: IProps) => {
   );
 
   useEffect(() => {
+    if (typeof image === 'string') {
+      setPreview(image);
+      return;
+    }
     if (image) {
       const reader = new FileReader();
       reader.readAsDataURL(image);
@@ -77,6 +87,7 @@ const ControllerImageField = ({ image, setImage, initPreview }: IProps) => {
         // @ts-ignore
         ref={inputRef}
         onChange={handleChange}
+        disabled={disabled}
       />
     </div>
   );

@@ -32,33 +32,38 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
 
   return (
     <Controller
-      render={({ field: { ref, ...others } }) => (
-        <DatePicker
-          renderInput={(props) => (
-            <TextField
-              {...props}
-              {...rest}
-              fullWidth
-              error={Boolean(errors[name])}
-              helperText={errors[name]?.message}
-              id={name}
-            />
-          )}
-          mask={mask}
-          InputAdornmentProps={{
-            position: 'start',
-          }}
-          {...others}
-          disabled={disabled}
-          minDate={minDate}
-          onChange={(value: Date | null) => {
-            others.onChange(value);
-            if (onChangeSelect) {
-              onChangeSelect(value);
-            }
-          }}
-        />
-      )}
+      render={({ field: { ref, ...others } }) => {
+        return (
+          <DatePicker
+            renderInput={(props) => {
+              const newProps = others.value
+                ? props
+                : { ...props, inputProps: { ...props.inputProps, value: '' } };
+              return (
+                <TextField
+                  {...newProps}
+                  {...rest}
+                  fullWidth
+                  error={Boolean(errors[name])}
+                  helperText={errors[name]?.message}
+                  id={name}
+                />
+              );
+            }}
+            mask={mask}
+            {...others}
+            inputFormat="dd/MM/yyyy"
+            disabled={disabled}
+            minDate={minDate}
+            onChange={(value: Date | null) => {
+              others.onChange(value);
+              if (onChangeSelect) {
+                onChangeSelect(value);
+              }
+            }}
+          />
+        );
+      }}
       name={name}
       control={control}
     />

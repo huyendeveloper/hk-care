@@ -51,3 +51,30 @@ textarea {
   overflow: hidden;
   position: relative;
 }
+
+.Mui-disabled,
+textarea:disabled {
+  -webkit-text-fill-color: rgb(102 102 102 / 82%) !important;
+}
+
+.MuiTableCell-sizeSmall {
+  font-size: 15.5px !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+@media screen and (max-width: 1440px) {
+  .MuiTableCell-sizeSmall {
+    width: auto !important;
+  }
+}
