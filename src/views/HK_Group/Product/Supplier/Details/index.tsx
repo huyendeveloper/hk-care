@@ -4,6 +4,7 @@ import { Box, Tab, useMediaQuery, useTheme } from '@mui/material';
 import { getValue } from '@testing-library/user-event/dist/utils';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import { FormFooter, FormHeader, FormPaperGrid } from 'components/Form';
+import { connectURL } from 'config';
 import { useMounted } from 'hooks';
 import { ISupplier } from 'interface';
 import React, { useEffect, useState } from 'react';
@@ -32,7 +33,7 @@ const DetailsForm = () => {
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [fileValue, setFileValue] = useState<File | object>();
+  const [files, setFiles] = useState<File[] | object[]>([]);
   const [tab, setTab] = useState<string>('1');
 
   const { control, setValue, getValues } = useForm<ISupplier>({
@@ -60,11 +61,6 @@ const DetailsForm = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crudId]);
-
-  const getFile = async (bussinessLicense: string) => {
-    const { data } = await supplierService.getFile(bussinessLicense);
-    setFileValue({ name: data });
-  };
 
   useEffect(() => {
     if (!supplier) return;
@@ -94,7 +90,13 @@ const DetailsForm = () => {
     setValue('taxCode', taxCode);
     setValue('active', active);
     if (bussinessLicense) {
-      getFile(bussinessLicense);
+      const fileList: object[] = [];
+      // @ts-ignore
+      bussinessLicense.forEach((item: string) => {
+        fileList.push({ name: `${connectURL}/${item}` });
+      });
+
+      setFiles(fileList);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supplier]);
@@ -117,7 +119,7 @@ const DetailsForm = () => {
   };
 
   return (
-    <PageWrapper title="Nhà cung cấp">
+    <PageWrapper title="Chi tiết nhà cung cấp">
       <FormPaperGrid noValidate>
         <FormHeader title="Xem chi tiết nhà cung cấp" />
         <Box sx={{ width: '100%' }}>
@@ -132,7 +134,7 @@ const DetailsForm = () => {
               </TabList>
             </Box>
             <TabPanel value="1">
-              <Details control={control} fileValue={fileValue} />
+              <Details control={control} files={files} />
             </TabPanel>
             <TabPanel value="2" sx={{ height: 1 }}>
               <TableData

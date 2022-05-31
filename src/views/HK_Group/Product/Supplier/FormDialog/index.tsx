@@ -5,12 +5,16 @@ import {
   Button,
   Dialog,
   Grid,
+  IconButton,
+  Stack,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
 import {
+  ControllerMultiFile,
   ControllerTextarea,
   ControllerTextField,
+  EntityMultipleSelecter,
   FormContent,
   FormFooter,
   FormGroup,
@@ -18,16 +22,18 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { typeNumber } from 'constants/typeInput';
+import { baseURL, connectURL } from 'config';
+import { typeNumber, typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSupplier, updateSupplier } from 'redux/slices/supplier';
 import { RootState } from 'redux/store';
 import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface Props {
   open: boolean;
@@ -53,9 +59,8 @@ const validationSchema = yup.object().shape({
   address: yup.string().max(150, 'Địa chỉ không quá 150 ký tự.').default(''),
 });
 
-const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
-  const theme = useTheme();
-  const [fileValue, setFileValue] = React.useState<File | object>();
+const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
+  const [files, setFiles] = useState<File[] | object[]>([]);
   const setNotification = useNotification();
   const dispatch = useDispatch();
   const { loading } = useSelector((state: RootState) => state.supplier);
@@ -66,14 +71,8 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const handleChangeFile = (e: any) => {
-    const file = e?.target.files[0];
-    setFileValue(file);
-  };
-
   const onSubmit = async (supplier: ISupplier) => {
-    // @ts-ignore
-    if (!fileValue?.name || fileValue?.name === 'File không tồn tại.') {
+    if (files.length === 0) {
       setNotification({
         message: 'Chưa có giấy chứng nhận',
         severity: 'warning',
@@ -84,7 +83,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
     if (supplier.id) {
       const { error, payload } = await dispatch(
         // @ts-ignore
-        updateSupplier({ ...supplier, active: data?.active, fileValue })
+        updateSupplier({ ...supplier, files })
       );
       if (error) {
         setNotification({
@@ -99,7 +98,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
     } else {
       const { error, payload } = await dispatch(
         // @ts-ignore
-        createSupplier({ ...supplier, fileValue })
+        createSupplier({ ...supplier, files })
       );
       if (error) {
         setNotification({
@@ -111,21 +110,14 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
     }
 
     reset();
-    setFileValue(undefined);
+    setFiles([]);
     handleClose(true);
   };
 
-  const getFile = async (bussinessLicense: string) => {
-    const { data } = await supplierService.getFile(bussinessLicense);
-    setFileValue({ name: data });
-
-    setValue('bussinessLicense', { name: data });
-  };
-
-  useEffect(() => {
-    reset();
-    setFileValue(undefined);
+  const fetchData = async () => {
+    setFiles([]);
     if (currentID) {
+      const { data } = await supplierService.get(currentID);
       setValue('id', currentID);
       setValue('name', data?.name || '');
       setValue('address', data?.address || '');
@@ -135,10 +127,21 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
       setValue('description', data?.description || '');
       setValue('fax', data?.fax || '');
       setValue('taxCode', data?.taxCode || '');
+      setValue('active', data?.active);
       if (data?.bussinessLicense) {
-        getFile(data?.bussinessLicense);
+        const fileList: object[] = [];
+        data.bussinessLicense.forEach((item: string) => {
+          fileList.push({ name: `${connectURL}/${item}` });
+        });
+        console.log('fileList', fileList)
+        setFiles(fileList);
       }
     }
+  };
+
+  useEffect(() => {
+    reset();
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 
@@ -198,7 +201,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerTextField
-                    inputProps={typeNumber((value) =>
+                    inputProps={typeStringNumber((value) =>
                       setValue('telephoneNumber', value)
                     )}
                     name="telephoneNumber"
@@ -248,17 +251,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID, data }: Props) => {
                 </Box>
 
                 <Grid item xs={12}>
-                  <Button variant="contained" fullWidth component="label">
-                    {/* @ts-ignore */}
-                    {fileValue?.name ? fileValue.name : 'Chọn file'}
-                    <input
-                      type="file"
-                      onChange={handleChangeFile}
-                      name="bussinessLicense"
-                      accept="application/pdf"
-                      hidden
-                    />
-                  </Button>
+                  <ControllerMultiFile files={files} setFiles={setFiles} />
                 </Grid>
               </Grid>
             </Grid>

@@ -13,7 +13,7 @@ import {
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IProductGroup } from 'interface';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -42,6 +42,7 @@ const validationSchema = yup.object().shape({
 });
 
 const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
+  const [disabled, setDisabled] = useState<boolean>(disable);
   const { loading } = useSelector((state: RootState) => state.productGroup);
   const dispatch = useDispatch();
   const setNotification = useNotification();
@@ -50,6 +51,10 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
+
+  useEffect(() => {
+    setDisabled(disable);
+  }, [disable, open]);
 
   const onSubmit = async (data: IProductGroup) => {
     if (data.id) {
@@ -96,7 +101,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            disable
+            disabled
               ? 'Xem chi tiết nhóm sản phẩm'
               : currentID
               ? 'Chỉnh sửa thông tin nhóm sản phẩm'
@@ -111,7 +116,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
               </Grid>
               <Grid item xs={12}>
                 <ControllerTextField
-                  disabled={disable}
+                  disabled={disabled}
                   name="name"
                   control={control}
                 />
@@ -123,7 +128,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
                 <ControllerTextarea
                   maxRows={5}
                   minRows={5}
-                  disabled={disable}
+                  disabled={disabled}
                   name="description"
                   control={control}
                 />
@@ -134,9 +139,14 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
 
         <FormFooter>
           <Button variant="outlined" onClick={() => handleClose()}>
-            {disable ? 'Đóng' : 'Hủy'}
+            {disabled ? 'Đóng' : 'Hủy'}
           </Button>
-          {!disable && (
+          {disabled && (
+            <Button onClick={() => setDisabled(false)}>
+              Chỉnh sửa thông tin
+            </Button>
+          )}
+          {!disabled && (
             <LoadingButton loading={loading} type="submit">
               Lưu
             </LoadingButton>

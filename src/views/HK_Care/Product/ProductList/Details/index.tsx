@@ -28,6 +28,7 @@ import {
   IMeasure,
   IProduct,
   IProductGroup,
+  IProductList,
   ISupplier,
   ITreatmentGroup,
   IUsage,
@@ -43,38 +44,28 @@ import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
 import TableData from '../../ProductList/TableData';
-import FormDialog from '../FormDialog';
+// import FormDialog from '../FormDialog';
 import Details from './Details';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useDispatch } from 'react-redux';
 import { updateProduct } from 'redux/slices/product';
 import { connectURL } from 'config';
-import { typeNumber, yupDate, yupOnlyNumber } from 'constants/typeInput';
+import FormDialog from '../FormDialog';
+import productListService from 'services/productList.service';
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Vui lòng nhập tên sản phẩm.'),
-  productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
-  treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
-  usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
-  mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
-  amountFirst: yupOnlyNumber(),
-  outOfDate: yupDate,
-  numberRegister: yupOnlyNumber(),
-  lotNumber: yupOnlyNumber(),
-  dosage: yup.string().required('Vui lòng nhập hàm lượng.').default('Null'),
-  routeOfUse: yup
+  name: yup
     .string()
-    .required('Vui lòng nhập liều dùng.')
-    .default('Theo chỉ định'),
-  amountSecond: yupOnlyNumber(),
-  dateManufacture: yupDate,
-  importPrice: yupOnlyNumber(),
-  price: yupOnlyNumber(),
+    .required('Vui lòng nhập tên sản phẩm.')
+    .strict(true)
+    .default(''),
+  description: yup.string().strict(true).default(''),
 });
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
-  const [product, setProduct] = useState();
+  const mounted = useMounted();
+  const [product, setProduct] = useState<IProduct>();
   const [taskQueue, setTaskQueue] = useState<boolean>(true);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const theme = useTheme();
@@ -89,7 +80,6 @@ const DetailsForm = () => {
   const [usageList, setUsageList] = useState<IUsage[]>([]);
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
-  const [disabled, setDisabled] = useState<boolean>(true);
   const dispatch = useDispatch();
   const setNotification = useNotification();
 
@@ -108,15 +98,15 @@ const DetailsForm = () => {
   const fetchData = async () => {
     if (!crudId) return;
 
-    const { data } = await productService.get(Number(crudId));
+    const { data } = await productListService.get(Number(crudId));
 
-    setValue('id', data?.id);
+    console.log('data', data);
     setValue('name', data?.name);
-    data?.numberRegister && setValue('numberRegister', data?.numberRegister);
-    data?.lotNumber && setValue('lotNumber', data?.lotNumber);
+    setValue('numberRegister', data?.numberRegister);
+    setValue('lotNumber', data?.lotNumber);
     setValue('producer', data?.producer);
-    data?.dateManufacture && setValue('dateManufacture', data?.dateManufacture);
-    data?.outOfDate && setValue('outOfDate', data?.outOfDate);
+    setValue('dateManufacture', data?.dateManufacture);
+    setValue('outOfDate', data?.outOfDate);
     setValue('importPrice', data?.importPrice);
     setValue('price', data?.price);
     setValue('packRule', data?.packRule);
@@ -126,27 +116,21 @@ const DetailsForm = () => {
     setValue('description', data?.description);
     setValue('hidden', data?.hidden);
     setValue('usageId', data?.usageO.id);
-    setValue('usageName', data?.usageO.name);
     setValue('productGroupId', data?.productGroupO.id);
-    setValue('productGroupName', data?.productGroupO.name);
     setValue('treamentGroupId', data?.treamentGroupO.id);
-    setValue('treamentGroupName', data?.treamentGroupO.name);
     setValue('productImage', data?.productImage);
-    data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
+    setImage(`${connectURL}/${data?.productImage}`);
     setValue('amountFirst', data?.amountFirst);
-    data?.amountSecond && setValue('amountSecond', data?.amountSecond);
-    // setSupplierList(data?.suppliers);
+    setValue('amountSecond', data?.amountSecond);
     setValue(
       'productsSupplier',
       // @ts-ignore
       data?.suppliers.map((x) => x.id)
     );
     setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
-    setValue('mesureLevelFisrtName', data?.mesureLevelFisrt.name);
     setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
-    setValue('mesureLevelSecondName', data?.mesureLevelSecond.name);
     setValue('mesureLevelThird', data?.mesureLevelThird.id);
-    setValue('mesureLevelThirdName', data?.mesureLevelThird.name);
+    setProduct(data);
     setTaskQueue(false);
   };
 
@@ -245,8 +229,6 @@ const DetailsForm = () => {
       message: 'Cập nhật thành công',
       severity: 'success',
     });
-
-    setDisabled(true);
   };
 
   return (
@@ -258,11 +240,7 @@ const DetailsForm = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormLabel required title="Tên sản phẩm" name="name" />
-                <ControllerTextField
-                  disabled={disabled}
-                  name="name"
-                  control={control}
-                />
+                <ControllerTextField disabled name="name" control={control} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel
@@ -278,7 +256,7 @@ const DetailsForm = () => {
                   noOptionsText="Không tìm thấy nhóm sản phẩm"
                   defaultValue={getValues('productGroupName')}
                   placeholder=""
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -287,7 +265,7 @@ const DetailsForm = () => {
                   type="number"
                   name="numberRegister"
                   control={control}
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -304,7 +282,7 @@ const DetailsForm = () => {
                   noOptionsText="Không tìm thấy nhóm điều trị"
                   defaultValue={getValues('treamentGroupName')}
                   placeholder=""
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -313,7 +291,7 @@ const DetailsForm = () => {
                   type="number"
                   name="lotNumber"
                   control={control}
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -326,7 +304,7 @@ const DetailsForm = () => {
                   noOptionsText="Không tìm thấy nhóm dạng dùng"
                   defaultValue={getValues('usageName')}
                   placeholder=""
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -335,7 +313,7 @@ const DetailsForm = () => {
                   name="outOfDate"
                   control={control}
                   errors={errors}
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12}>
@@ -350,7 +328,7 @@ const DetailsForm = () => {
                       noOptionsText="Không tìm thấy đơn vị đo lường"
                       defaultValue={getValues('mesureLevelFisrtName')}
                       placeholder="Cấp 1 *"
-                      disabled={disabled}
+                      disabled
                       required
                     />
                   </Grid>
@@ -359,7 +337,7 @@ const DetailsForm = () => {
                       type="number"
                       name="amountFirst"
                       control={control}
-                      disabled={disabled}
+                      disabled
                     />
                   </Grid>
                   <Grid item xs={6} md={2}>
@@ -371,14 +349,14 @@ const DetailsForm = () => {
                       noOptionsText="Không tìm thấy đơn vị đo lường"
                       defaultValue={getValues('mesureLevelSecondName')}
                       placeholder="Cấp 2"
-                      disabled={disabled}
+                      disabled
                     />
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       name="amountSecond"
                       control={control}
-                      disabled={disabled}
+                      disabled
                     />
                   </Grid>
                   <Grid item xs={6} md={2}>
@@ -390,7 +368,7 @@ const DetailsForm = () => {
                       noOptionsText="Không tìm thấy đơn vị đo lường"
                       defaultValue={getValues('mesureLevelThirdName')}
                       placeholder="Cấp 3"
-                      disabled={disabled}
+                      disabled
                     />
                   </Grid>
                   <Grid item xs={6} md={2}></Grid>
@@ -400,7 +378,7 @@ const DetailsForm = () => {
                 <FormLabel title="Nhà sản xuất" name="producer" />
                 <ControllerTextField
                   name="producer"
-                  disabled={disabled}
+                  disabled
                   control={control}
                 />
               </Grid>
@@ -410,26 +388,20 @@ const DetailsForm = () => {
                   name="dateManufacture"
                   control={control}
                   errors={errors}
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá nhập" name="importPrice" />
                 <ControllerTextField
                   name="importPrice"
-                  type="number"
-                  disabled={disabled}
+                  disabled
                   control={control}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá bán" name="price" />
-                <ControllerTextField
-                  name="price"
-                  type="number"
-                  disabled={disabled}
-                  control={control}
-                />
+                <ControllerTextField name="price" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Nhà cung cấp" name="productsSupplier" />
@@ -440,14 +412,14 @@ const DetailsForm = () => {
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy nhà cung cấp"
                   placeholder=""
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Quy cách đóng gói" name="packRule" />
                 <ControllerTextField
                   name="packRule"
-                  disabled={disabled}
+                  disabled
                   control={control}
                 />
               </Grid>
@@ -456,23 +428,19 @@ const DetailsForm = () => {
                 <FormLabel title="Hoạt chất" name="content" />
                 <ControllerTextField
                   name="content"
-                  disabled={disabled}
+                  disabled
                   control={control}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel required title="Hàm lượng" name="dosage" />
-                <ControllerTextField
-                  name="dosage"
-                  disabled={disabled}
-                  control={control}
-                />
+                <ControllerTextField name="dosage" disabled control={control} />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel required title="Liều dùng" name="routeOfUse" />
                 <ControllerTextField
                   name="routeOfUse"
-                  disabled={disabled}
+                  disabled
                   control={control}
                 />
               </Grid>
@@ -481,7 +449,7 @@ const DetailsForm = () => {
                 <ControllerImageField
                   image={image}
                   setImage={setImage}
-                  disabled={disabled}
+                  disabled
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -494,7 +462,7 @@ const DetailsForm = () => {
                     minRows={11}
                     name="description"
                     control={control}
-                    disabled={disabled}
+                    disabled
                   />
                 </Grid>
               </Grid>
@@ -507,20 +475,16 @@ const DetailsForm = () => {
             Quay lại danh sách sản phẩm
           </LinkButton>
 
-          {!disabled && <LoadingButton type="submit">Lưu</LoadingButton>}
-
-          {disabled && (
-            <Button variant="contained" onClick={() => setDisabled(false)}>
-              Chỉnh sửa thông tin sản phẩm
-            </Button>
-          )}
+          <Button variant="contained" onClick={handleOpenUpdateDialog}>
+            Chỉnh sửa thông tin sản phẩm
+          </Button>
         </FormFooter>
       </FormPaperGrid>
 
       <FormDialog
         dataUpdate={product}
         // @ts-ignore
-        currentID={product?.id}
+        currentID={Number(crudId)}
         open={openFormDialog}
         handleClose={handleCloseUpdateDialog}
       />

@@ -1,10 +1,9 @@
 import { Outlet, RouteObject } from 'react-router-dom';
 import {
-  Measure,
-  ProductGroup,  ProductList, ProductDetails, Supplier, SupplierDetails, TreatmentGroup,  Usage, 
+  Measure, ProductDetails, ProductGroup, ProductList, ReferencePrices, Supplier, SupplierDetails, TreatmentGroup, Usage
 } from 'views/HK_Group/Product';
 
-const QLSanPhamRoutes: RouteObject = {
+const HKGroupRoutes: RouteObject = {
   path: 'hk_group/product',
   element: <Outlet />,
   children: [
@@ -52,7 +51,13 @@ const QLSanPhamRoutes: RouteObject = {
         { path: ':id', element: <SupplierDetails /> },
       ],
     },
+    {
+      path:'reference_prices',
+      children:[
+        {index:true,element:<ReferencePrices/>}
+      ]
+    }
   ],
 };
 
-export default QLSanPhamRoutes;
+export default HKGroupRoutes;

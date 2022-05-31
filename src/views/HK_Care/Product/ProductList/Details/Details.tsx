@@ -1,7 +1,5 @@
-import { Button, Grid, IconButton, Stack } from '@mui/material';
-import { LinkIconButton } from 'components/common';
+import { Button, Grid } from '@mui/material';
 import {
-  ControllerMultiFile,
   ControllerTextarea,
   ControllerTextField,
   FormContent,
@@ -9,10 +7,9 @@ import {
   FormLabel,
 } from 'components/Form';
 import React from 'react';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // @ts-ignore
-const Details = ({ control, files }) => {
+const Details = ({ control, fileValue }) => {
   return (
     <FormContent>
       <FormGroup>
@@ -73,7 +70,20 @@ const Details = ({ control, files }) => {
               title="Đính kèm giấy chứng nhận"
               name="bussinessLicense"
             />
-            <ControllerMultiFile files={files} setFiles={(file) => {}} viewOnly />
+            <Button variant="contained" fullWidth component="label">
+              {/* @ts-ignore */}
+              {fileValue?.name
+                ? // @ts-ignore
+                  fileValue.name
+                : 'Không có chứng nhận'}
+              <input
+                disabled
+                type="file"
+                name="bussinessLicense"
+                accept="application/pdf"
+                hidden
+              />
+            </Button>
           </Grid>
         </Grid>
       </FormGroup>

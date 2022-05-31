@@ -49,7 +49,7 @@ export interface ISupplier {
   description?: string;
   active?: number;
   id: number;
-  fileValue?: any;
+  files?: File[] | object[];
 }
 
 export interface IProduct {
@@ -88,7 +88,30 @@ export interface IProduct {
   mesureLevelThirdName?: string;
 }
 
+export interface IProductList {
+  productName: string;
+  mesure: string;
+  stockQuantity: number;
+  productId: number;
+  productGroup?: string;
+  importPrice: number;
+  price: number;
+  status: number;
+  mesureLevelFisrt: string;
+  amountFirst: string;
+  mesureLevelSecond: string;
+  amountSecond: string;
+  mesureLevelThird: string;
+  mesureLevelFisrtName: string;
+  mesureLevelSecondName: string;
+  mesureLevelThirdName: string;
+}
+
 export interface ITenant {
   id: string;
   name: string;
+}
+
+export interface IReferencePrices {
+  id: number;
 }

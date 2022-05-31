@@ -3,6 +3,7 @@ import authReducer from './auth';
 import measureReducer from './measure';
 import productReducer from './product';
 import productGroupReducer from './productGroup';
+import productListReducer from './productList';
 import supplierReducer from './supplier';
 import treatmentGroupReducer from './treatmentGroup';
 import usageReducer from './usage';
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   treatmentGroup: treatmentGroupReducer,
   productGroup: productGroupReducer,
   product: productReducer,
+  productList: productListReducer,
 });
 
 export default rootReducer;

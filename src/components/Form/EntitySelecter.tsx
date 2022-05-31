@@ -28,6 +28,7 @@ interface Props<T, O extends FieldValues[]>
   noOptionsText?: string;
   handleChangeInput?: (value: string) => void;
   defaultValue?: string;
+  loading?: boolean;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -48,6 +49,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     getOptionDisabled,
     handleChangeInput,
     defaultValue,
+    loading = false,
     ...rest
   } = props;
 
@@ -78,9 +80,10 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           options={options.map((option) => {
             return renderValue ? option[renderValue] : option.id;
           })}
-          getOptionLabel={(option) =>
-            labels[option]?.name || defaultValue || ''
-          }
+          getOptionLabel={(option) => {
+            return labels[option]?.name || defaultValue || '';
+          }}
+          loading={loading}
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
