@@ -65,7 +65,7 @@ const getSections = (): SectionItem[] => [
           },
           {
             title: 'Giá tham chiếu',
-            path: '/404',
+            path: '/hk_group/product/reference_prices',
             roles: ['hkl3'],
           },
         ],
@@ -93,7 +93,7 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Danh sách sản phẩm',
-            path: '/404',
+            path: '/hk_care/product/list',
             roles: ['hkl2_1_1'],
           },
           {

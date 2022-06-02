@@ -1,5 +1,6 @@
 export { default as ControllerDatePicker } from './ControllerDatePicker';
 export { default as ControllerImageField } from './ControllerImageField';
+export { default as ControllerMultiFile } from './ControllerMultiFile';
 export { default as ControllerTextarea } from './ControllerTextarea';
 export { default as ControllerTextField } from './ControllerTextField';
 export { default as EntityMultipleSelecter } from './EntityMultipleSelecter';

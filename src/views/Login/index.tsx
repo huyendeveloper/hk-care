@@ -48,6 +48,7 @@ const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
+  const [loadingTenant, setLoadingTenant] = useState<boolean>(true);
 
   const { control, handleSubmit } = useForm<ILogin>({
     mode: 'onChange',
@@ -56,9 +57,15 @@ const Login = () => {
   });
 
   useEffect(() => {
-    tenantService.getAll().then(({ data }) => {
-      setTenantList(data);
-    });
+    tenantService
+      .getAll()
+      .then(({ data }) => {
+        setTenantList(data);
+        setLoadingTenant(false);
+      })
+      .catch((e) => {
+        setLoadingTenant(false);
+      });
   }, []);
 
   const onSubmit = async (data: ILogin) => {
@@ -120,6 +127,7 @@ const Login = () => {
                   placeholder=""
                   noOptionsText="Không tìm thấy điểm bán"
                   // label="Điểm bán"
+                  loading={loadingTenant}
                 />
               </FormGroup>
               <FormGroup fullWidth>

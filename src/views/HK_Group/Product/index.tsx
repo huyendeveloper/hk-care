@@ -32,3 +32,7 @@ export const Supplier = Loadable(
 export const SupplierDetails = Loadable(
   lazy(() => import('views/HK_Group/Product/Supplier/Details'))
 );
+
+export const ReferencePrices = Loadable(
+  lazy(() => import('views/HK_Group/Product/ReferencePrices'))
+);

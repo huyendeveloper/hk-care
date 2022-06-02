@@ -17,10 +17,18 @@ interface Props {
   name?: string;
   handleDelete: () => void;
   tableName: string;
+  spanContent?: string;
 }
 
 const DeleteDialog = (props: Props) => {
-  const { open, onClose, name = '', handleDelete, tableName } = props;
+  const {
+    open,
+    onClose,
+    name = '',
+    handleDelete,
+    tableName,
+    spanContent = '',
+  } = props;
 
   return (
     <Dialog open={open} maxWidth="xs" fullWidth onClose={onClose} scroll="body">
@@ -34,6 +42,7 @@ const DeleteDialog = (props: Props) => {
         }}
       >
         <DeleteIcon sx={{ fontSize: 70, color: 'text.secondary' }} />
+        <Typography variant="h6">Xóa {tableName}</Typography>
       </Box>
       <Divider />
       <DialogContent>
@@ -42,7 +51,8 @@ const DeleteDialog = (props: Props) => {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Bạn có chắc chắn bạn muốn xóa {tableName} {<strong>{name}</strong>}?
+          Bạn có chắc chắn bạn muốn xóa {tableName} {<strong>{name}</strong>}
+          {spanContent}?
         </Typography>
       </DialogContent>
       <Divider />

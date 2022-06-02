@@ -57,7 +57,7 @@ const FormDialog = ({
 
   useEffect(() => {
     setDisabled(disable);
-  }, [disable]);
+  }, [disable, open]);
 
   const onSubmit = async (data: IUsage) => {
     if (data.id) {

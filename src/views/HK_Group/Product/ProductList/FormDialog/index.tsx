@@ -17,7 +17,7 @@ import {
 } from 'components/Form';
 import EntitySelecter from 'components/Form/EntitySelecter';
 import { defaultFilters } from 'constants/defaultFilters';
-import { yupDate, yupOnlyNumber } from 'constants/typeInput';
+import { typeNumber, yupDate, yupOnlyNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import {
   IMeasure,
@@ -40,6 +40,7 @@ import usageService from 'services/usage.service';
 import { FilterParams } from 'types';
 import * as yup from 'yup';
 import FormDialogSupplier from 'views/HK_Group/Product/Supplier/FormDialog';
+import { connectURL } from 'config';
 
 interface Props {
   open: boolean;
@@ -58,15 +59,20 @@ const validationSchema = yup.object().shape({
   outOfDate: yupDate,
   numberRegister: yupOnlyNumber(),
   lotNumber: yupOnlyNumber(),
-  dosage: yup.string().required('Vui lòng nhập hàm lượng.'),
-  routeOfUse: yup.string().required('Vui lòng nhập liều dùng.'),
+  dosage: yup.string().required('Vui lòng nhập hàm lượng.').default('Null'),
+  routeOfUse: yup
+    .string()
+    .required('Vui lòng nhập liều dùng.')
+    .default('Theo chỉ định'),
   amountSecond: yupOnlyNumber(),
   dateManufacture: yupDate,
+  importPrice: yupOnlyNumber(),
+  price: yupOnlyNumber(),
 });
 
-const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
+const FormDialog = ({ open, handleClose, currentID }: Props) => {
   const setNotification = useNotification();
-  const [image, setImage] = useState<Blob | null | undefined>();
+  const [image, setImage] = useState<Blob | null | string | undefined>();
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
@@ -121,20 +127,10 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
     handleClose(true);
   };
 
-  const getFile = async (image: string) => {
-    const { data } = await supplierService.getFile(image);
-    setImage(data);
-  };
-
   const fetchData = async () => {
     if (currentID) {
-      let data;
-      if (dataUpdate) {
-        data = dataUpdate;
-      } else {
-        const res = await productService.get(currentID);
-        data = res.data;
-      }
+      const { data } = await productService.get(currentID);
+
       setValue('id', data?.id);
       setValue('name', data?.name);
       data?.numberRegister && setValue('numberRegister', data?.numberRegister);
@@ -158,7 +154,7 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
       setValue('treamentGroupId', data?.treamentGroupO.id);
       setValue('treamentGroupName', data?.treamentGroupO.name);
       setValue('productImage', data?.productImage);
-      data?.productImage && getFile(data?.productImage);
+      data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
       setValue('amountFirst', data?.amountFirst);
       data?.amountSecond && setValue('amountSecond', data?.amountSecond);
       // setSupplierList(data?.suppliers);
@@ -229,13 +225,17 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
   useEffect(() => {
     reset();
     fetchData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentID, open]);
+
+  useEffect(() => {
     fetchProductGroupList();
     fetchTreatmentGroupList();
     fetchUsageList();
     fetchMeasureList();
     fetchSupplierList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID, open]);
+  }, []);
 
   const handleCloseFormDialog = (updated: boolean | undefined) => {
     setOpenFormDialog(false);
@@ -370,7 +370,7 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
                       defaultValue={getValues('mesureLevelFisrtName')}
-                      placeholder="Cấp 1"
+                      placeholder="Cấp 1 *"
                     />
                   </Grid>
                   <Grid item xs={6} md={2}>
@@ -436,7 +436,11 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
                   <FormLabel title="Giá nhập" name="importPrice" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="importPrice" control={control} />
+                  <ControllerTextField
+                    type="number"
+                    name="importPrice"
+                    control={control}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -444,7 +448,11 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
                   <FormLabel title="Giá bán" name="price" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="price" control={control} />
+                  <ControllerTextField
+                    type="number"
+                    name="price"
+                    control={control}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12}>

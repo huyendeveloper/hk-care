@@ -57,60 +57,83 @@ const getFormData = (payload: IProduct, file: any) => {
 };
 
 class ProductService {
-  getAll({
+  getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
+    return axiosClient.get(
+      `${baseURL}/ProductList/SearchRegisterProduct?Keyword=${searchText}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+    // return axiosClient.post(`${baseURL}/ProductList/SearchRegisterProduct`, {
+    //   maxResultCount: pageSize,
+    //   skipCount: (pageIndex - 1) * pageSize,
+    //   sorting: '',
+    //   keyword: 'searchText',
+    //   descending: false,
+    // });
+  }
+
+  getAllProduct({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
+    return axiosClient.get(
+      `${baseURL}/ProductList/SearchAll?Keyword=${searchText}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+    // return axiosClient.post(`${baseURL}/ProductList/SearchAll`, {
+    //   maxResultCount: pageSize,
+    //   skipCount: (pageIndex - 1) * pageSize,
+    //   sorting: '',
+    //   keyword: 'searchText',
+    //   descending: false,
+    // });
+  }
+
+  getAllProductRegisted({
     pageIndex,
     pageSize,
     sortBy,
     searchText,
-    supplierId,
   }: FilterParams) {
     return axiosClient.get(
-      `${baseURL}/product/SearchAll?Keyword=${searchText}&SkipCount=${
+      `${baseURL}/ProductList/SearchRegisterProductList?Keyword=${searchText}&SkipCount=${
         (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}&supplierId=${supplierId}`
+      }&MaxResultCount=${pageSize}`
     );
+
+    // return axiosClient.post(
+    //   `${baseURL}/ProductList/SearchRegisterProductList`,
+    //   {
+    //     maxResultCount: pageSize,
+    //     skipCount: (pageIndex - 1) * pageSize,
+    //     sorting: '',
+    //     keyword: 'searchText',
+    //     descending: false,
+    //   }
+    // );
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/product/GetProductById/${id}`);
+    return axiosClient.get(
+      `${baseURL}/ProductList/GetProductListDetail?productId=${id}`
+    );
   }
 
-  create(payload: IProduct, file: any) {
-    const token = LocalStorage.get('accessToken');
-
-    const params = getFormData(payload, file);
-    params.append('hidden', 'false');
-
-    return axios({
-      method: 'post',
-      url: `${baseURL}/product/CreateProduct`,
-      data: params,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  create(payload: { listProductId: number[] }) {
+    return axiosClient.post(
+      `${baseURL}/ProductList/RegisterProducts`,
+      payload.listProductId
+    );
   }
 
-  update(payload: IProduct, file: any) {
-    const token = LocalStorage.get('accessToken');
-
-    const params = getFormData(payload, file);
-    params.append('hidden', 'true');
-
-    return axios({
-      method: 'put',
-      url: `${baseURL}/product/UpdateProduct/${payload.id}`,
-      data: params,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  update(payload: { price: number; productId: number }) {
+    return axiosClient.put(
+      `${baseURL}/ProductList/UpdatePrice?productId=${payload.productId}&price=${payload.price}`
+    );
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/product/${id}`);
+    return axiosClient.post(
+      `${baseURL}/ProductList/UnRegisterProduct?productId=${id}`
+    );
   }
 
   changeStatus(id: number | null, status: boolean) {

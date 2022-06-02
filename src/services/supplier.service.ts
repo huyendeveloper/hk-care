@@ -1,6 +1,6 @@
 import axiosClient from 'api';
 import axios from 'axios';
-import { baseURL } from 'config';
+import { baseURL, connectURL } from 'config';
 import { ISupplier } from 'interface';
 import { FilterParams } from 'types';
 import LocalStorage from 'utils/LocalStorage';
@@ -15,14 +15,16 @@ class SupplierService {
   }
 
   getAllSupplier() {
-    return axiosClient.get(`${baseURL}/supplier/search-all`);
+    return axiosClient.get(
+      `${baseURL}/supplier/search-all?MaxResultCount=1000`
+    );
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/supplier/${id}`);
+    return axiosClient.get(`${baseURL}/supplier/GetSupplierById/${id}`);
   }
 
-  create(payload: ISupplier, file: any) {
+  create(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
 
     params.append('name', payload.name);
@@ -32,8 +34,11 @@ class SupplierService {
     payload.mobileNumber && params.append('mobileNumber', payload.mobileNumber);
     payload.fax && params.append('fax', payload.fax);
     payload.taxCode && params.append('taxCode', payload.taxCode);
-    if (file) {
-      params.append('bussinessLicense', file, file.name);
+    if (files.length > 0) {
+      files.forEach((item) => {
+        // @ts-ignore
+        params.append('bussinessLicense', item, item.name);
+      });
     }
     payload.description && params.append('description', payload.description);
     params.append('active', '1');
@@ -51,9 +56,8 @@ class SupplierService {
     });
   }
 
-  update(payload: ISupplier, file: any) {
+  update(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
-
     params.append('name', payload.name);
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
@@ -61,9 +65,23 @@ class SupplierService {
     payload.mobileNumber && params.append('mobileNumber', payload.mobileNumber);
     payload.fax && params.append('fax', payload.fax);
     payload.taxCode && params.append('taxCode', payload.taxCode);
-    if (file && file.type) {
-      params.append('bussinessLicense', file, file.name);
+
+    if (files.length > 0) {
+      files.forEach((item) => {
+        // @ts-ignore
+        if (item) {
+          // @ts-ignore
+          if (item.type) {
+            // @ts-ignore
+            params.append('bussinessLicense', item, item.name);
+          } else {
+            // @ts-ignore
+            params.append('filesOld', item.name.replace(`${connectURL}/`, ''));
+          }
+        }
+      });
     }
+
     payload.description && params.append('description', payload.description);
     payload.active && params.append('active', payload.active.toString());
 
@@ -91,7 +109,7 @@ class SupplierService {
   }
 
   getFile(filePath: string) {
-    return axiosClient.get(`${baseURL}/file/url-file?filePath=${filePath}`);
+    return axiosClient.get(`${connectURL}/${filePath}`);
   }
 }
 

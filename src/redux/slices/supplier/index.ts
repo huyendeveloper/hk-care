@@ -41,9 +41,9 @@ export const getAllSupplier = createAsyncThunk(
 export const createSupplier = createAsyncThunk(
   'supplier/create',
   async (payload: ISupplier, { rejectWithValue }) => {
-    const { fileValue, ...data } = payload;
+    const { files, ...data } = payload;
     try {
-      await supplierService.create(data, fileValue);
+      await supplierService.create(data, files || []);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -53,9 +53,9 @@ export const createSupplier = createAsyncThunk(
 export const updateSupplier = createAsyncThunk(
   'supplier/update',
   async (payload: ISupplier, { rejectWithValue }) => {
-    const { fileValue, ...data } = payload;
+    const { files, ...data } = payload;
     try {
-      await supplierService.update(data, fileValue);
+      await supplierService.update(data, files || []);
     } catch (error) {
       return rejectWithValue(error);
     }
