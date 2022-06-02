@@ -8,39 +8,35 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import { styled } from '@mui/material/styles';
 import Page from 'components/common/Page';
+import { FormLabel } from 'components/Form';
 import ControllerTextField from 'components/Form/ControllerTextField';
 import EntitySelecter from 'components/Form/EntitySelecter';
 import FormGroup from 'components/Form/FormGroup';
-import useMounted from 'hooks/useMounted';
 import useNotification from 'hooks/useNotification';
 import { ILogin, ITenant } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login } from 'redux/slices';
-import { AppDispatch } from 'redux/store';
+import { AppDispatch, RootState } from 'redux/store';
 import tenantService from 'services/tenant.service';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({
   __tenant: yup
     .string()
-    // .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng chọn điểm bán.')
     .nullable()
     .default(null),
   username: yup
     .string()
-    // .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    // .email('Email is invalid')
     .required('Vui lòng điền tên đăng nhập.')
     .default(''),
   password: yup
     .string()
-    // .trim('Cannot include leading and trailing spaces')
     .strict(true)
     .required('Vui lòng điền mật khẩu.')
     .default(''),
@@ -48,11 +44,11 @@ const validationSchema = yup.object().shape({
 
 const Login = () => {
   const setNotification = useNotification();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading } = useSelector((state: RootState) => state.auth);
   const dispatch: AppDispatch = useDispatch();
-  const isMounted = useMounted();
   const navigate = useNavigate();
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
+  const [loadingTenant, setLoadingTenant] = useState<boolean>(true);
 
   const { control, handleSubmit } = useForm<ILogin>({
     mode: 'onChange',
@@ -61,32 +57,29 @@ const Login = () => {
   });
 
   useEffect(() => {
-    tenantService.getAll().then(({ data }) => {
-      setTenantList(data);
-    });
+    tenantService
+      .getAll()
+      .then(({ data }) => {
+        setTenantList(data);
+        setLoadingTenant(false);
+      })
+      .catch((e) => {
+        setLoadingTenant(false);
+      });
   }, []);
 
   const onSubmit = async (data: ILogin) => {
-    try {
-      setLoading(true);
-      const { type } = await dispatch(login(data));
+    // @ts-ignore
+    const { error } = await dispatch(login(data));
 
-      if (type.includes('fulfilled')) {
-        return navigate('/');
-      }
-
-      if (type.includes('rejected')) {
-        setNotification({
-          error: 'Tên đăng nhập hoặc mật khẩu sai!',
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
+    if (error) {
+      setNotification({
+        error: 'Vui lòng kiểm tra lại thông tin đăng nhập.',
+      });
+      return;
     }
+
+    return navigate('/');
   };
 
   return (
@@ -124,6 +117,7 @@ const Login = () => {
                 src="/static/logo.png"
               />
               <FormGroup fullWidth>
+                <FormLabel required title="Điểm bán" name="__tenant" />
                 <EntitySelecter
                   name="__tenant"
                   required
@@ -131,14 +125,17 @@ const Login = () => {
                   options={tenantList}
                   renderLabel={(field) => field.name}
                   placeholder=""
-                  label="Điểm bán"
+                  noOptionsText="Không tìm thấy điểm bán"
+                  // label="Điểm bán"
+                  loading={loadingTenant}
                 />
               </FormGroup>
               <FormGroup fullWidth>
+                <FormLabel required title="Tên đăng nhập" name="username" />
                 <ControllerTextField
                   name="username"
                   control={control}
-                  label="Tên đăng nhập"
+                  // label="Tên đăng nhập"
                   required
                   fullWidth
                   InputProps={{
@@ -151,14 +148,14 @@ const Login = () => {
                 />
               </FormGroup>
               <FormGroup fullWidth>
+                <FormLabel required title="Mật khẩu" name="password" />
                 <ControllerTextField
                   name="password"
                   control={control}
                   type="password"
-                  label="Mật khẩu"
+                  // label="Mật khẩu"
                   required
                   fullWidth
-                  // placeholder="Password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

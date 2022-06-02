@@ -3,8 +3,10 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+import { useDebounce } from 'react-use';
 
 export interface Label extends FieldValues {
   name: string;
@@ -24,6 +26,9 @@ interface Props<T, O extends FieldValues[]>
   placeholder: string;
   forcePopupIcon?: boolean;
   noOptionsText?: string;
+  handleChangeInput?: (value: string) => void;
+  defaultValue?: string;
+  loading?: boolean;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -42,8 +47,13 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     forcePopupIcon,
     noOptionsText,
     getOptionDisabled,
+    handleChangeInput,
+    defaultValue,
+    loading = false,
     ...rest
   } = props;
+
+  const [valueInput, setValueInput] = useState<string>('');
 
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.id;
@@ -51,6 +61,14 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     acc[id] = { id, name: renderLabel(option), caption };
     return acc;
   }, {});
+
+  useDebounce(
+    () => {
+      handleChangeInput && handleChangeInput(valueInput);
+    },
+    1500,
+    [valueInput]
+  );
 
   return (
     <Controller
@@ -62,25 +80,35 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           options={options.map((option) => {
             return renderValue ? option[renderValue] : option.id;
           })}
-          getOptionLabel={(option) => labels[option]?.name || 'Not available'}
+          getOptionLabel={(option) => {
+            return labels[option]?.name || defaultValue || '';
+          }}
+          loading={loading}
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
-          renderInput={(params) => (
-            <TextField
-              error={Boolean(error)}
-              helperText={error?.message && error.message}
-              placeholder={placeholder}
-              {...params}
-              {...rest}
-            />
-          )}
+          renderInput={(params) => {
+            // @ts-ignore
+            params.inputProps.value = params.inputProps.value || defaultValue;
+            return (
+              <TextField
+                error={Boolean(error)}
+                helperText={error?.message && error.message}
+                placeholder={placeholder}
+                onChange={(e) => {
+                  setValueInput(e.target.value);
+                }}
+                {...params}
+                {...rest}
+              />
+            );
+          }}
           renderOption={(props, option: number) => {
             const { name, caption } = labels[option];
             return (
               <Box component="li" {...props} key={option}>
                 <Box>
-                  {name || 'Not available'}
+                  {name || defaultValue}
                   {caption && (
                     <Typography variant="caption" display="block">
                       {caption}

@@ -24,8 +24,9 @@ const PageWrapper: FC<Props> = (props) => {
           gridTemplateRows: 'auto 1fr',
           rowGap: 2,
           py: 3,
+          maxWidth:'1300px !important'
         }}
-        maxWidth={false}
+        
       >
         <PageBreadcrums />
         {children}

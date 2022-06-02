@@ -28,26 +28,30 @@ const validationSchema = yup.object().shape({
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   lastName: yup
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   email: yup
     .string()
     .trim('Cannot include leading and trailing spaces')
     .strict(true)
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .default(''),
   mobileNumber: yup
     .string()
-    .required('Required')
+    .required('Vui lòng nhập trường này.')
     .matches(Regexs.phone, 'yupErrorMessage.onlyNumber')
     .default(''),
-  roleId: yup.number().required('Required').nullable().default(null),
+  roleId: yup
+    .number()
+    .required('Vui lòng nhập trường này.')
+    .nullable()
+    .default(null),
 });
 
 interface FormData {
@@ -59,7 +63,6 @@ interface FormData {
 }
 
 const Overview = () => {
-
   const [openEditProfileDialog, setOpenEditProfileDialog] =
     useState<boolean>(false);
   const { user: userInfo, onForceUpdate } = useAuth();
@@ -67,7 +70,6 @@ const Overview = () => {
   const { control, getValues, reset } = useForm<FormData>({
     mode: 'onChange',
     defaultValues: validationSchema.getDefault(),
-
   });
 
   const handleOpenEditProfile = () => {
@@ -82,17 +84,16 @@ const Overview = () => {
   useEffect(() => {
     reset({
       roleId: 1,
-      firstName: "John",
-      lastName: "Smith",
-      email: "johnsmith@gmail.com",
-      mobileNumber: "391887289",
-    })
-  }, [reset])
+      firstName: 'John',
+      lastName: 'Smith',
+      email: 'johnsmith@gmail.com',
+      mobileNumber: '391887289',
+    });
+  }, [reset]);
 
   return (
     <Page title="User | Profile details">
       <form>
-
         <Box sx={{ p: 2 }}>
           <Box>
             <Typography>Profile details</Typography>
@@ -131,10 +132,7 @@ const Overview = () => {
                       />
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
-                      <FormLabel
-                        required
-                        title="Last name"
-                        name="lastName" />
+                      <FormLabel required title="Last name" name="lastName" />
                     </Grid>
                     <Grid item xs={12} sm={8} md={4}>
                       <ControllerTextField
@@ -148,10 +146,7 @@ const Overview = () => {
                 <FormGroup>
                   <Grid container alignItems="center" spacing={2}>
                     <Grid item xs={12} sm={4} md={2}>
-                      <FormLabel
-                        required
-                        title="Email"
-                        name="email" />
+                      <FormLabel required title="Email" name="email" />
                     </Grid>
                     <Grid item xs={12} sm={8} md={4}>
                       <ControllerTextField
@@ -160,7 +155,6 @@ const Overview = () => {
                         control={control}
                       />
                     </Grid>
-
                   </Grid>
                 </FormGroup>
                 <FormGroup>
@@ -181,7 +175,7 @@ const Overview = () => {
                           startAdornment: (
                             <FormInputAdornment
                               position="start"
-                              title={"+84"}
+                              title={'+84'}
                               disabled
                               visible={!!getValues('mobileNumber')}
                             />
@@ -194,10 +188,7 @@ const Overview = () => {
                 <FormGroup>
                   <Grid container alignItems="center" spacing={2}>
                     <Grid item xs={12} sm={4} md={2}>
-                      <FormLabel
-                        required
-                        title="Role"
-                        name="roleId" />
+                      <FormLabel required title="Role" name="roleId" />
                     </Grid>
                     <Grid item xs={12} sm={8} md={4}>
                       <EntitySelecter
@@ -242,7 +233,7 @@ const Overview = () => {
           </Box>
         </Box>
       </form>
-    </Page >
+    </Page>
   );
 };
 

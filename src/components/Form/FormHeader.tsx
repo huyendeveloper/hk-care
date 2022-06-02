@@ -15,9 +15,8 @@ const FormHeader = (props: Props) => {
   return (
     <Box sx={{ mb: 2 }} {...rest}>
       <Typography
-        variant="h6"
         color="text.secondary"
-        sx={{ mb: 1.5, fontWeight: 'regular' }}
+        sx={{ mb: 1.5, fontWeight: 'regular', fontSize: '1.74rem' }}
       >
         {title}
       </Typography>

@@ -14,6 +14,7 @@ interface Props {
   rowsPerPage: number;
   rowsPerPageOptions: number[];
   isSmall?: boolean;
+  totalItem?: number;
 }
 
 const TablePagination = (props: Props) => {
@@ -21,6 +22,7 @@ const TablePagination = (props: Props) => {
     pageIndex,
     totalPages,
     rowsPerPage,
+    totalItem = 0,
     rowsPerPageOptions,
     onChangePage,
     onChangeRowsPerPage,
@@ -44,14 +46,14 @@ const TablePagination = (props: Props) => {
           mr: 3,
         }}
       >
-        <Typography
+        {/* <Typography
           variant="subtitle2"
           color="text.secondary"
           sx={{ whiteSpace: 'nowrap' }}
         >
           Số dòng mỗi trang
-        </Typography>
-        <FormControl sx={{ ml: 1, mr: 2 }}>
+        </Typography> */}
+        {/* <FormControl sx={{ ml: 1, mr: 2 }}>
           <Select
             value={String(rowsPerPage)}
             onChange={handleChangeRowsPerPage}
@@ -73,19 +75,22 @@ const TablePagination = (props: Props) => {
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </FormControl> */}
         <Typography
           variant="subtitle2"
           color="text.secondary"
           sx={{ whiteSpace: 'nowrap' }}
         >
           {totalPages === 0 ? 0 : (pageIndex - 1) * rowsPerPage + 1}–
-          {pageIndex * rowsPerPage} of {totalPages}
+          {pageIndex * rowsPerPage > totalPages
+            ? totalPages
+            : pageIndex * rowsPerPage}{' '}
+          trên tổng {totalPages}
         </Typography>
       </Box>
       <Pagination
         page={pageIndex}
-        count={totalPages}
+        count={Math.ceil(totalPages / rowsPerPage)}
         shape="rounded"
         showFirstButton={!isSmall}
         showLastButton={!isSmall}

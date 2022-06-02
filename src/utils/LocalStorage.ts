@@ -4,7 +4,6 @@ class LocalStorage {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : fallback;
     } catch (error) {
-      console.log(error);
       return fallback;
     }
   }

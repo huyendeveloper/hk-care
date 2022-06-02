@@ -37,6 +37,7 @@ const PageBreadcrumbs = () => {
               to={link}
               color={'text.primary'}
               variant="subtitle2"
+              fontSize={'1rem'}
             >
               {text}
             </Link>

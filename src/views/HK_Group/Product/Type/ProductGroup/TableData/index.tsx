@@ -22,8 +22,16 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { IProductGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  deleteProductGroup,
+  getAllProductGroup,
+} from 'redux/slices/productGroup';
+import { RootState } from 'redux/store';
 import productGroupService from 'services/productGroup.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
@@ -44,44 +52,37 @@ const getCells = (): Cells<IProductGroup> => [
   },
 ];
 
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
-
 const TableData = () => {
+  const [disableView, setDisableView] = useState<boolean>(false);
+  const setNotification = useNotification();
+  const dispatch = useDispatch();
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading } = useSelector((state: RootState) => state.productGroup);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    productGroupService
-      .getAll(filters)
-      .then(({ data }) => {
-        setProductGroupList(data.items ?? []);
-        setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllProductGroup(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách nhóm sản phẩm!',
       });
+      return;
+    }
+
+    setProductGroupList(payload.productGroupList);
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -115,14 +116,22 @@ const TableData = () => {
     }));
   };
 
+  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setDisableView(true);
+    setOpenFormDialog(true);
+  };
+
   const handleOpenCreateDialog = () => {
     setCurrentID(null);
     setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
     setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
@@ -143,23 +152,27 @@ const TableData = () => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-    try {
-      await productGroupService.delete(currentID);
-      handleCloseDeleteDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteProductGroup(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi khi xóa nhóm sản phẩm!' });
+      return;
     }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+
+    setProductGroupList(productGroupList.filter((x) => x.id !== currentID));
   };
 
   const renderAction = (row: IProductGroup) => {
     return (
       <>
-        <LinkIconButton to={`${row.id}`}>
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        </LinkIconButton>
+        <IconButton onClick={handleOpenViewDialog(row.id)}>
+          <VisibilityIcon />
+        </IconButton>
 
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
@@ -184,6 +197,7 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenCreateDialog}
+          sx={{ fontSize: '1rem' }}
         >
           Thêm mới nhóm sản phẩm
         </Button>
@@ -201,13 +215,17 @@ const TableData = () => {
               />
 
               <TableBody>
-                {productGroupList.map((item) => {
+                {productGroupList.map((item, index) => {
                   const { id, name } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell align="left">{renderAction(item)}</TableCell>
+                      <TableCell sx={{ width: '44%' }}>
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
+                      <TableCell sx={{ width: '44%' }}>{name}</TableCell>
+                      <TableCell sx={{ width: '12%' }} align="left">
+                        {renderAction(item)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -240,6 +258,7 @@ const TableData = () => {
         data={productGroupList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        disable={disableView}
       />
     </TableWrapper>
   );

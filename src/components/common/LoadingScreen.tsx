@@ -14,7 +14,7 @@ const LoadingScreen = () => {
     >
       <Box>
         <Typography gutterBottom variant="subtitle2" align="center">
-          Product name
+          Đang tải . . .
         </Typography>
         <Box sx={{ width: 400 }}>
           <LinearProgress />

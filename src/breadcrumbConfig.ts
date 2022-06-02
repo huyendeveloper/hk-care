@@ -17,7 +17,7 @@ const breadcrumbConfig = [
     path: '/hk_group/product/list',
   },
   {
-    breadcrumb: 'Chi tiết danh sách sản phẩm',
+    breadcrumb: 'Chi tiết sản phẩm',
     path: '/hk_group/product/list/:id',
   },
   {
@@ -56,6 +56,17 @@ const breadcrumbConfig = [
     breadcrumb: 'Nhà cung cấp',
     path: '/hk_group/product/supplier',
   },
+  {
+    breadcrumb: 'Chi tiết nhà cung cấp',
+    path: '/hk_group/product/supplier/:id',
+  },
+  {
+    breadcrumb: 'Giá tham chiếu',
+    path: '/hk_group/product/reference_prices',
+  },
+  { breadcrumb: 'HK Care', path: '/hk_care' },
+  { breadcrumb: 'Quản lý sản phẩm', path: '/hk_care/product' },
+  { breadcrumb: 'Danh sách sản phẩm', path: '/hk_care/product/list' },
 ];
 
 export default breadcrumbConfig;

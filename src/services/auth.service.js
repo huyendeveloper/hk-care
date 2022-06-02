@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { baseURL } from 'config';
+import { connectURL } from 'config';
 
 class AuthService {
   login(body) {
@@ -10,7 +10,7 @@ class AuthService {
     params.append('client_secret', '1q2w3e*');
     params.append('grant_type', 'password');
     params.append('__tenant', body.__tenant);
-    return axios.post('http://210.245.85.229:1997/connect/token', params, {
+    return axios.post(`${connectURL}/connect/token`, params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },

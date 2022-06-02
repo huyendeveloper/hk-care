@@ -1,16 +1,20 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
+  Box,
+  Button,
   Dialog,
   Grid,
-  Button,
-  Box,
+  IconButton,
+  Stack,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
 import {
+  ControllerMultiFile,
   ControllerTextarea,
   ControllerTextField,
+  EntityMultipleSelecter,
   FormContent,
   FormFooter,
   FormGroup,
@@ -18,10 +22,18 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import { baseURL, connectURL } from 'config';
+import { typeNumber, typeStringNumber } from 'constants/typeInput';
+import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { createSupplier, updateSupplier } from 'redux/slices/supplier';
+import { RootState } from 'redux/store';
+import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface Props {
   open: boolean;
@@ -31,13 +43,27 @@ interface Props {
 }
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Required').strict(true).default(''),
-  description: yup.string().strict(true).default(''),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên nhà cung cấp.')
+    .max(150, 'Tên nhà cung cấp không quá 150 ký tự.')
+    .strict(true)
+    .default(''),
+  telephoneNumber: yup
+    .string()
+    .required('Vui lòng nhập số điện thoại.')
+    .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .strict(true)
+    .default(''),
+  address: yup.string().max(150, 'Địa chỉ không quá 150 ký tự.').default(''),
 });
 
-const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('md'));
+const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
+  const [files, setFiles] = useState<File[] | object[]>([]);
+  const setNotification = useNotification();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state: RootState) => state.supplier);
 
   const { control, handleSubmit, setValue, reset } = useForm<ISupplier>({
     mode: 'onChange',
@@ -45,36 +71,79 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (payload: ISupplier) => {
-    try {
-      // if (payload.id) {
-      //   await measureService.update(payload);
-      // } else {
-      //   await measureService.create(payload);
-      // }
-      reset();
-      handleClose(true);
-    } catch (error) {
-      console.error(error);
+  const onSubmit = async (supplier: ISupplier) => {
+    if (files.length === 0) {
+      setNotification({
+        message: 'Chưa có giấy chứng nhận',
+        severity: 'warning',
+      });
+      return;
+    }
+
+    if (supplier.id) {
+      const { error, payload } = await dispatch(
+        // @ts-ignore
+        updateSupplier({ ...supplier, files })
+      );
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi cập nhật nhà cung cấp!',
+        });
+        return;
+      }
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+    } else {
+      const { error, payload } = await dispatch(
+        // @ts-ignore
+        createSupplier({ ...supplier, files })
+      );
+      if (error) {
+        setNotification({
+          error: payload.response.data || 'Lỗi khi thêm nhà cung cấp!',
+        });
+        return;
+      }
+      setNotification({ message: 'Thêm thành công', severity: 'success' });
+    }
+
+    reset();
+    setFiles([]);
+    handleClose(true);
+  };
+
+  const fetchData = async () => {
+    setFiles([]);
+    if (currentID) {
+      const { data } = await supplierService.get(currentID);
+      setValue('id', currentID);
+      setValue('name', data?.name || '');
+      setValue('address', data?.address || '');
+      setValue('nameContact', data?.nameContact || '');
+      setValue('telephoneNumber', data?.telephoneNumber || '');
+      setValue('mobileNumber', data?.mobileNumber || '');
+      setValue('description', data?.description || '');
+      setValue('fax', data?.fax || '');
+      setValue('taxCode', data?.taxCode || '');
+      setValue('active', data?.active);
+      if (data?.bussinessLicense) {
+        const fileList: object[] = [];
+        data.bussinessLicense.forEach((item: string) => {
+          fileList.push({ name: `${connectURL}/${item}` });
+        });
+        console.log('fileList', fileList)
+        setFiles(fileList);
+      }
     }
   };
 
   useEffect(() => {
     reset();
-    if (currentID) {
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('address', data?.address || '');
-      setValue('contactName', data?.contactName || '');
-      setValue('phone', data?.phone || '');
-      setValue('phone2', data?.phone2 || '');
-      setValue('description', data?.description || '');
-      setValue('fax', data?.fax || '');
-      setValue('taxCode', data?.taxCode || '');
-      setValue('certificate', data?.certificate || '');
-    }
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID]);
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -89,16 +158,6 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
-              {currentID && (
-                <Grid item xs={12} md={6}>
-                  <Grid item xs={12}>
-                    <FormLabel title="Mã nhà cung cấp" name="id" />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ControllerTextField name="id" disabled control={control} />
-                  </Grid>
-                </Grid>
-              )}
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel required title="Tên nhà cung cấp" name="name" />
@@ -107,7 +166,14 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                   <ControllerTextField name="name" control={control} />
                 </Grid>
               </Grid>
-              {!mobile && !currentID && <Grid item xs={12} md={6}></Grid>}
+              <Grid item xs={12} md={6}>
+                <Grid item xs={12}>
+                  <FormLabel title="Người liên hệ" name="nameContact" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField name="nameContact" control={control} />
+                </Grid>
+              </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel title="Địa chỉ" name="address" />
@@ -118,36 +184,29 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Người liên hệ" name="contactName" />
+                  <FormLabel title="Di động" name="mobileNumber" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="contactName" control={control} />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel required title="Điện thoại" name="phone" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField name="phone" control={control} />
+                  <ControllerTextField name="mobileNumber" control={control} />
                 </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Di động" name="phone2" />
+                  <FormLabel
+                    required
+                    title="Điện thoại"
+                    name="telephoneNumber"
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="phone2" control={control} />
-                </Grid>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Fax" name="fax" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField name="fax" control={control} />
+                  <ControllerTextField
+                    inputProps={typeStringNumber((value) =>
+                      setValue('telephoneNumber', value)
+                    )}
+                    name="telephoneNumber"
+                    control={control}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -159,20 +218,14 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 'auto' }}>
-                  <Grid item xs={12}>
-                    <FormLabel
-                      required
-                      title="Đính kèm giấy chứng nhận"
-                      name="certificate"
-                    />
-                  </Grid>
-                </Box>
-
                 <Grid item xs={12}>
-                  <ControllerTextField name="certificate" control={control} />
+                  <FormLabel title="Fax" name="fax" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField name="fax" control={control} />
                 </Grid>
               </Grid>
+
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel title="Ghi chú" name="description" />
@@ -186,6 +239,21 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
                   />
                 </Grid>
               </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 'auto' }}>
+                  <Grid item xs={12}>
+                    <FormLabel
+                      required
+                      title="Đính kèm giấy chứng nhận"
+                      name="bussinessLicense"
+                    />
+                  </Grid>
+                </Box>
+
+                <Grid item xs={12}>
+                  <ControllerMultiFile files={files} setFiles={setFiles} />
+                </Grid>
+              </Grid>
             </Grid>
           </FormGroup>
         </FormContent>
@@ -194,11 +262,13 @@ const FormDialog = ({ open, handleClose, currentID, data }: Props) => {
           <Button variant="outlined" onClick={() => handleClose()}>
             Hủy
           </Button>
-          <LoadingButton type="submit">Lưu</LoadingButton>
+          <LoadingButton loading={loading} type="submit">
+            Lưu
+          </LoadingButton>
         </FormFooter>
       </FormPaperGrid>
     </Dialog>
   );
 };
 
-export default FormDialog;
+export default FormDialogSupplier;

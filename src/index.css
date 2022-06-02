@@ -23,3 +23,58 @@ textarea {
 .MuiFormLabel-asterisk {
   color: #d32f2f;
 }
+
+.preview-image {
+  width: 100%;
+  margin-bottom: -4px;
+}
+
+.preview-image:hover {
+  opacity: 0.4;
+}
+
+.preview-image:hover + .preview-image-icon {
+  display: inline-block !important;
+}
+
+.preview-image-icon {
+  display: none !important;
+}
+
+.button-select-file {
+  background-repeat: no-repeat;
+  width: 100%;
+  min-height: 194px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.Mui-disabled,
+textarea:disabled {
+  -webkit-text-fill-color: rgb(102 102 102 / 82%) !important;
+}
+
+.MuiTableCell-sizeSmall {
+  font-size: 15.5px !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+@media screen and (max-width: 1440px) {
+  .MuiTableCell-sizeSmall {
+    width: auto !important;
+  }
+}

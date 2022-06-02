@@ -38,30 +38,80 @@ export interface IMeasure {
 }
 
 export interface ISupplier {
-  id: number;
   name: string;
   address?: string;
-  contactName?: string;
-  phone: string;
-  status: boolean;
-  phone2?: string;
-  description?: string;
+  nameContact?: string;
+  telephoneNumber: string;
+  mobileNumber?: string;
   fax?: string;
   taxCode?: string;
-  certificate: string;
+  bussinessLicense: any;
+  description?: string;
+  active?: number;
+  id: number;
+  files?: File[] | object[];
 }
 
 export interface IProduct {
-  id: number;
+  image?: any;
   name: string;
-  group: string;
-  priceBuy: number;
-  priceSale: number;
-  active: boolean;
-  date?: Date;
+  numberRegister?: number;
+  productGroupId: number | null;
+  productGroup?: string;
+  importPrice: number;
+  price: number;
+  hidden: boolean;
+  lotNumber?: number;
+  treamentGroupId: number | null;
+  outOfDate?: Date;
+  usageId: number | null;
+  mesureLevelFisrt: number | null;
+  amountFirst: number | null;
+  mesureLevelSecond: number;
+  amountSecond: number;
+  mesureLevelThird: number;
+  producer: string;
+  dateManufacture: Date;
+  productsSupplier: number[];
+  packRule: string;
+  content: string;
+  dosage: string;
+  routeOfUse: string;
+  productImage: string;
+  description: string;
+  id: number;
+  productGroupName?: string;
+  treamentGroupName?: string;
+  usageName?: string;
+  mesureLevelFisrtName?: string;
+  mesureLevelSecondName?: string;
+  mesureLevelThirdName?: string;
+}
+
+export interface IProductList {
+  productName: string;
+  mesure: string;
+  stockQuantity: number;
+  productId: number;
+  productGroup?: string;
+  importPrice: number;
+  price: number;
+  status: number;
+  mesureLevelFisrt: string;
+  amountFirst: string;
+  mesureLevelSecond: string;
+  amountSecond: string;
+  mesureLevelThird: string;
+  mesureLevelFisrtName: string;
+  mesureLevelSecondName: string;
+  mesureLevelThirdName: string;
 }
 
 export interface ITenant {
   id: string;
   name: string;
+}
+
+export interface IReferencePrices {
+  id: number;
 }

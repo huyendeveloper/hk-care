@@ -5,28 +5,31 @@ import { FilterParams } from 'types';
 
 class UsageService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.post(`${baseURL}/app/usage/search-all`, {
-      maxResultCount: pageSize,
-      skipCount: (pageIndex - 1) * pageSize,
-      sorting: sortBy,
-      keyword: searchText,
-    });
+    return axiosClient.get(
+      `${baseURL}/usage/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
+        (pageIndex - 1) * pageSize
+      }&MaxResultCount=${pageSize}`
+    );
+  }
+
+  getAllUsage() {
+    return axiosClient.get(`${baseURL}/usage/search-all`);
   }
 
   get(id: number) {
-    return axiosClient.get(`${baseURL}/app/usage/${id}`);
+    return axiosClient.get(`${baseURL}/usage/${id}`);
   }
 
   create(payload: IUsage) {
-    return axiosClient.post(`${baseURL}/app/usage`, payload);
+    return axiosClient.post(`${baseURL}/usage/Create`, payload);
   }
 
   update({ id, ...payload }: IUsage) {
-    return axiosClient.put(`${baseURL}/app/usage/${id}`, payload);
+    return axiosClient.put(`${baseURL}/usage/Update/${id}`, payload);
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/app/usage/${id}`);
+    return axiosClient.delete(`${baseURL}/usage/${id}`);
   }
 }
 

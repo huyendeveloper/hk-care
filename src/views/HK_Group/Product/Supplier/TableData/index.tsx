@@ -12,6 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { BlockDialog, UnBlockDialog } from 'components/Dialog';
@@ -23,96 +24,58 @@ import {
   TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
+import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-// import supplierService from 'services/supplier.service';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeStatus, getAllSupplier } from 'redux/slices/supplier';
+import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
+import FormDialogSupplier from '../FormDialog';
 import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<ISupplier> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Tên nhà cung cấp' },
   { id: 'address', label: 'Địa chỉ' },
-  { id: 'contactName', label: 'Người liên hệ' },
-  { id: 'phone', label: 'Số điện thoại' },
-  { id: 'status', label: 'Trạng thái' },
-  { id: 'status', label: 'Thao tác' },
+  { id: 'nameContact', label: 'Người liên hệ' },
+  { id: 'telephoneNumber', label: 'Số điện thoại' },
+  { id: 'active', label: 'Trạng thái' },
+  { id: 'active', label: 'Thao tác' },
 ];
 
-const defaultFilters: FilterParams = {
-  pageIndex: 1,
-  pageSize: 10,
-  sortBy: '',
-  sortDirection: '',
-  searchText: '',
-};
-
 const TableData = () => {
+  const setNotification = useNotification();
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-
+  const { loading } = useSelector((state: RootState) => state.supplier);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const dispatch = useDispatch();
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = () => {
-    setSupplierList([
-      {
-        id: 1,
-        name: 'name1',
-        address: 'address1',
-        contactName: 'contactName1',
-        phone: 'phone1',
-        phone2: 'phone2',
-        status: true,
-        description: 'description1',
-        fax: 'fax1',
-        taxCode: 'taxCode1',
-        certificate: 'certificate1',
-      },
-      {
-        id: 2,
-        name: 'name2',
-        address: 'address2',
-        contactName: 'contactName2',
-        phone: 'phone2',
-        status: false,
-        certificate: 'certificate2',
-      },
-      {
-        id: 3,
-        name: 'name3',
-        address: 'address3',
-        contactName: 'contactName3',
-        phone: 'phone3',
-        status: true,
-        certificate: 'certificate3',
-      },
-    ]);
-    setLoading(false);
-    // supplierService
-    //   .getAll(filters)
-    //   .then(({ data }) => {
-    //     setSupplierList(data.items ?? []);
-    //     setTotalRows(Math.ceil(data?.totalCount / filters.pageSize));
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
+  const fetchData = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllSupplier(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách nhà cung cấp!',
+      });
+      return;
+    }
+
+    setSupplierList(payload.supplierList);
+    setTotalRows(payload.totalCount);
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -183,24 +146,42 @@ const TableData = () => {
 
   const handleBlock = async () => {
     if (!currentID) return;
-    try {
-      //   await productService.delete(currentID);
-      handleCloseBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: 2 })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi khi vô hiệu hóa nhà cung cấp này!' });
+      return;
     }
+    setNotification({
+      message: 'Vô hiệu hóa thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const handleUnBlock = async () => {
     if (!currentID) return;
-    try {
-      //   await productService.delete(currentID);
-      handleCloseUnBlockDialog();
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    handleCloseUnBlockDialog();
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID, status: 1 })
+    );
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi kích hoạt hoạt động nhà cung cấp này!',
+      });
+      return;
     }
+    setNotification({
+      message: 'Kích hoạt thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
   };
 
   const renderAction = (row: ISupplier) => {
@@ -216,7 +197,7 @@ const TableData = () => {
           <EditIcon />
         </IconButton>
 
-        {row.status ? (
+        {row.active === 1 ? (
           <IconButton onClick={handleOpenBlockDialog(row.id)}>
             <BlockIcon />
           </IconButton>
@@ -241,6 +222,7 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenCreateDialog}
+          sx={{ fontSize: '1rem' }}
         >
           Thêm mới nhà cung cấp
         </Button>
@@ -258,18 +240,40 @@ const TableData = () => {
               />
 
               <TableBody>
-                {supplierList.map((item) => {
-                  const { id, name, address, contactName, phone, status } =
-                    item;
+                {supplierList.map((item, index) => {
+                  const {
+                    id,
+                    name,
+                    address,
+                    nameContact,
+                    telephoneNumber,
+                    active,
+                  } = item;
+
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell>{address}</TableCell>
-                      <TableCell>{contactName}</TableCell>
-                      <TableCell>{phone}</TableCell>
                       <TableCell>
-                        {status ? (
+                        {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                      </TableCell>
+                      <TableCell>{name}</TableCell>
+                      {/* @ts-ignore */}
+                      <Tooltip title={address} placement="bottom">
+                        <TableCell
+                          sx={{
+                            maxWidth: '240px',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {address}
+                        </TableCell>
+                      </Tooltip>
+
+                      <TableCell>{nameContact}</TableCell>
+                      <TableCell>{telephoneNumber}</TableCell>
+                      <TableCell>
+                        {active === 1 ? (
                           <Button>Hoạt động</Button>
                         ) : (
                           <Button color="error">Không hoạt động</Button>
@@ -312,7 +316,7 @@ const TableData = () => {
         handleUnBlock={handleUnBlock}
       />
 
-      <FormDialog
+      <FormDialogSupplier
         currentID={currentID}
         data={supplierList.find((x) => x.id === currentID)}
         open={openFormDialog}
