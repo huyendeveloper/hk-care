@@ -67,7 +67,7 @@ export interface IProduct {
   outOfDate?: Date | null;
   usageId: number | null;
   mesureLevelFisrt: number | null;
-  amountFirst: number | null;
+  amountThird: number | null;
   mesureLevelSecond: number;
   amountSecond: number | null;
   mesureLevelThird: number;
@@ -99,7 +99,7 @@ export interface IProductList {
   price: number;
   status: number;
   mesureLevelFisrt: string;
-  amountFirst: string;
+  amountThird: string;
   mesureLevelSecond: string;
   amountSecond: string;
   mesureLevelThird: string;
@@ -119,7 +119,7 @@ export interface IReceipt {
   price: number;
   status: number;
   mesureLevelFisrt: string;
-  amountFirst: string;
+  amountThird: string;
   mesureLevelSecond: string;
   amountSecond: string;
   mesureLevelThird: string;

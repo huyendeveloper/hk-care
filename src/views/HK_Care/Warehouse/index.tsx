@@ -8,3 +8,7 @@ export const ImportReceipt = Loadable(
 export const CreateImportReceipt = Loadable(
   lazy(() => import('views/HK_Care/Warehouse/Import/Receipt/Create'))
 );
+
+export const ImportReceiptDetail = Loadable(
+  lazy(() => import('views/HK_Care/Warehouse/Import/Receipt/Details'))
+);

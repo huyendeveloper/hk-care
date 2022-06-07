@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, FormGroup, Grid } from '@mui/material';
+import { FormGroup, Grid } from '@mui/material';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerDatePicker,
@@ -98,8 +98,8 @@ const DetailsForm = () => {
     setValue('treamentGroupId', data?.treamentGroupO.id);
     setValue('productImage', data?.productImage);
     setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountFirst', data?.amountFirst);
     setValue('amountSecond', data?.amountSecond);
+    setValue('amountThird', data?.amountThird);
     setValue(
       'productsSupplier',
       // @ts-ignore
@@ -174,10 +174,6 @@ const DetailsForm = () => {
   if (taskQueue) {
     return <LoadingScreen />;
   }
-
-  const handleOpenUpdateDialog = () => {
-    setOpenFormDialog(true);
-  };
 
   const handleCloseUpdateDialog = () => {
     setOpenFormDialog(false);
@@ -303,7 +299,7 @@ const DetailsForm = () => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       control={control}
                       disabled
                     />
@@ -322,7 +318,7 @@ const DetailsForm = () => {
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
-                      name="amountSecond"
+                      name="amountThird"
                       control={control}
                       disabled
                     />

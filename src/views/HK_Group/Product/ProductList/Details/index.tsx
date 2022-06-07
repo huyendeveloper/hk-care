@@ -121,8 +121,8 @@ const DetailsForm = () => {
     setValue('treamentGroupName', data?.treamentGroupO.name);
     setValue('productImage', data?.productImage);
     data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountFirst', data?.amountFirst);
-    data?.amountSecond && setValue('amountSecond', data?.amountSecond);
+    setValue('amountSecond', data?.amountSecond);
+    data?.amountThird && setValue('amountThird', data?.amountThird);
     // setSupplierList(data?.suppliers);
     setValue(
       'productsSupplier',
@@ -333,7 +333,7 @@ const DetailsForm = () => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       control={control}
                       disabled={disabled}
                     />
@@ -353,7 +353,7 @@ const DetailsForm = () => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type={'number'}
-                      name="amountSecond"
+                      name="amountThird"
                       control={control}
                       disabled={disabled}
                     />

@@ -38,7 +38,7 @@ import productGroupService from 'services/productGroup.service';
 import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
-import FormDialogSupplier from 'views/HK_Trading/Supplier/FormDialog';
+import FormDialogSupplier from 'views/HK_Group/Product/Supplier/FormDialog';
 import * as yup from 'yup';
 
 interface Props {
@@ -167,8 +167,8 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
 
       setValue('productImage', data?.productImage);
       data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
-      setValue('amountFirst', data?.amountFirst);
-      data?.amountSecond && setValue('amountSecond', data?.amountSecond);
+      setValue('amountSecond', data?.amountSecond);
+      data?.amountThird && setValue('amountThird', data?.amountThird);
       // setSupplierList(data?.suppliers);
       setValue(
         'productsSupplier',
@@ -413,7 +413,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       control={control}
                     />
                   </Grid>
@@ -431,7 +431,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type={'number'}
-                      name="amountSecond"
+                      name="amountThird"
                       control={control}
                     />
                   </Grid>

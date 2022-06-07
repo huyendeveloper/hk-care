@@ -1,16 +1,21 @@
-import CloseIcon from '@mui/icons-material/Close';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Stack } from '@mui/material';
 import React from 'react';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 interface IProps {
   files: File[] | object[];
   setFiles: (files: File[] | object[]) => void;
   viewOnly?: boolean;
+  max?: number;
 }
 
-const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
+const ControllerMultiFile = ({
+  files,
+  setFiles,
+  viewOnly,
+  max = 6,
+}: IProps) => {
   const handleChangeFile = (e: any) => {
     const file = e?.target.files[0];
     if (file) {
@@ -89,7 +94,7 @@ const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
           </div>
         </Stack>
       ))}
-      {files.length < 6 && !viewOnly && (
+      {files.length < max && !viewOnly && (
         <Button variant="contained" fullWidth component="label">
           Chọn file
           <input

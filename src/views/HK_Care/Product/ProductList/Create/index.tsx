@@ -5,7 +5,7 @@ import {
   FormContent,
   FormFooter,
   FormHeader,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';

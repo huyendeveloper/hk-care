@@ -1,5 +1,4 @@
-import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, TableCell, TableRow, TextField } from '@mui/material';
+import { TableCell, TableRow, TextField } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import React from 'react';
@@ -7,8 +6,7 @@ import Bill from './Bill';
 
 interface IProps {
   item: any;
-  index: number;
-  remove: any;
+  index: number; 
   errors: any;
   register: any;
   setValue: any;
@@ -19,8 +17,7 @@ interface IProps {
 
 const ReceiptEntity = ({
   item,
-  index,
-  remove,
+  index, 
   errors,
   register,
   setValue,
@@ -102,15 +99,7 @@ const ReceiptEntity = ({
         />
       </TableCell>
 
-      <TableCell align="left">
-        <IconButton
-          onClick={() => {
-            remove(index);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </TableCell>
+     
     </TableRow>
   );
 };
