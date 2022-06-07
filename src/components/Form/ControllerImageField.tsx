@@ -54,25 +54,39 @@ const ControllerImageField = ({
     inputRef?.current?.click();
   };
 
+  const [enable, setEnable] = useState<boolean>(false);
+
   return (
     <div>
-      <button className="button-select-file" onClick={handleClick}>
+      <button
+        className="button-select-file"
+        style={{ cursor: disabled ? 'default' : 'pointer' }}
+        onClick={handleClick}
+      >
         {preview ? (
           <>
             <img
               // @ts-ignore
               src={preview}
-              className="preview-image"
+              className={`preview-image ${disabled ? 'disabled' : ''}`}
               alt=""
+              style={{
+                opacity: `${enable ? '0.4' : '1'}`,
+              }}
+              onMouseOver={() => !disabled && setEnable(true)}
+              onMouseOut={() => setEnable(false)}
             />
             <AddPhotoAlternateIcon
-              className="preview-image-icon"
+              // className={`preview-image-icon ${disabled ? 'disabled' : ''}`}
               sx={{
                 position: 'absolute',
                 top: 'calc((100% - 35px) / 2)',
                 left: 'calc((100% - 35px) / 2)',
+                display: `${enable ? 'inline-block' : 'none'}`,
               }}
               fontSize="large"
+              onMouseOver={() => !disabled && setEnable(true)}
+              onMouseOut={() => setEnable(false)}
             />
           </>
         ) : (

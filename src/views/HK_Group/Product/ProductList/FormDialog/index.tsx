@@ -15,9 +15,10 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import EntitySelecter from 'components/Form/EntitySelecter';
-import { defaultFilters } from 'constants/defaultFilters';
-import { typeNumber, yupDate, yupOnlyNumber } from 'constants/typeInput';
+import { connectURL } from 'config';
+import { yupDate, yupOnlyNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import {
   IMeasure,
@@ -37,40 +38,41 @@ import productGroupService from 'services/productGroup.service';
 import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
-import { FilterParams } from 'types';
+import FormDialogSupplier from 'views/HK_Trading/Supplier/FormDialog';
 import * as yup from 'yup';
-import FormDialogSupplier from 'views/HK_Group/Product/Supplier/FormDialog';
-import { connectURL } from 'config';
 
 interface Props {
   open: boolean;
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   dataUpdate?: IProduct;
+  supplierId?: number;
 }
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Vui lòng nhập tên sản phẩm.'),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên sản phẩm.')
+    .trim('Vui lòng nhập tên sản phẩm.'),
   productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
   treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
   usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
   mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
-  amountFirst: yupOnlyNumber(),
   outOfDate: yupDate,
-  numberRegister: yupOnlyNumber(),
-  lotNumber: yupOnlyNumber(),
-  dosage: yup.string().required('Vui lòng nhập hàm lượng.').default('Null'),
+  dosage: yup
+    .string()
+    .required('Vui lòng nhập hàm lượng.')
+    .trim('Vui lòng nhập hàm lượng.')
+    .default('Null'),
   routeOfUse: yup
     .string()
     .required('Vui lòng nhập liều dùng.')
+    .trim('Vui lòng nhập liều dùng.')
     .default('Theo chỉ định'),
-  amountSecond: yupOnlyNumber(),
   dateManufacture: yupDate,
-  importPrice: yupOnlyNumber(),
-  price: yupOnlyNumber(),
 });
 
-const FormDialog = ({ open, handleClose, currentID }: Props) => {
+const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
   const setNotification = useNotification();
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
@@ -83,12 +85,21 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
   const [usageList, setUsageList] = useState<IUsage[]>([]);
   const dispatch = useDispatch();
 
+  const [productGroupName, setProductGroupName] = useState<string>('');
+  const [treamentGroupName, setTreamentGroupName] = useState<string>('');
+  const [usageName, setUsageName] = useState<string>('');
+  const [mesureLevelFisrtName, setMesureLevelFisrtName] = useState<string>('');
+  const [mesureLevelSecondName, setMesureLevelSecondName] =
+    useState<string>('');
+  const [mesureLevelThirdName, setMesureLevelThirdName] = useState<string>('');
+  const [product, setProduct] = useState<IProduct>();
+  const [productsSupplier, setProductsSupplier] = useState<number[]>([]);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
     reset,
   } = useForm<IProduct>({
     mode: 'onChange',
@@ -111,9 +122,10 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
         severity: 'success',
       });
     } else {
+      const suppliers = productsSupplier.length > 0 ? { productsSupplier } : {};
       const { error } = await dispatch(
         // @ts-ignore
-        createProduct({ ...payload, image })
+        createProduct({ ...payload, image, ...suppliers })
       );
       if (error) {
         setNotification({ error: 'Lỗi khi thêm sản phẩm!' });
@@ -148,11 +160,11 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
       setValue('description', data?.description);
       setValue('hidden', data?.hidden);
       setValue('usageId', data?.usageO.id);
-      setValue('usageName', data?.usageO.name);
+
       setValue('productGroupId', data?.productGroupO.id);
-      setValue('productGroupName', data?.productGroupO.name);
+
       setValue('treamentGroupId', data?.treamentGroupO.id);
-      setValue('treamentGroupName', data?.treamentGroupO.name);
+
       setValue('productImage', data?.productImage);
       data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
       setValue('amountFirst', data?.amountFirst);
@@ -163,12 +175,35 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
         // @ts-ignore
         data?.suppliers.map((x) => x.id)
       );
+
       setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
-      setValue('mesureLevelFisrtName', data?.mesureLevelFisrt.name);
+
       setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
-      setValue('mesureLevelSecondName', data?.mesureLevelSecond.name);
+
       setValue('mesureLevelThird', data?.mesureLevelThird.id);
-      setValue('mesureLevelThirdName', data?.mesureLevelThird.name);
+
+      setProductGroupName(data?.productGroupO.name);
+      setTreamentGroupName(data?.treamentGroupO.name);
+      setUsageName(data?.usageO.name);
+      setMesureLevelFisrtName(data?.mesureLevelFisrt.name);
+      setMesureLevelSecondName(data?.mesureLevelSecond.name);
+      setMesureLevelThirdName(data?.mesureLevelThird.name);
+      setProduct(data);
+    } else {
+      if (supplierId) {
+        setProductsSupplier([supplierId]);
+      }
+
+      setProductGroupName('');
+      setTreamentGroupName('');
+      setUsageName('');
+      setMesureLevelFisrtName('');
+      setMesureLevelSecondName('');
+      setMesureLevelThirdName('');
+
+      setImage(null);
+      setProduct(undefined);
+      reset();
     }
   };
 
@@ -216,7 +251,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
     supplierService
       .getAllSupplier()
       .then(({ data }) => {
-        setSupplierList(data.items);
+        setSupplierList(data);
       })
       .catch((err) => {})
       .finally(() => {});
@@ -238,6 +273,8 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
   }, []);
 
   const handleCloseFormDialog = (updated: boolean | undefined) => {
+    fetchSupplierList();
+    setProductsSupplier([]);
     setOpenFormDialog(false);
   };
 
@@ -275,7 +312,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                     options={productGroupList}
                     renderLabel={(field) => field.name}
                     noOptionsText="Không tìm thấy nhóm sản phẩm"
-                    defaultValue={getValues('productGroupName')}
+                    defaultValue={productGroupName}
                     placeholder=""
                   />
                 </Grid>
@@ -308,7 +345,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                     options={treatmentGroupList}
                     renderLabel={(field) => field.name}
                     noOptionsText="Không tìm thấy nhóm điều trị"
-                    defaultValue={getValues('treamentGroupName')}
+                    defaultValue={treamentGroupName}
                     placeholder=""
                   />
                 </Grid>
@@ -338,7 +375,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                     options={usageList}
                     renderLabel={(field) => field.name}
                     noOptionsText="Không tìm thấy nhóm dạng dùng"
-                    defaultValue={getValues('usageName')}
+                    defaultValue={usageName}
                     placeholder=""
                   />
                 </Grid>
@@ -369,7 +406,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelFisrtName')}
+                      defaultValue={mesureLevelFisrtName}
                       placeholder="Cấp 1 *"
                     />
                   </Grid>
@@ -387,12 +424,13 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelSecondName')}
+                      defaultValue={mesureLevelSecondName}
                       placeholder="Cấp 2"
                     />
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
+                      type={'number'}
                       name="amountSecond"
                       control={control}
                     />
@@ -404,7 +442,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelThirdName')}
+                      defaultValue={mesureLevelThirdName}
                       placeholder="Cấp 3"
                     />
                   </Grid>
@@ -436,10 +474,10 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                   <FormLabel title="Giá nhập" name="importPrice" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField
-                    type="number"
+                  <ControllerNumberInput
                     name="importPrice"
-                    control={control}
+                    value={product?.importPrice}
+                    setValue={setValue}
                   />
                 </Grid>
               </Grid>
@@ -448,10 +486,10 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                   <FormLabel title="Giá bán" name="price" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField
-                    type="number"
+                  <ControllerNumberInput
                     name="price"
-                    control={control}
+                    value={product?.price}
+                    setValue={setValue}
                   />
                 </Grid>
               </Grid>
@@ -467,7 +505,9 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                       options={supplierList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy nhà cung cấp"
+                      defaultValue={productsSupplier}
                       placeholder=""
+                      disabled={productsSupplier.length > 0}
                     />
                   </Box>
                   <IconButton
@@ -536,7 +576,15 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
         </FormContent>
 
         <FormFooter>
-          <Button variant="outlined" onClick={() => handleClose()}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setProduct(undefined);
+              setImage(undefined);
+              reset();
+              handleClose();
+            }}
+          >
             Hủy
           </Button>
           <LoadingButton type="submit">Lưu</LoadingButton>

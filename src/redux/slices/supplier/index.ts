@@ -74,6 +74,17 @@ export const changeStatus = createAsyncThunk(
   }
 );
 
+export const deleteSupplier = createAsyncThunk(
+  'supplier/delete',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await supplierService.delete(id);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const supplierSlice = createSlice({
   name: 'supplier',
   initialState,

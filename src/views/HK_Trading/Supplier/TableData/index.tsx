@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
@@ -12,16 +13,16 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Tooltip,
+  Tooltip
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
-import { BlockDialog, UnBlockDialog } from 'components/Dialog';
+import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -29,12 +30,15 @@ import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeStatus, getAllSupplier } from 'redux/slices/supplier';
+import {
+  changeStatus,
+  deleteSupplier,
+  getAllSupplier
+} from 'redux/slices/supplier';
 import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialogSupplier from '../FormDialog';
-import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<ISupplier> => [
   { id: 'id', label: 'STT' },
@@ -57,6 +61,7 @@ const TableData = () => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const dispatch = useDispatch();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -184,6 +189,32 @@ const TableData = () => {
     fetchData();
   };
 
+  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleDelete = async () => {
+    if (!currentID) return;
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteSupplier(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi khi xóa nhà cung cấp!' });
+      return;
+    }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+
+    setSupplierList(supplierList.filter((x) => x.id !== currentID));
+  };
+
   const renderAction = (row: ISupplier) => {
     return (
       <>
@@ -202,9 +233,14 @@ const TableData = () => {
             <BlockIcon />
           </IconButton>
         ) : (
-          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
-            <CheckIcon />
-          </IconButton>
+          <>
+            <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+              <CheckIcon />
+            </IconButton>
+            <IconButton onClick={handleOpenDeleteDialog(row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </>
         )}
       </>
     );
@@ -314,6 +350,15 @@ const TableData = () => {
         onClose={handleCloseUnBlockDialog}
         open={openUnBlockDialog}
         handleUnBlock={handleUnBlock}
+      />
+
+      <DeleteDialog
+        id={currentID}
+        tableName="nhà cung cấp"
+        name={supplierList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseDeleteDialog}
+        open={openDeleteDialog}
+        handleDelete={handleDelete}
       />
 
       <FormDialogSupplier

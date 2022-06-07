@@ -1,16 +1,9 @@
 import * as yup from 'yup';
 
-export const yupOnlyNumber = (require?: string) => {
-  if (require) {
-    return yup
-      .number()
-      .required(require)
-      .typeError('Vui lòng chỉ nhập số.')
-      .integer('Vui lòng chỉ nhập số.')
-      .min(0, 'Vui lòng chỉ nhập số.');
-  }
+export const yupOnlyNumber = (require: string) => {
   return yup
     .number()
+    .required(require)
     .typeError('Vui lòng chỉ nhập số.')
     .integer('Vui lòng chỉ nhập số.')
     .min(0, 'Vui lòng chỉ nhập số.');
@@ -18,6 +11,8 @@ export const yupOnlyNumber = (require?: string) => {
 
 export const yupDate = yup
   .date()
+  .notRequired()
+  .nullable(true)
   .typeError('Vui lòng nhập đúng định dạng dd/mm/yyyy.');
 
 export const typeNumber = (setValue: (value: number) => void) => {

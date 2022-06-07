@@ -4,6 +4,7 @@ import Link from '@mui/material/Link';
 import breadcrumbConfig from 'breadcrumbConfig';
 import { Link as RouterLink } from 'react-router-dom';
 import useReactRouterBreadcrumbs from 'use-react-router-breadcrumbs';
+import LocalStorage from 'utils/LocalStorage';
 
 export interface Breadcrumb {
   text: string;
@@ -12,7 +13,7 @@ export interface Breadcrumb {
 
 const PageBreadcrumbs = () => {
   const breadcrumbs: Breadcrumb[] = useReactRouterBreadcrumbs(
-    breadcrumbConfig,
+    breadcrumbConfig(LocalStorage.get('tennant')),
     { disableDefaults: true }
   ).map(({ match }) => {
     return { text: match?.route?.breadcrumb as string, link: '#' };
