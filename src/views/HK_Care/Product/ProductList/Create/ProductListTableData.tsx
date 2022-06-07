@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import {
@@ -14,17 +14,15 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
-import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -43,15 +41,8 @@ const ProductListTableData = ({
   registerList,
   handleCancelRegist,
 }: IProps) => {
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const { loading } = useSelector((state: RootState) => state.productList);
-  const [totalRows, setTotalRows] = useState<number>(0);
-
-  const fetchData = async () => {
-    setTotalRows(registerList.length);
-  };
 
   const cells = useMemo(() => getCells(), []);
 
@@ -115,7 +106,9 @@ const ProductListTableData = ({
               <TableBody>
                 {registerList
                   .filter((item) =>
-                    item.productName.startsWith(filters.searchText)
+                    item.productName
+                      .toLocaleLowerCase()
+                      .includes(filters.searchText.toLowerCase())
                   )
                   .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10)
                   .map((item, index) => {
@@ -142,7 +135,9 @@ const ProductListTableData = ({
           pageIndex={filters.pageIndex}
           totalPages={
             registerList.filter((item) =>
-              item.productName.startsWith(filters.searchText)
+              item.productName
+                .toLocaleLowerCase()
+                .includes(filters.searchText.toLowerCase())
             ).length
           }
           onChangePage={handleChangePage}

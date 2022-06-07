@@ -96,7 +96,7 @@ class ProductService {
     const token = LocalStorage.get('accessToken');
 
     const params = getFormData(payload, file);
-    params.append('hidden', 'true');
+    params.append('hidden', payload.hidden.toString());
 
     return axios({
       method: 'put',
@@ -110,7 +110,7 @@ class ProductService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/product/${id}`);
+    return axiosClient.delete(`${baseURL}/product/DeleteProduct/${id}`);
   }
 
   changeStatus(id: number | null, status: boolean) {

@@ -70,7 +70,12 @@ const Login = () => {
 
   const onSubmit = async (data: ILogin) => {
     // @ts-ignore
-    const { error } = await dispatch(login(data));
+    const { error } = await dispatch(
+      login({
+        ...data,
+        tenant: tenantList.find((x) => x.id === data.__tenant)?.name || '',
+      })
+    );
 
     if (error) {
       setNotification({

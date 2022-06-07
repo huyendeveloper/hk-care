@@ -82,7 +82,7 @@ const Create = () => {
           </Grid>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_care/product/list">Huỷ</LinkButton>
+          <LinkButton to="/hk_care/product/list">Quay lại</LinkButton>
           <LoadingButton onClick={handleSubmit}>Lưu</LoadingButton>
         </FormFooter>
       </FormPaperGrid>

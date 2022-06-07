@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
-import { Button, IconButton, Stack } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button, Stack } from '@mui/material';
+import React from 'react';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 interface IProps {
   files: File[] | object[];
@@ -25,6 +27,12 @@ const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
     }
   };
 
+  const removeItem = (index: number) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
+  };
+
   return (
     <>
       {files.map((item, index) => (
@@ -44,21 +52,41 @@ const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
               disabled={viewOnly}
             />
           </Button>
-          {/* @ts-ignore */}
-          {item?.name && !item.type && (
-            // @ts-ignore
-            <a href={item?.name} target={'_blank'}>
+
+          <div>
+            <Stack
+              height={1}
+              bgcolor="#00AB55"
+              color={'white'}
+              justifyContent="center"
+              alignContent={'center'}
+              pr={1}
+              gap={1}
+            >
+              {/* @ts-ignore */}
+              {item?.name && !item.type && (
+                // @ts-ignore
+                // eslint-disable-next-line react/jsx-no-target-blank
+                <a href={item?.name} target={'_blank'}>
+                  <Stack
+                    height={1}
+                    bgcolor="#00AB55"
+                    color={'white'}
+                    justifyContent="center"
+                    pr={1}
+                  >
+                    <VisibilityIcon />
+                  </Stack>
+                </a>
+              )}
               <Stack
-                height={1}
-                bgcolor="#00AB55"
-                color={'white'}
-                justifyContent="center"
-                pr={1}
+                onClick={() => removeItem(index)}
+                style={{ cursor: 'pointer' }}
               >
-                <VisibilityIcon />
+                <RemoveCircleIcon />
               </Stack>
-            </a>
-          )}
+            </Stack>
+          </div>
         </Stack>
       ))}
       {files.length < 6 && !viewOnly && (

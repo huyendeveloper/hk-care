@@ -9,10 +9,10 @@ import {
   FormGroup,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import { useNotification } from 'hooks';
-import { IMeasure, IProduct, IProductList } from 'interface';
+import { IMeasure, IProductList } from 'interface';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -25,44 +25,20 @@ interface Props {
   open: boolean;
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
-  dataUpdate?: IProduct;
 }
 
-const validationSchema = yup.object().shape({
-  // name: yup.string().required('Vui lòng nhập tên sản phẩm.'),
-  // productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
-  // treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
-  // usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
-  // mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
-  // amountFirst: yupOnlyNumber(),
-  // numberRegister: yupOnlyNumber(),
-  // lotNumber: yupOnlyNumber(),
-  // routeOfUse: yup
-  //   .string()
-  //   .required('Vui lòng nhập liều dùng.')
-  //   .default('Theo chỉ định'),
-  // amountSecond: yupOnlyNumber(),
-});
+const validationSchema = yup.object().shape({});
 
-const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
+const FormDialog = ({ open, handleClose, currentID }: Props) => {
   const setNotification = useNotification();
-  const [image, setImage] = useState<Blob | null | string | undefined>();
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const dispatch = useDispatch();
   const [mesureLevelFisrtName, setMesureLevelFisrtName] = useState<string>('');
   const [mesureLevelSecondName, setMesureLevelSecondName] =
     useState<string>('');
   const [mesureLevelThirdName, setMesureLevelThirdName] = useState<string>('');
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    getValues,
-    reset,
-  } = useForm<IProductList>({
+  const { control, handleSubmit, setValue, reset } = useForm<IProductList>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -83,7 +59,6 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
     });
 
     reset();
-    setImage(undefined);
     handleClose(true);
   };
 
@@ -124,15 +99,6 @@ const FormDialog = ({ open, handleClose, currentID, dataUpdate }: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
-
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
-    setOpenFormDialog(false);
-  };
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
-    fetchData();
-  };
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>

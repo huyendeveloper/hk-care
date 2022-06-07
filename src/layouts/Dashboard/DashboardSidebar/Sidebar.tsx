@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from 'redux/store';
 import type { Role } from 'types/common';
+import LocalStorage from 'utils/LocalStorage';
 import SidebarItem from './SidebarItem';
 
 interface SectionItem {
@@ -59,11 +60,6 @@ const getSections = (): SectionItem[] => [
             roles: ['hkl3'],
           },
           {
-            title: 'Nhà cung cấp',
-            path: '/hk_group/product/supplier',
-            roles: ['hkl3'],
-          },
-          {
             title: 'Giá tham chiếu',
             path: '/hk_group/product/reference_prices',
             roles: ['hkl3'],
@@ -72,7 +68,7 @@ const getSections = (): SectionItem[] => [
       },
       {
         title: 'Thông tin điểm bán',
-        path: '/404',
+        path: '/hk_group/tenant',
         roles: ['hkl2'],
       },
       {
@@ -83,7 +79,7 @@ const getSections = (): SectionItem[] => [
     ],
   },
   {
-    title: 'HK_Care',
+    title: LocalStorage.get('tennant'),
     roles: ['hkl2_1', 'hkl2_1_1', 'hkl2_1_2', 'hkl2_1_3', 'hkl2_1_4'],
     children: [
       {
@@ -115,7 +111,7 @@ const getSections = (): SectionItem[] => [
             children: [
               {
                 title: 'Hoá đơn nhập kho',
-                path: '/404',
+                path: '/hk_care/warehouse/import/receipt',
                 roles: ['hkl2_1_2'],
               },
               {
@@ -197,12 +193,17 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Kế hoạch nhập kho',
         path: '/404',
-        roles: [],
+        roles: ['hkl4'],
       },
       {
         title: 'Kế hoạch phân phối',
         path: '/404',
-        roles: [],
+        roles: ['hkl4'],
+      },
+      {
+        title: 'Quản lý nhà cung cấp',
+        path: '/hk_trading/supplier',
+        roles: ['hkl4'],
       },
     ],
   },

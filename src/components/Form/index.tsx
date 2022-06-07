@@ -1,3 +1,4 @@
+export { default as CheckboxesTags } from './CheckboxesTags';
 export { default as ControllerDatePicker } from './ControllerDatePicker';
 export { default as ControllerImageField } from './ControllerImageField';
 export { default as ControllerMultiFile } from './ControllerMultiFile';
@@ -11,3 +12,4 @@ export { default as FormGroup } from './FormGroup';
 export { default as FormHeader } from './FormHeader';
 export { default as FormLabel } from './FormLabel';
 export { default as FormPaperGrid } from './FormPaperGrid';
+export { default as Selecter } from './Selecter';

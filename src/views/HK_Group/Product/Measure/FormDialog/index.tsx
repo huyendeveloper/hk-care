@@ -32,6 +32,7 @@ const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên đơn vị đo lường.')
+    .trim('Vui lòng nhập tên đơn vị đo lường.')
     .max(100, 'Tên đơn vị đo lường không quá 100 ký tự.')
     .strict(true)
     .default(''),

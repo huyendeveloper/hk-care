@@ -25,14 +25,6 @@ export const Measure = Loadable(
   lazy(() => import('views/HK_Group/Product/Measure'))
 );
 
-export const Supplier = Loadable(
-  lazy(() => import('views/HK_Group/Product/Supplier'))
-);
-
-export const SupplierDetails = Loadable(
-  lazy(() => import('views/HK_Group/Product/Supplier/Details'))
-);
-
 export const ReferencePrices = Loadable(
   lazy(() => import('views/HK_Group/Product/ReferencePrices'))
 );

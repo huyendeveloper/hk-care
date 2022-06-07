@@ -1,6 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   IconButton,
@@ -30,6 +29,7 @@ import { deleteProductList, getAllProduct } from 'redux/slices/productList';
 import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
+import { numberFormat } from 'utils/numberFormat';
 import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<IProductList> => [
@@ -141,11 +141,6 @@ const TableData = ({ active = 1 }: IProps) => {
     fetchData();
   };
 
-  const handleOpenUpdateDialog = (id: number) => {
-    setCurrentID(id);
-    setOpenFormDialog(true);
-  };
-
   const renderAction = (row: IProductList) => {
     return (
       <>
@@ -154,10 +149,6 @@ const TableData = ({ active = 1 }: IProps) => {
             <VisibilityIcon />
           </IconButton>
         </LinkIconButton>
-
-        <IconButton onClick={() => handleOpenUpdateDialog(row.productId)}>
-          <EditIcon />
-        </IconButton>
 
         {(!row.stockQuantity || !(row.stockQuantity > 0)) && (
           <IconButton onClick={handleOpenDeleteDialog(row.productId)}>
@@ -171,7 +162,7 @@ const TableData = ({ active = 1 }: IProps) => {
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
       <TableSearchField
-        title="Đăng ký sản phẩm"
+        title=" "
         placeHolder="Tìm kiếm sản phẩm"
         onSearch={handleSearch}
         searchText={filters.searchText}
@@ -219,8 +210,8 @@ const TableData = ({ active = 1 }: IProps) => {
                       <TableCell>{mesure}</TableCell>
                       <TableCell>{productGroup}</TableCell>
                       <TableCell>{stockQuantity}</TableCell>
-                      <TableCell>{importPrice}</TableCell>
-                      <TableCell>{price}</TableCell>
+                      <TableCell>{numberFormat(importPrice)}</TableCell>
+                      <TableCell>{numberFormat(price)}</TableCell>
 
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
