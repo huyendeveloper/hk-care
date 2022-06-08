@@ -59,7 +59,14 @@ const breadcrumbConfig = (tennant: string) => {
       breadcrumb: 'Chi tiết đơn vị đo lường',
       path: '/hk_group/product/measure/:id',
     },
-
+    {
+      breadcrumb: 'Nhà cung cấp',
+      path: '/hk_group/product/supplier',
+    },
+    {
+      breadcrumb: 'Chi tiết nhà cung cấp',
+      path: '/hk_group/product/supplier/:id',
+    },
     {
       breadcrumb: 'Giá tham chiếu',
       path: '/hk_group/product/reference_prices',
@@ -83,14 +90,6 @@ const breadcrumbConfig = (tennant: string) => {
     {
       breadcrumb: 'HK Trading',
       path: '/hk_trading',
-    },
-    {
-      breadcrumb: 'Quản lý nhà cung cấp',
-      path: '/hk_trading/supplier',
-    },
-    {
-      breadcrumb: 'Chi tiết nhà cung cấp',
-      path: '/hk_trading/supplier/:id',
     },
   ];
 };

@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
-import TableData from '../../../HK_Group/Product/ProductList/TableData';
+import TableData from '../../ProductList/TableData';
 import FormDialog from '../FormDialog';
 import Details from './Details';
 
@@ -149,11 +149,7 @@ const DetailsForm = () => {
         </Box>
 
         <FormFooter>
-          <LinkButton to="/hk_trading/supplier">Đóng</LinkButton>
-
-          {/* <Button variant="contained" onClick={handleOpenUpdateDialog}>
-            Chỉnh sửa thông tin
-          </Button> */}
+          <LinkButton to="/hk_group/product/supplier">Đóng</LinkButton>
         </FormFooter>
       </FormPaperGrid>
       <FormDialog

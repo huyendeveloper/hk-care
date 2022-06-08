@@ -60,6 +60,11 @@ const getSections = (): SectionItem[] => [
             roles: ['hkl3'],
           },
           {
+            title: 'Nhà cung cấp',
+            path: '/hk_group/product/supplier',
+            roles: ['hkl3'],
+          },
+          {
             title: 'Giá tham chiếu',
             path: '/hk_group/product/reference_prices',
             roles: ['hkl3'],
@@ -198,11 +203,6 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Kế hoạch phân phối',
         path: '/404',
-        roles: ['hkl4'],
-      },
-      {
-        title: 'Quản lý nhà cung cấp',
-        path: '/hk_trading/supplier',
         roles: ['hkl4'],
       },
     ],

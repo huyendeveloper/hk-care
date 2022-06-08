@@ -71,8 +71,8 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
       setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
       setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
       setValue('mesureLevelThird', data?.mesureLevelThird.id);
-      setValue('amountFirst', data?.amountFirst);
       setValue('amountSecond', data?.amountSecond);
+      setValue('amountThird', data?.amountThird);
       setMesureLevelFisrtName(data?.mesureLevelFisrt.name);
       setMesureLevelSecondName(data?.mesureLevelSecond.name);
       setMesureLevelThirdName(data?.mesureLevelThird.name);
@@ -140,7 +140,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       disabled
                       control={control}
                     />
@@ -159,7 +159,7 @@ const FormDialog = ({ open, handleClose, currentID }: Props) => {
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
-                      name="amountSecond"
+                      name="amountThird"
                       disabled
                       control={control}
                     />

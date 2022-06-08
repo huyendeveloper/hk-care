@@ -22,12 +22,12 @@ const getFormData = (payload: IProduct, file: any) => {
   payload.usageId && params.append('usageId', payload.usageId.toString());
   payload.mesureLevelFisrt &&
     params.append('mesureLevelFisrt', payload.mesureLevelFisrt.toString());
-  payload.amountFirst &&
-    params.append('amountFirst', payload.amountFirst.toString());
-  payload.mesureLevelSecond &&
-    params.append('mesureLevelSecond', payload.mesureLevelSecond.toString());
   payload.amountSecond &&
     params.append('amountSecond', payload.amountSecond.toString());
+  payload.mesureLevelSecond &&
+    params.append('mesureLevelSecond', payload.mesureLevelSecond.toString());
+  payload.amountThird &&
+    params.append('amountThird', payload.amountThird.toString());
   payload.mesureLevelThird &&
     params.append('mesureLevelThird', payload.mesureLevelThird.toString());
   payload.producer && params.append('producer', payload.producer);

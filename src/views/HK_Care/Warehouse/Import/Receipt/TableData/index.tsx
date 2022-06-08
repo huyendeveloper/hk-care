@@ -2,22 +2,21 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Button,
   IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
-import { LinkButton, Scrollbar } from 'components/common';
+import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -134,13 +133,16 @@ const TableData = () => {
   const renderAction = (row: IImportReceipt) => {
     return (
       <>
-        <IconButton>
-          <VisibilityIcon />
-        </IconButton>
-
-        <IconButton>
-          <EditIcon />
-        </IconButton>
+        <LinkIconButton to={`${row.id}`}>
+          <IconButton>
+            <VisibilityIcon />
+          </IconButton>
+        </LinkIconButton>
+        <LinkIconButton to={`${row.id}/update`}>
+          <IconButton>
+            <EditIcon />
+          </IconButton>
+        </LinkIconButton>
       </>
     );
   };
@@ -157,7 +159,7 @@ const TableData = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           sx={{ fontSize: '1rem' }}
-          to='create'
+          to="create"
         >
           Thêm hóa đơn
         </LinkButton>
