@@ -1,14 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  Box,
-  Button,
-  FormGroup,
-  Grid,
-  Tab,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { FormGroup, Grid } from '@mui/material';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerDatePicker,
@@ -23,35 +14,29 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { useMounted, useNotification } from 'hooks';
+import { connectURL } from 'config';
+import { useNotification } from 'hooks';
 import {
   IMeasure,
   IProduct,
   IProductGroup,
-  IProductList,
   ISupplier,
   ITreatmentGroup,
   IUsage,
 } from 'interface';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { updateProduct } from 'redux/slices/product';
 import measureService from 'services/measure.service';
-import productService from 'services/product.service';
 import productGroupService from 'services/productGroup.service';
+import productListService from 'services/productList.service';
 import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
-import TableData from '../../ProductList/TableData';
-// import FormDialog from '../FormDialog';
-import Details from './Details';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { useDispatch } from 'react-redux';
-import { updateProduct } from 'redux/slices/product';
-import { connectURL } from 'config';
 import FormDialog from '../FormDialog';
-import productListService from 'services/productList.service';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -64,14 +49,8 @@ const validationSchema = yup.object().shape({
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
-  const mounted = useMounted();
-  const [product, setProduct] = useState<IProduct>();
   const [taskQueue, setTaskQueue] = useState<boolean>(true);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [fileValue, setFileValue] = useState<File | object>();
-  const [tab, setTab] = useState<string>('1');
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -100,7 +79,6 @@ const DetailsForm = () => {
 
     const { data } = await productListService.get(Number(crudId));
 
-    console.log('data', data);
     setValue('name', data?.name);
     setValue('numberRegister', data?.numberRegister);
     setValue('lotNumber', data?.lotNumber);
@@ -120,8 +98,8 @@ const DetailsForm = () => {
     setValue('treamentGroupId', data?.treamentGroupO.id);
     setValue('productImage', data?.productImage);
     setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountFirst', data?.amountFirst);
     setValue('amountSecond', data?.amountSecond);
+    setValue('amountThird', data?.amountThird);
     setValue(
       'productsSupplier',
       // @ts-ignore
@@ -130,7 +108,6 @@ const DetailsForm = () => {
     setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
     setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
     setValue('mesureLevelThird', data?.mesureLevelThird.id);
-    setProduct(data);
     setTaskQueue(false);
   };
 
@@ -178,7 +155,7 @@ const DetailsForm = () => {
     supplierService
       .getAllSupplier()
       .then(({ data }) => {
-        setSupplierList(data.items);
+        setSupplierList(data);
       })
       .catch((err) => {})
       .finally(() => {});
@@ -194,26 +171,13 @@ const DetailsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crudId]);
 
-  const getFile = async (image: string) => {
-    const { data } = await supplierService.getFile(image);
-    setImage(data);
-  };
-
   if (taskQueue) {
     return <LoadingScreen />;
   }
 
-  const handleOpenUpdateDialog = () => {
-    setOpenFormDialog(true);
-  };
-
   const handleCloseUpdateDialog = () => {
     setOpenFormDialog(false);
     fetchData();
-  };
-
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue);
   };
 
   const onSubmit = async (payload: IProduct) => {
@@ -335,7 +299,7 @@ const DetailsForm = () => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       control={control}
                       disabled
                     />
@@ -354,7 +318,7 @@ const DetailsForm = () => {
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
-                      name="amountSecond"
+                      name="amountThird"
                       control={control}
                       disabled
                     />
@@ -471,18 +435,17 @@ const DetailsForm = () => {
         </FormContent>
 
         <FormFooter>
-          <LinkButton to="/hk_group/product/list">
+          <LinkButton to="/hk_care/product/list">
             Quay lại danh sách sản phẩm
           </LinkButton>
 
-          <Button variant="contained" onClick={handleOpenUpdateDialog}>
+          {/* <Button variant="contained" onClick={handleOpenUpdateDialog}>
             Chỉnh sửa thông tin sản phẩm
-          </Button>
+          </Button> */}
         </FormFooter>
       </FormPaperGrid>
 
       <FormDialog
-        dataUpdate={product}
         // @ts-ignore
         currentID={Number(crudId)}
         open={openFormDialog}

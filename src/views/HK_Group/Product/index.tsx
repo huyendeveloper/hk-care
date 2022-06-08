@@ -28,7 +28,6 @@ export const Measure = Loadable(
 export const Supplier = Loadable(
   lazy(() => import('views/HK_Group/Product/Supplier'))
 );
-
 export const SupplierDetails = Loadable(
   lazy(() => import('views/HK_Group/Product/Supplier/Details'))
 );

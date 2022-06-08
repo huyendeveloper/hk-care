@@ -1,14 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  Box,
-  Button,
-  FormGroup,
-  Grid,
-  Tab,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { Button, FormGroup, Grid } from '@mui/material';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerDatePicker,
@@ -23,7 +15,10 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { useMounted, useNotification } from 'hooks';
+import ControllerNumberInput from 'components/Form/ControllerNumberInput';
+import { connectURL } from 'config';
+import { yupDate, yupOnlyNumber } from 'constants/typeInput';
+import { useNotification } from 'hooks';
 import {
   IMeasure,
   IProduct,
@@ -34,7 +29,9 @@ import {
 } from 'interface';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { updateProduct } from 'redux/slices/product';
 import measureService from 'services/measure.service';
 import productService from 'services/product.service';
 import productGroupService from 'services/productGroup.service';
@@ -42,45 +39,36 @@ import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
-import TableData from '../../ProductList/TableData';
 import FormDialog from '../FormDialog';
-import Details from './Details';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { useDispatch } from 'react-redux';
-import { updateProduct } from 'redux/slices/product';
-import { connectURL } from 'config';
-import { typeNumber, yupDate, yupOnlyNumber } from 'constants/typeInput';
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required('Vui lòng nhập tên sản phẩm.'),
+  name: yup
+    .string()
+    .required('Vui lòng nhập tên sản phẩm.')
+    .trim('Vui lòng nhập tên sản phẩm.'),
   productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
   treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
   usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
   mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
-  amountFirst: yupOnlyNumber(),
   outOfDate: yupDate,
-  numberRegister: yupOnlyNumber(),
-  lotNumber: yupOnlyNumber(),
-  dosage: yup.string().required('Vui lòng nhập hàm lượng.').default('Null'),
+  dosage: yup
+    .string()
+    .required('Vui lòng nhập hàm lượng.')
+    .trim('Vui lòng nhập hàm lượng.')
+    .default('Null'),
   routeOfUse: yup
     .string()
     .required('Vui lòng nhập liều dùng.')
+    .trim('Vui lòng nhập liều dùng.')
     .default('Theo chỉ định'),
-  amountSecond: yupOnlyNumber(),
   dateManufacture: yupDate,
-  importPrice: yupOnlyNumber(),
-  price: yupOnlyNumber(),
 });
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
-  const [product, setProduct] = useState();
+  const [product, setProduct] = useState<IProduct>();
   const [taskQueue, setTaskQueue] = useState<boolean>(true);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [fileValue, setFileValue] = useState<File | object>();
-  const [tab, setTab] = useState<string>('1');
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -133,8 +121,8 @@ const DetailsForm = () => {
     setValue('treamentGroupName', data?.treamentGroupO.name);
     setValue('productImage', data?.productImage);
     data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountFirst', data?.amountFirst);
-    data?.amountSecond && setValue('amountSecond', data?.amountSecond);
+    setValue('amountSecond', data?.amountSecond);
+    data?.amountThird && setValue('amountThird', data?.amountThird);
     // setSupplierList(data?.suppliers);
     setValue(
       'productsSupplier',
@@ -147,6 +135,7 @@ const DetailsForm = () => {
     setValue('mesureLevelSecondName', data?.mesureLevelSecond.name);
     setValue('mesureLevelThird', data?.mesureLevelThird.id);
     setValue('mesureLevelThirdName', data?.mesureLevelThird.name);
+    setProduct(data);
     setTaskQueue(false);
   };
 
@@ -194,7 +183,7 @@ const DetailsForm = () => {
     supplierService
       .getAllSupplier()
       .then(({ data }) => {
-        setSupplierList(data.items);
+        setSupplierList(data);
       })
       .catch((err) => {})
       .finally(() => {});
@@ -210,26 +199,13 @@ const DetailsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crudId]);
 
-  const getFile = async (image: string) => {
-    const { data } = await supplierService.getFile(image);
-    setImage(data);
-  };
-
   if (taskQueue) {
     return <LoadingScreen />;
   }
 
-  const handleOpenUpdateDialog = () => {
-    setOpenFormDialog(true);
-  };
-
   const handleCloseUpdateDialog = () => {
     setOpenFormDialog(false);
     fetchData();
-  };
-
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue);
   };
 
   const onSubmit = async (payload: IProduct) => {
@@ -357,7 +333,7 @@ const DetailsForm = () => {
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
                       type="number"
-                      name="amountFirst"
+                      name="amountSecond"
                       control={control}
                       disabled={disabled}
                     />
@@ -376,7 +352,8 @@ const DetailsForm = () => {
                   </Grid>
                   <Grid item xs={6} md={2}>
                     <ControllerTextField
-                      name="amountSecond"
+                      type={'number'}
+                      name="amountThird"
                       control={control}
                       disabled={disabled}
                     />
@@ -415,20 +392,20 @@ const DetailsForm = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá nhập" name="importPrice" />
-                <ControllerTextField
+                <ControllerNumberInput
                   name="importPrice"
-                  type="number"
+                  value={product?.importPrice}
+                  setValue={setValue}
                   disabled={disabled}
-                  control={control}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá bán" name="price" />
-                <ControllerTextField
+                <ControllerNumberInput
                   name="price"
-                  type="number"
+                  value={product?.price}
+                  setValue={setValue}
                   disabled={disabled}
-                  control={control}
                 />
               </Grid>
               <Grid item xs={12}>

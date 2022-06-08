@@ -30,6 +30,7 @@ export const login = createAsyncThunk(
       if (res.data.access_token) {
         const access_Token = res.data.access_token as string;
         LocalStorage.set('accessToken', access_Token);
+        LocalStorage.set('tennant', body.tenant || '');
         const { data } = await userService.getRoles();
 
         return {

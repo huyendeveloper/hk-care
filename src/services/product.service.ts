@@ -22,12 +22,12 @@ const getFormData = (payload: IProduct, file: any) => {
   payload.usageId && params.append('usageId', payload.usageId.toString());
   payload.mesureLevelFisrt &&
     params.append('mesureLevelFisrt', payload.mesureLevelFisrt.toString());
-  payload.amountFirst &&
-    params.append('amountFirst', payload.amountFirst.toString());
-  payload.mesureLevelSecond &&
-    params.append('mesureLevelSecond', payload.mesureLevelSecond.toString());
   payload.amountSecond &&
     params.append('amountSecond', payload.amountSecond.toString());
+  payload.mesureLevelSecond &&
+    params.append('mesureLevelSecond', payload.mesureLevelSecond.toString());
+  payload.amountThird &&
+    params.append('amountThird', payload.amountThird.toString());
   payload.mesureLevelThird &&
     params.append('mesureLevelThird', payload.mesureLevelThird.toString());
   payload.producer && params.append('producer', payload.producer);
@@ -96,7 +96,7 @@ class ProductService {
     const token = LocalStorage.get('accessToken');
 
     const params = getFormData(payload, file);
-    params.append('hidden', 'true');
+    params.append('hidden', payload.hidden.toString());
 
     return axios({
       method: 'put',
@@ -110,7 +110,7 @@ class ProductService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/product/${id}`);
+    return axiosClient.delete(`${baseURL}/product/DeleteProduct/${id}`);
   }
 
   changeStatus(id: number | null, status: boolean) {

@@ -8,10 +8,11 @@ import type { FC } from 'react';
 interface Props extends BoxProps {
   loading: boolean;
   total?: number;
+  noDataText?: string;
 }
 
 const TableContent: FC<Props> = (props) => {
-  const { loading, total, children, ...rest } = props;
+  const { loading, total, children, noDataText, ...rest } = props;
 
   if (loading) {
     return <LoadingScreen />;
@@ -22,7 +23,7 @@ const TableContent: FC<Props> = (props) => {
       {total === 0 ? (
         <Box sx={{ display: 'grid', placeContent: 'center' }}>
           <Typography variant="h6" color="text.secondary">
-            Không tìm thấy thông tin tìm kiếm
+            {noDataText || 'Không tìm thấy thông tin tìm kiếm'}
           </Typography>
         </Box>
       ) : (

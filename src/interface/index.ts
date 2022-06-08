@@ -2,6 +2,7 @@ export interface ILogin {
   username: string;
   password: string;
   __tenant: string | null;
+  tenant: string | null;
 }
 
 export interface ILoginResponse {
@@ -55,23 +56,23 @@ export interface ISupplier {
 export interface IProduct {
   image?: any;
   name: string;
-  numberRegister?: number;
+  numberRegister?: number | null;
   productGroupId: number | null;
   productGroup?: string;
   importPrice: number;
   price: number;
   hidden: boolean;
-  lotNumber?: number;
+  lotNumber?: number | null;
   treamentGroupId: number | null;
-  outOfDate?: Date;
+  outOfDate?: Date | null;
   usageId: number | null;
   mesureLevelFisrt: number | null;
-  amountFirst: number | null;
+  amountThird: number | null;
   mesureLevelSecond: number;
-  amountSecond: number;
+  amountSecond: number | null;
   mesureLevelThird: number;
   producer: string;
-  dateManufacture: Date;
+  dateManufacture: Date | null;
   productsSupplier: number[];
   packRule: string;
   content: string;
@@ -98,7 +99,7 @@ export interface IProductList {
   price: number;
   status: number;
   mesureLevelFisrt: string;
-  amountFirst: string;
+  amountThird: string;
   mesureLevelSecond: string;
   amountSecond: string;
   mesureLevelThird: string;
@@ -107,11 +108,52 @@ export interface IProductList {
   mesureLevelThirdName: string;
 }
 
+export interface IReceipt {
+  description?: string;
+  productName: string;
+  mesure: string;
+  stockQuantity: number;
+  productId: number;
+  productGroup?: string;
+  importPrice: number;
+  price: number;
+  status: number;
+  mesureLevelFisrt: string;
+  amountThird: string;
+  mesureLevelSecond: string;
+  amountSecond: string;
+  mesureLevelThird: string;
+  mesureLevelFisrtName: string;
+  mesureLevelSecondName: string;
+  mesureLevelThirdName: string;
+  quantity: number;
+  dateManufacture: Date;
+  productList?: any[];
+  discount?: number;
+  outOfDate: Date;
+  amount: number;
+}
+
 export interface ITenant {
   id: string;
   name: string;
+  address: string;
+  hotline: string;
+  status: boolean;
 }
 
-export interface IReferencePrices {
+export interface IReferencePricesMock {
   id: number;
+  name: string;
+  mesure: string;
+  type: string;
+  importPrice: number;
+  price: number;
+}
+
+export interface IImportReceipt {
+  id: number;
+  importDate: Date;
+  unitPrice: number;
+  inDebt: number;
 }

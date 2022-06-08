@@ -1,20 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import {
-  Box,
-  Button,
-  Dialog,
-  Grid,
-  IconButton,
-  Stack,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Box, Button, Dialog, Grid } from '@mui/material';
 import {
   ControllerMultiFile,
   ControllerTextarea,
   ControllerTextField,
-  EntityMultipleSelecter,
   FormContent,
   FormFooter,
   FormGroup,
@@ -22,8 +12,8 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { baseURL, connectURL } from 'config';
-import { typeNumber, typeStringNumber } from 'constants/typeInput';
+import { connectURL } from 'config';
+import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +23,6 @@ import { createSupplier, updateSupplier } from 'redux/slices/supplier';
 import { RootState } from 'redux/store';
 import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface Props {
   open: boolean;
@@ -46,12 +35,14 @@ const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên nhà cung cấp.')
+    .trim('Vui lòng nhập tên nhà cung cấp.')
     .max(150, 'Tên nhà cung cấp không quá 150 ký tự.')
     .strict(true)
     .default(''),
   telephoneNumber: yup
     .string()
     .required('Vui lòng nhập số điện thoại.')
+    .trim('Vui lòng nhập số điện thoại.')
     .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
     .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
     .strict(true)
@@ -133,7 +124,6 @@ const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
         data.bussinessLicense.forEach((item: string) => {
           fileList.push({ name: `${connectURL}/${item}` });
         });
-        console.log('fileList', fileList)
         setFiles(fileList);
       }
     }

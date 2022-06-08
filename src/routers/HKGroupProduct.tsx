@@ -1,6 +1,7 @@
 import { Outlet, RouteObject } from 'react-router-dom';
 import {
-  Measure, ProductDetails, ProductGroup, ProductList, ReferencePrices, Supplier, SupplierDetails, TreatmentGroup, Usage
+  Measure, ProductDetails, ProductGroup, ProductList, ReferencePrices, Supplier,
+  SupplierDetails, TreatmentGroup, Usage
 } from 'views/HK_Group/Product';
 
 const HKGroupRoutes: RouteObject = {
@@ -43,7 +44,7 @@ const HKGroupRoutes: RouteObject = {
       children: [
         { index:true, element: <Measure /> },
       ],
-    },
+    }, 
     {
       path: 'supplier',
       children: [

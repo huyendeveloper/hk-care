@@ -15,9 +15,7 @@ class SupplierService {
   }
 
   getAllSupplier() {
-    return axiosClient.get(
-      `${baseURL}/supplier/search-all?MaxResultCount=1000`
-    );
+    return axiosClient.get(`${baseURL}/supplier/GetSupplierActive`);
   }
 
   get(id: number) {

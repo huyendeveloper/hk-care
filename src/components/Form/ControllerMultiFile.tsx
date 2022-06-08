@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react';
-import { Button, IconButton, Stack } from '@mui/material';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button, Stack } from '@mui/material';
+import React from 'react';
 
 interface IProps {
   files: File[] | object[];
   setFiles: (files: File[] | object[]) => void;
   viewOnly?: boolean;
+  max?: number;
 }
 
-const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
+const ControllerMultiFile = ({
+  files,
+  setFiles,
+  viewOnly,
+  max = 6,
+}: IProps) => {
   const handleChangeFile = (e: any) => {
     const file = e?.target.files[0];
     if (file) {
@@ -23,6 +30,12 @@ const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
       newFiles[index] = file;
       setFiles(newFiles);
     }
+  };
+
+  const removeItem = (index: number) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
   };
 
   return (
@@ -44,24 +57,44 @@ const ControllerMultiFile = ({ files, setFiles, viewOnly }: IProps) => {
               disabled={viewOnly}
             />
           </Button>
-          {/* @ts-ignore */}
-          {item?.name && !item.type && (
-            // @ts-ignore
-            <a href={item?.name} target={'_blank'}>
+
+          <div>
+            <Stack
+              height={1}
+              bgcolor="#00AB55"
+              color={'white'}
+              justifyContent="center"
+              alignContent={'center'}
+              pr={1}
+              gap={1}
+            >
+              {/* @ts-ignore */}
+              {item?.name && !item.type && (
+                // @ts-ignore
+                // eslint-disable-next-line react/jsx-no-target-blank
+                <a href={item?.name} target={'_blank'}>
+                  <Stack
+                    height={1}
+                    bgcolor="#00AB55"
+                    color={'white'}
+                    justifyContent="center"
+                    pr={1}
+                  >
+                    <VisibilityIcon />
+                  </Stack>
+                </a>
+              )}
               <Stack
-                height={1}
-                bgcolor="#00AB55"
-                color={'white'}
-                justifyContent="center"
-                pr={1}
+                onClick={() => removeItem(index)}
+                style={{ cursor: 'pointer' }}
               >
-                <VisibilityIcon />
+                <RemoveCircleIcon />
               </Stack>
-            </a>
-          )}
+            </Stack>
+          </div>
         </Stack>
       ))}
-      {files.length < 6 && !viewOnly && (
+      {files.length < max && !viewOnly && (
         <Button variant="contained" fullWidth component="label">
           Chọn file
           <input

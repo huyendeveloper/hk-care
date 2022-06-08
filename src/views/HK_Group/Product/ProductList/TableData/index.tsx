@@ -28,11 +28,14 @@ import { useNotification } from 'hooks';
 import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeStatus, getAllProduct } from 'redux/slices/product';
+import { changeStatus, getAllProduct, deleteProduct } from 'redux/slices/product';
 import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
+import { numberFormat } from 'utils/numberFormat';
 import FormDialog from '../FormDialog';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DeleteDialog } from 'components/Dialog';
 
 const getCells = (): Cells<IProduct> => [
   { id: 'id', label: 'STT' },
@@ -60,6 +63,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
   const { loading } = useSelector((state: RootState) => state.product);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     supplierId,
@@ -106,6 +110,27 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       pageIndex: 1,
       pageSize: rowsPerPage,
     }));
+  };
+
+  const handleDelete = async () => {
+    if (!currentID) return;
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteProduct(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi khi xóa sản phẩm!' });
+      return;
+    }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+
+    setProductList(productList.filter((x) => x.id !== currentID));
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
   };
 
   const handleSearch = (searchText: string) => {
@@ -190,10 +215,15 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     fetchData();
   };
 
+  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenDeleteDialog(true);
+  };
+
   const renderAction = (row: IProduct) => {
     return (
       <>
-        <LinkIconButton to={`${row.id}`}>
+        <LinkIconButton to={`/hk_group/product/list/${row.id}`}>
           <IconButton>
             <VisibilityIcon />
           </IconButton>
@@ -204,9 +234,14 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         </IconButton>
 
         {row.hidden ? (
-          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
-            <CheckIcon />
-          </IconButton>
+          <>
+            <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+              <CheckIcon />
+            </IconButton>
+            <IconButton onClick={handleOpenDeleteDialog(row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </>
         ) : (
           <IconButton onClick={handleOpenBlockDialog(row.id)}>
             <BlockIcon />
@@ -258,8 +293,8 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
                       </TableCell>
                       <TableCell>{name}</TableCell>
                       <TableCell>{productGroup}</TableCell>
-                      <TableCell>{importPrice}</TableCell>
-                      <TableCell>{price}</TableCell>
+                      <TableCell>{numberFormat(importPrice)}</TableCell>
+                      <TableCell>{numberFormat(price)}</TableCell>
                       <TableCell>
                         {hidden ? (
                           <Button color="error">Không</Button>
@@ -305,9 +340,19 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       />
 
       <FormDialog
+        supplierId={supplierId}
         currentID={currentID}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+      />
+
+      <DeleteDialog
+        id={currentID}
+        tableName="sảm phẩm"
+        name={productList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseDeleteDialog}
+        open={openDeleteDialog}
+        handleDelete={handleDelete}
       />
     </TableWrapper>
   );

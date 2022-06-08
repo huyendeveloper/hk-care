@@ -5,8 +5,11 @@ import MainLayout from 'layouts/Main';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 import CRUDRoutes from "./CRUDExample";
-import HKGroupProductRoutes from "./HKGroupProduct";
 import HKCareProductRoutes from "./HKCareProduct";
+import HKCareWarehouse from './HKCareWarehouse';
+import HKGroup from "./HKGroup";
+import HKGroupProductRoutes from "./HKGroupProduct";
+import HKTrading from "./HKTrading";
 import Loadable from './Loadable';
 import UserRoutes from "./User";
 
@@ -40,7 +43,10 @@ const routes: RouteObject[] = [
       CRUDRoutes,
       UserRoutes,
       HKGroupProductRoutes,
-      HKCareProductRoutes
+      HKCareProductRoutes,
+      HKCareWarehouse,
+      HKTrading,
+      HKGroup
       //if has other Routes, push it in here
     ]
   },

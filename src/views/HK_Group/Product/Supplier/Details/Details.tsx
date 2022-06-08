@@ -1,15 +1,13 @@
-import { Button, Grid, IconButton, Stack } from '@mui/material';
-import { LinkIconButton } from 'components/common';
+import { Grid } from '@mui/material';
 import {
   ControllerMultiFile,
   ControllerTextarea,
   ControllerTextField,
   FormContent,
   FormGroup,
-  FormLabel,
+  FormLabel
 } from 'components/Form';
 import React from 'react';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // @ts-ignore
 const Details = ({ control, files }) => {
@@ -73,7 +71,11 @@ const Details = ({ control, files }) => {
               title="Đính kèm giấy chứng nhận"
               name="bussinessLicense"
             />
-            <ControllerMultiFile files={files} setFiles={(file) => {}} viewOnly />
+            <ControllerMultiFile
+              files={files}
+              setFiles={(file: File[] | object[]) => {}}
+              viewOnly
+            />
           </Grid>
         </Grid>
       </FormGroup>

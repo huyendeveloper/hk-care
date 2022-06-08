@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Box, Tab, useMediaQuery, useTheme } from '@mui/material';
-import { getValue } from '@testing-library/user-event/dist/utils';
+import { Box, Tab } from '@mui/material';
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import { FormFooter, FormHeader, FormPaperGrid } from 'components/Form';
 import { connectURL } from 'config';
@@ -20,9 +19,19 @@ const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên nhà cung cấp.')
+    .trim('Vui lòng nhập tên nhà cung cấp.')
+    .max(150, 'Tên nhà cung cấp không quá 150 ký tự.')
     .strict(true)
     .default(''),
-  description: yup.string().strict(true).default(''),
+  telephoneNumber: yup
+    .string()
+    .required('Vui lòng nhập số điện thoại.')
+    .trim('Vui lòng nhập số điện thoại.')
+    .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .strict(true)
+    .default(''),
+  address: yup.string().max(150, 'Địa chỉ không quá 150 ký tự.').default(''),
 });
 
 const DetailsForm = () => {
@@ -31,8 +40,6 @@ const DetailsForm = () => {
   const [supplier, setSupplier] = useState<ISupplier>();
   const [taskQueue, setTaskQueue] = useState<number>(0);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [tab, setTab] = useState<string>('1');
 
@@ -105,10 +112,6 @@ const DetailsForm = () => {
     return <LoadingScreen />;
   }
 
-  const handleOpenUpdateDialog = () => {
-    setOpenFormDialog(true);
-  };
-
   const handleCloseUpdateDialog = () => {
     setOpenFormDialog(false);
     fetchData();
@@ -147,10 +150,6 @@ const DetailsForm = () => {
 
         <FormFooter>
           <LinkButton to="/hk_group/product/supplier">Đóng</LinkButton>
-
-          {/* <Button variant="contained" onClick={handleOpenUpdateDialog}>
-            Chỉnh sửa thông tin
-          </Button> */}
         </FormFooter>
       </FormPaperGrid>
       <FormDialog

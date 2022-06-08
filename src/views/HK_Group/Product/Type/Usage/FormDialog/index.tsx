@@ -32,6 +32,7 @@ const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên dạng dùng.')
+    .trim('Vui lòng nhập tên dạng dùng.')
     .max(100, 'Tên dạng dùng không quá 100 ký tự.')
     .strict(true)
     .default(''),
