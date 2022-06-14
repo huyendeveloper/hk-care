@@ -150,7 +150,7 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Hóa đơn bán hàng',
-            path: '/404',
+            path: '/hk_care/sales/order',
             roles: ['hkl2_1_3'],
           },
           {

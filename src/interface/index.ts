@@ -108,6 +108,15 @@ export interface IProductList {
   mesureLevelThirdName: string;
 }
 
+interface IProductReceiptWHDtos {
+  lotNumber: string;
+  name: string;
+  productName: string;
+  mesureNameLevelFirst: string;
+  measure: string;
+  amount: number;
+}
+
 export interface IReceipt {
   description?: string;
   productName: string;
@@ -128,10 +137,20 @@ export interface IReceipt {
   mesureLevelThirdName: string;
   quantity: number;
   dateManufacture: Date;
-  productList?: any[];
+  productReceiptWHDtos?: IProductReceiptWHDtos[];
   discount?: number;
   outOfDate: Date;
   amount: number;
+  mesureNameLevelFirst?: string;
+  pathFile?: string;
+  measure?: string;
+  totalMoney: number;
+  lotNumber?: string;
+  numberRegister?: string;
+  name?: string;
+  vat?: number;
+  discountValue?: number;
+  paid?: number;
 }
 
 export interface ITenant {
@@ -153,7 +172,34 @@ export interface IReferencePricesMock {
 
 export interface IImportReceipt {
   id: number;
-  importDate: Date;
-  unitPrice: number;
-  inDebt: number;
+  creationTime: Date;
+  moneyToPay: number;
+  debts: number;
+  code: string;
+}
+
+export interface ISalesOrder {
+  id: number;
+  salesDate: Date;
+  customer: string;
+  type: string;
+  saler: string;
+  pay: number;
+}
+
+export interface ISearchProduct {
+  productId: number;
+  productName: string;
+  priceLevelFirst: number;
+  mesureNameLevelFirst: string;
+  priceLevelSecond: number;
+  mesureNameLevelSecond: string;
+  priceLevelThird: number;
+  mesureNameLevelThird: string;
+  productImage: string;
+  stockQuantity: number;
+  routeOfUse: string;
+  quantity?: number;
+  discount?: number;
+  price?: number;
 }

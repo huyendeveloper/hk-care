@@ -16,6 +16,7 @@ interface Props<T> extends Omit<TextFieldProps, 'name'> {
   mask?: string;
   onChangeSelect?: (date: Date | null) => void;
   minDate?: Date;
+  error?: boolean;
 }
 
 const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
@@ -27,6 +28,7 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
     mask,
     onChangeSelect,
     minDate,
+    error = false,
     ...rest
   } = props;
 
@@ -48,7 +50,7 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
                     {...newProps}
                     {...rest}
                     fullWidth
-                    error={Boolean(errors[name])}
+                    error={Boolean(errors[name]) || error}
                     helperText={errors[name]?.message}
                     id={name}
                   />

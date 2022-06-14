@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import {
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -92,8 +92,19 @@ const ProductListTableData = ({
         searchText={filters.searchText}
       />
 
-      <TableContent total={registerList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+      <TableContent
+        total={
+          registerList
+            .filter((item) =>
+              item.productName
+                .toLocaleLowerCase()
+                .includes(filters.searchText.toLowerCase())
+            )
+            .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10).length
+        }
+        loading={loading}
+      >
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -143,7 +154,7 @@ const ProductListTableData = ({
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>

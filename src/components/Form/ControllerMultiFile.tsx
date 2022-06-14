@@ -41,8 +41,13 @@ const ControllerMultiFile = ({
   return (
     <>
       {files.map((item, index) => (
-        <Stack flexDirection={'row'} alignContent="center" mb={'20px'}>
-          <Button key={index} variant="contained" fullWidth component="label">
+        <Stack
+          key={index}
+          flexDirection={'row'}
+          alignContent="center"
+          mb={'20px'}
+        >
+          <Button variant="contained" fullWidth component="label">
             {/* @ts-ignore */}
             {item?.name
               ? // @ts-ignore
@@ -84,12 +89,14 @@ const ControllerMultiFile = ({
                   </Stack>
                 </a>
               )}
-              <Stack
-                onClick={() => removeItem(index)}
-                style={{ cursor: 'pointer' }}
-              >
-                <RemoveCircleIcon />
-              </Stack>
+              {!viewOnly && (
+                <Stack
+                  onClick={() => removeItem(index)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <RemoveCircleIcon />
+                </Stack>
+              )}
             </Stack>
           </div>
         </Stack>

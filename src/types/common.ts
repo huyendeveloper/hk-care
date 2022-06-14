@@ -11,6 +11,8 @@ export interface FilterParams {
   sortBy: string;
   searchText: string;
   supplierId?: number;
+  startDate?: string;
+  lastDate?: string;
 }
 export interface Dictionary<T = any> {
   [key: string]: T;

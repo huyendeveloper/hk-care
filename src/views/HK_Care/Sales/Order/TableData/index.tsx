@@ -18,89 +18,150 @@ import {
   TableSearchField,
   TableWrapper,
 } from 'components/Table';
-import type { Cells } from 'components/Table/TableHeader';
+import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { previousDay } from 'date-fns';
-import { useNotification } from 'hooks';
-import { IImportReceipt } from 'interface';
+import { ISalesOrder } from 'interface';
 import moment from 'moment';
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllImportReceipt } from 'redux/slices/importReceipt';
-import { getAllUsage } from 'redux/slices/usage';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-import type { FilterParams } from 'types/common';
+import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 
-const getCells = (): Cells<IImportReceipt> => [
+const getCells = (): Cells<ISalesOrder> => [
   {
     id: 'id',
     label: 'STT',
   },
   {
     id: 'id',
-    label: 'Mã hóa đơn',
+    label: 'Số hóa đơn',
   },
   {
-    id: 'creationTime',
-    label: 'Ngày nhập',
+    id: 'salesDate',
+    label: 'Ngày bán',
   },
   {
-    id: 'moneyToPay',
-    label: 'Tiền cần trả',
+    id: 'customer',
+    label: 'Khách hàng',
   },
   {
-    id: 'debts',
-    label: 'Công nợ',
+    id: 'type',
+    label: 'Loại hóa đơn',
   },
   {
-    id: 'moneyToPay',
+    id: 'saler',
+    label: 'Nhân viên bán hàng',
+  },
+  {
+    id: 'pay',
+    label: 'Khách phải trả',
+  },
+  {
+    id: 'saler',
     label: 'Thao tác',
   },
 ];
 
 const TableData = () => {
-  const setNotification = useNotification();
-  const dispatch = useDispatch();
-  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
-
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.usage);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [salesOrder, setSalesOrder] = useState<ISalesOrder[]>([]);
+  const { loading } = useSelector((state: RootState) => state.usage);
+  const [totalRows, setTotalRows] = useState<number>(0);
+
+  useEffect(() => {
+    setSalesOrder([
+      {
+        id: 1,
+        salesDate: new Date('04/14/2022'),
+        customer: 'Gussy',
+        type: 'Wanda',
+        saler: 'Marya',
+        pay: 4,
+      },
+      {
+        id: 2,
+        salesDate: new Date('06/19/2021'),
+        customer: 'Steffane',
+        type: 'Tabbatha',
+        saler: 'Belicia',
+        pay: 49,
+      },
+      {
+        id: 3,
+        salesDate: new Date('04/17/2022'),
+        customer: 'Lauren',
+        type: 'Glynis',
+        saler: 'Nara',
+        pay: 65,
+      },
+      {
+        id: 4,
+        salesDate: new Date('12/14/2021'),
+        customer: 'Charla',
+        type: 'Jaimie',
+        saler: 'Marybelle',
+        pay: 70,
+      },
+      {
+        id: 5,
+        salesDate: new Date('06/21/2021'),
+        customer: 'Isabelita',
+        type: 'Aurea',
+        saler: 'Gabriell',
+        pay: 67,
+      },
+      {
+        id: 6,
+        salesDate: new Date('01/31/2022'),
+        customer: 'Adelaida',
+        type: 'Karole',
+        saler: 'Henrietta',
+        pay: 20,
+      },
+      {
+        id: 7,
+        salesDate: new Date('01/09/2022'),
+        customer: 'Theodosia',
+        type: 'Viki',
+        saler: 'Kimberlyn',
+        pay: 44,
+      },
+      {
+        id: 8,
+        salesDate: new Date('07/06/2021'),
+        customer: 'Stace',
+        type: 'Lizzie',
+        saler: 'Corenda',
+        pay: 19,
+      },
+      {
+        id: 9,
+        salesDate: new Date('07/23/2021'),
+        customer: 'Andria',
+        type: 'Pavla',
+        saler: 'Marylynne',
+        pay: 91,
+      },
+      {
+        id: 10,
+        salesDate: new Date('06/16/2021'),
+        customer: 'Roobbie',
+        type: 'Kora',
+        saler: 'Malia',
+        pay: 3,
+      },
+    ]);
+  }, [filters]);
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = async () => {
-    // @ts-ignore
-    const { payload, error } = await dispatch(getAllImportReceipt(filters));
-    if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách hóa đơn nhập kho!',
-      });
-      return;
-    }
-
- 
-    // setImportReceipt([
-    //   { id: 1, creationTime: new Date('9/29/2021'), moneyToPay: 78, debts: 86 },
-    //   { id: 2, creationTime: new Date('6/16/2021'), moneyToPay: 26, debts: 3 },
-    //   { id: 3, creationTime: new Date('11/26/2021'), moneyToPay: 61, debts: 28 },
-    //   { id: 4, creationTime: new Date('3/9/2022'), moneyToPay: 63, debts: 32 },
-    //   { id: 5, creationTime: new Date('12/9/2021'), moneyToPay: 80, debts: 60 },
-    //   { id: 6, creationTime: new Date('11/1/2021'), moneyToPay: 98, debts: 80 },
-    //   { id: 7, creationTime: new Date('12/6/2021'), moneyToPay: 66, debts: 26 },
-    //   { id: 8, creationTime: new Date('8/4/2021'), moneyToPay: 81, debts: 1 },
-    //   { id: 9, creationTime: new Date('2/12/2022'), moneyToPay: 99, debts: 3 },
-    //   { id: 10, creationTime: new Date('6/13/2021'), moneyToPay: 17, debts: 96 },
-    // ]);
-    setImportReceipt(payload.importReceiptList);
-    setTotalRows(payload.totalCount);
+  const handleSearch = (searchText: string) => {
+    setFilters((state) => ({
+      ...state,
+      searchText,
+    }));
   };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
 
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
@@ -124,14 +185,7 @@ const TableData = () => {
     }));
   };
 
-  const handleSearch = (searchText: string) => {
-    setFilters((state) => ({
-      ...state,
-      searchText,
-    }));
-  };
-
-  const renderAction = (row: IImportReceipt) => {
+  const renderAction = (row: ISalesOrder) => {
     return (
       <>
         <LinkIconButton to={`${row.id}`}>
@@ -151,7 +205,7 @@ const TableData = () => {
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
       <TableSearchField
-        title="Danh sách hóa đơn nhập kho"
+        title="Danh sách hóa đơn bán hàng"
         placeHolder="Tìm kiếm hóa đơn"
         onSearch={handleSearch}
         searchText={filters.searchText}
@@ -169,7 +223,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={importReceipt.length} loading={loading}>
+      <TableContent total={salesOrder.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -181,19 +235,21 @@ const TableData = () => {
               />
 
               <TableBody>
-                {importReceipt.map((item, index) => {
-                  const { id, code, creationTime, moneyToPay, debts } = item;
+                {salesOrder.map((item, index) => {
+                  const { id, salesDate, customer, type, saler, pay } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell>{code}</TableCell>
+                      <TableCell>{id}</TableCell>
                       <TableCell>
-                        {moment(creationTime).format('DD/MM/YYYY HH:MM')}
+                        {moment(salesDate).format('DD/MM/YYYY HH:MM')}
                       </TableCell>
-                      <TableCell>{numberFormat(moneyToPay)}</TableCell>
-                      <TableCell>{numberFormat(debts)}</TableCell>
+                      <TableCell>{customer}</TableCell>
+                      <TableCell>{type}</TableCell>
+                      <TableCell>{saler}</TableCell>
+                      <TableCell>{numberFormat(pay)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>
                   );

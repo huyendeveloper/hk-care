@@ -4,6 +4,8 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import SearchField from './SearchField';
 import Typography from '@mui/material/Typography';
+import { TextField } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 interface Props extends BoxProps {
   placeHolder: string;
@@ -11,6 +13,9 @@ interface Props extends BoxProps {
   searchText: string;
   title?: string;
   headerTitle?: string;
+  searchArea?: boolean;
+  setStart?: (date: string) => void;
+  setEnd?: (date: string) => void;
 }
 
 const TableSearchField = (props: Props) => {
@@ -21,6 +26,9 @@ const TableSearchField = (props: Props) => {
     onSearch,
     children,
     headerTitle,
+    searchArea,
+    setStart,
+    setEnd,
     ...rest
   } = props;
   return (
@@ -34,6 +42,7 @@ const TableSearchField = (props: Props) => {
           {headerTitle}
         </Typography>
       )}
+
       <SearchField
         title={title}
         placeHolder={placeHolder}
@@ -46,6 +55,27 @@ const TableSearchField = (props: Props) => {
           </Stack>
         </Box>
       </SearchField>
+      {searchArea && (
+        <Stack
+          flexDirection="row"
+          gap={1}
+          alignItems="center"
+          justifyContent="flex-end"
+          sx={{ mt: 2 }}
+        >
+          <TextField
+            type="date"
+            variant="outlined"
+            onChange={(e) => setStart && setStart(e.target.value)}
+          />
+          <RemoveIcon />
+          <TextField
+            type="date"
+            variant="outlined"
+            onChange={(e) => setEnd && setEnd(e.target.value)}
+          />
+        </Stack>
+      )}
     </Wrapper>
   );
 };

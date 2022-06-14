@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const TotalBill = ({ control, index }: IProps) => {
-  const results = useWatch({ control, name: 'productList' });
+  const results = useWatch({ control, name: 'productReceiptWHDtos' });
 
   const item = results[index];
 

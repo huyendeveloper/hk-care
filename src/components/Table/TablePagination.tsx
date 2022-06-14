@@ -53,7 +53,7 @@ const TablePagination = (props: Props) => {
         >
           Số dòng mỗi trang
         </Typography> */}
-        {/* <FormControl sx={{ ml: 1, mr: 2 }}>
+        <FormControl sx={{ ml: 1, mr: 2 }}>
           <Select
             value={String(rowsPerPage)}
             onChange={handleChangeRowsPerPage}
@@ -75,7 +75,7 @@ const TablePagination = (props: Props) => {
               </MenuItem>
             ))}
           </Select>
-        </FormControl> */}
+        </FormControl>
         <Typography
           variant="subtitle2"
           color="text.secondary"
