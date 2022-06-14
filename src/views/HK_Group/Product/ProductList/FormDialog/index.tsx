@@ -49,11 +49,23 @@ interface Props {
   supplierId?: number;
 }
 
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
+
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên sản phẩm.')
-    .trim('Vui lòng nhập tên sản phẩm.'),
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên sản phẩm.'),
   productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
   treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
   usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
@@ -62,12 +74,14 @@ const validationSchema = yup.object().shape({
   dosage: yup
     .string()
     .required('Vui lòng nhập hàm lượng.')
-    .trim('Vui lòng nhập hàm lượng.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập hàm lượng.')
     .default('Null'),
   routeOfUse: yup
     .string()
     .required('Vui lòng nhập liều dùng.')
-    .trim('Vui lòng nhập liều dùng.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập liều dùng.')
     .default('Theo chỉ định'),
   dateManufacture: yupDate,
 });

@@ -24,7 +24,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllProductList } from 'redux/slices/productList';
 import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
-import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -124,7 +123,7 @@ const ProductTableData = ({
       />
 
       <TableContent total={productList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -158,7 +157,7 @@ const ProductTableData = ({
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>

@@ -6,4 +6,6 @@ export const defaultFilters: FilterParams = {
   sortBy: '',
   sortDirection: '',
   searchText: '',
+  startDate: '',
+  lastDate: '',
 };

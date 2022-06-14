@@ -1,30 +1,40 @@
 import PrivateRoute from "components/common/PrivateRoute";
 import PublicRoute from "components/common/PublicRoute";
 import DashboardLayout from "layouts/Dashboard";
-import MainLayout from 'layouts/Main';
-import { lazy } from 'react';
-import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
+import MainLayout from "layouts/Main";
+import { lazy } from "react";
+import { Navigate, RouteObject, useRoutes } from "react-router-dom";
+import { CreateSalesOrder } from "views/HK_Care/Sales";
 import CRUDRoutes from "./CRUDExample";
 import HKCareProductRoutes from "./HKCareProduct";
-import HKCareWarehouse from './HKCareWarehouse';
+import HKCareSales from "./HKCareSales";
+import HKCareWarehouse from "./HKCareWarehouse";
 import HKGroup from "./HKGroup";
 import HKGroupProductRoutes from "./HKGroupProduct";
 import HKTrading from "./HKTrading";
-import Loadable from './Loadable';
+import Loadable from "./Loadable";
 import UserRoutes from "./User";
 
 // Authentication
-const Login = Loadable(lazy(() => import('views/Login')));
+const Login = Loadable(lazy(() => import("views/Login")));
 
-const Home = Loadable(lazy(() => import('views/Home')));
+const Home = Loadable(lazy(() => import("views/Home")));
 
 const routes: RouteObject[] = [
   {
-    path: 'login',
+    path: "login",
     element: (
       <PublicRoute>
         <Login />
       </PublicRoute>
+    ),
+  },
+  {
+    path: "/hk_care/sales/order/create",
+    element: (
+      <PrivateRoute>
+        <CreateSalesOrder />
+      </PrivateRoute>
     ),
   },
   /* if has other public route, */
@@ -32,7 +42,7 @@ const routes: RouteObject[] = [
 
   /*if route need dashboard or header layout, push it in PrivateRote */
   {
-    path: '/',
+    path: "/",
     element: (
       <PrivateRoute>
         <DashboardLayout />
@@ -45,22 +55,23 @@ const routes: RouteObject[] = [
       HKGroupProductRoutes,
       HKCareProductRoutes,
       HKCareWarehouse,
+      HKCareSales,
       HKTrading,
-      HKGroup
+      HKGroup,
       //if has other Routes, push it in here
-    ]
+    ],
   },
 
   //every route not defined
   {
-    path: '*',
+    path: "*",
     element: <MainLayout />,
     children: [
       { index: true, element: <Navigate to="/" /> },
-      { path: '*', element: <Navigate to="/" /> },
+      { path: "*", element: <Navigate to="/" /> },
     ],
   },
-]
+];
 
 const Router = () => {
   const element = useRoutes(routes);

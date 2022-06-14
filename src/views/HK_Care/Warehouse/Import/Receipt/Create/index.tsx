@@ -22,21 +22,34 @@ import {
 } from 'components/Form';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
+import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IReceipt } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  createImportReceipt,
+  getImportReceipt,
+  updateImportReceipt,
+} from 'redux/slices/importReceipt';
 import { getAllProduct } from 'redux/slices/productList';
 import { RootState } from 'redux/store';
+import importReceiptService from 'services/importReceipt.service';
 import { FilterParams } from 'types';
 import * as yup from 'yup';
 import ReceiptEntity from './ReceiptEntity';
 import TotalBill from './TotalBill';
 
-const validationSchema = yup.object().shape({});
+const validationSchema = yup.object().shape({
+  productReceiptWHDtos: yup.array().of(
+    yup.object().shape({
+      lotNumber: yup.string().required('Bắt buộc'),
+    })
+  ),
+});
 
 const getCells = (): Cells<IReceipt> => [
   { id: 'productId', label: 'STT' },
@@ -58,15 +71,37 @@ const CreateForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const setNotification = useNotification();
+  const navigate = useNavigate();
   const [productList, setProductList] = useState<IReceipt[]>([]);
   const { loading } = useSelector((state: RootState) => state.productList);
   const [files, setFiles] = useState<File[] | object[]>([]);
+  const [pathFile, setPathFile] = useState<string>('');
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     pageSize: 1000,
   });
 
   const cells = useMemo(() => getCells(), []);
+
+  const getPathFile = async () => {
+    const { data } = await importReceiptService.getPathFileReceipt(files[0]);
+    setPathFile(data);
+  };
+
+  useEffect(() => {
+    if (files.length > 0) {
+      // @ts-ignore
+      if (files[0].type === 'application/pdf') {
+        getPathFile();
+      } else {
+        // @ts-ignore
+        setPathFile(files[0].name);
+      }
+    } else {
+      setPathFile('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files]);
 
   const {
     control,
@@ -83,12 +118,42 @@ const CreateForm = () => {
 
   const { fields, append, remove } = useFieldArray<IReceipt>({
     control,
-    name: 'productList',
+    name: 'productReceiptWHDtos',
   });
+
+  const fetchDataUpdate = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getImportReceipt(id));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách sản phẩm!',
+      });
+      return;
+    }
+
+    const importReceipt = payload.importReceipt;
+
+    const fileList: object[] = [];
+    importReceipt.pathFile &&
+      fileList.push({
+        name: `${connectURL}/${importReceipt.pathFile}`,
+      });
+
+    setFiles(fileList);
+    setPathFile(`${connectURL}/${importReceipt.pathFile}`);
+    setValue('description', importReceipt.description);
+    setValue('vat', importReceipt.vat);
+
+    setValue('discountValue', importReceipt.discountValue);
+    setValue('paid', importReceipt.paid);
+
+    setValue('productReceiptWHDtos', importReceipt.listProductReceiptWH);
+  };
 
   const fetchData = async () => {
     if (id) {
-      console.log('id', id);
+      fetchDataUpdate();
     }
     // @ts-ignore
     const { payload, error } = await dispatch(getAllProduct(filters));
@@ -107,19 +172,57 @@ const CreateForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSubmit = async (payload: IReceipt) => {
-    // const { error } = await dispatch(
-    //   // @ts-ignore
-    //   updateProduct({ ...payload, image })
-    // );
-    // if (error) {
-    //   setNotification({ error: 'Lỗi khi cập nhật sản phẩm!' });
-    //   return;
-    // }
-    // setNotification({
-    //   message: 'Cập nhật thành công',
-    //   severity: 'success',
-    // });
+  const onSubmit = async (data: IReceipt) => {
+    // @ts-ignore
+    if (data?.productReceiptWHDtos?.length < 1) {
+      setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
+      return;
+    }
+    const newPayload = {
+      ...data,
+      vat: data.vat || 0,
+      description: data.description || '',
+      discountValue: data.discountValue || 0,
+      paid: data.paid || 0,
+      // @ts-ignore
+      productReceiptWHDtos: data.productReceiptWHDtos.map((item) => ({
+        ...item,
+        amount: data.amount || 0,
+        discount: data.discount || 0,
+        importPrice: data.importPrice || 0,
+        price: data.price || data.importPrice || 0,
+        numberRegister: data.numberRegister || '',
+        lotNumber: data.lotNumber || '',
+      })),
+    };
+    if (id) {
+      const { error } = await dispatch(
+        // @ts-ignore
+        updateImportReceipt({ ...newPayload, pathFile, id })
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi khi cập nhật hóa đơn nhập kho!' });
+        return;
+      }
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+      return;
+    }
+    const { payload, error, ...res } = await dispatch(
+      // @ts-ignore
+      createImportReceipt({ ...newPayload, pathFile })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi khi thêm hóa đơn nhập kho!' });
+      return;
+    }
+    setNotification({
+      message: 'Thêm thành công',
+      severity: 'success',
+    });
+    return navigate(`/hk_care/warehouse/import/receipt/${payload.id}`);
   };
 
   const handleOnSort = (field: string) => {
@@ -131,24 +234,16 @@ const CreateForm = () => {
 
   const onChangeSelect = (value: number | null) => {
     const productSelected = productList.filter((x) => x.productId === value)[0];
-    // @ts-ignore
-    if (fields.some((x) => x.productId === productSelected.productId)) {
-      const index = fields.findIndex(
-        // @ts-ignore
-        (x) => x.productId === productSelected.productId
-      );
-
-      setValue(
-        `productList.${index}.amount`,
-        (getValues(`productList.${index}.amount`) || 0) + 1
-      );
-    } else {
-      append(productSelected);
-    }
+    append({
+      ...productSelected,
+      name: productSelected.productName,
+      measure: productSelected.mesureNameLevelFirst,
+      amount: 0,
+    });
   };
 
   return (
-    <PageWrapperFullwidth title="Thêm hóa đơn">
+    <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm hóa đơn'}>
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader title="Thông tin sản phẩm" />
         <FormContent>
@@ -167,12 +262,8 @@ const CreateForm = () => {
               </Grid>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent
-                    total={fields.length}
-                    noDataText=" "
-                    loading={false}
-                  >
-                    <TableContainer sx={{ p: 1.5 }}>
+                  <TableContent total={1} noDataText=" " loading={false}>
+                    <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
                           <TableHeader
@@ -186,13 +277,14 @@ const CreateForm = () => {
                             {fields.map((item, index) => (
                               <ReceiptEntity
                                 item={item}
+                                key={index}
                                 index={index}
                                 remove={remove}
                                 errors={errors}
                                 register={register}
                                 setValue={setValue}
                                 getValues={getValues}
-                                arrayName="productList"
+                                arrayName="productReceiptWHDtos"
                                 control={control}
                               />
                             ))}
@@ -203,10 +295,14 @@ const CreateForm = () => {
                   </TableContent>
                 </TableWrapper>
               </Grid>
-              <Grid container xs={12} alignItems="center">
+              <Grid container alignItems="center">
                 <Grid item lg={9} xs={0}></Grid>
                 <Grid item lg={3} xs={12} p={2}>
-                  <TotalBill control={control} setValue={setValue} />
+                  <TotalBill
+                    control={control}
+                    setValue={setValue}
+                    getValues={getValues}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>

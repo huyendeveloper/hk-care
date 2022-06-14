@@ -1,7 +1,7 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import type { AppBarProps } from '@mui/material/AppBar';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -13,13 +13,11 @@ import { styled } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import LinkIconButton from 'components/common/LinkIconButton';
 import LogoutConfirmDialog from 'components/common/LogoutConfirmDialog';
-import useAuth from 'hooks/useAuth';
 import useMounted from 'hooks/useMounted';
 import { FC, useState } from 'react';
-import sleep from 'utils/sleep';
-import { logout } from 'redux/slices';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { logout } from 'redux/slices';
 
 interface Props extends AppBarProps {
   onToggleMobileSidebar: () => void;

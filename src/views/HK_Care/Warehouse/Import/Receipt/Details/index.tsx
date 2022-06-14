@@ -20,13 +20,15 @@ import {
 } from 'components/Form';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
+import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IReceipt } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { getImportReceipt } from 'redux/slices/importReceipt';
 import { FilterParams } from 'types';
 import * as yup from 'yup';
 import ReceiptEntity from './ReceiptEntity';
@@ -50,11 +52,23 @@ const getCells = (): Cells<IReceipt> => [
   { id: 'mesure', label: '' },
 ];
 
+interface ImportReceipt {
+  toTalMoney: number;
+  vat: number;
+  discountValue: number;
+  moneyToPay: number;
+  paid: number;
+  debts: number;
+  description: string;
+  pathFile: string;
+}
+
 const Details = () => {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const { loading } = useSelector((state: RootState) => state.productList);
   const [receiptProduct, setReceiptProduct] = useState<IReceipt[]>([]);
+  const [importReceipt, setImportReceipt] = useState<ImportReceipt>();
   const [files, setFiles] = useState<File[] | object[]>([
     { name: '23465233827' },
   ]);
@@ -65,25 +79,35 @@ const Details = () => {
 
   const cells = useMemo(() => getCells(), []);
 
-  const {
-    control,
-    setValue,
-    getValues,
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<IReceipt>({
+  const { control, setValue, handleSubmit } = useForm<IReceipt>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
   const fetchData = async () => {
-    // handle fetch data
+    // @ts-ignore
+    const { payload, error } = await dispatch(getImportReceipt(id));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi khi tải danh sách sản phẩm!',
+      });
+      return;
+    }
+    setImportReceipt(payload.importReceipt);
+    const fileList: object[] = [];
+    files &&
+      fileList.push({
+        name: `${connectURL}/${payload.importReceipt.pathFile}`,
+      });
+    setFiles(fileList);
+    setReceiptProduct(payload.importReceipt.listProductReceiptWH);
   };
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmit = async (payload: IReceipt) => {};
@@ -104,12 +128,8 @@ const Details = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent
-                    total={receiptProduct.length}
-                    noDataText=" "
-                    loading={false}
-                  >
-                    <TableContainer sx={{ p: 1.5 }}>
+                  <TableContent total={1} noDataText=" " loading={false}>
+                    <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
                           <TableHeader
@@ -122,14 +142,10 @@ const Details = () => {
                           <TableBody>
                             {receiptProduct.map((item, index) => (
                               <ReceiptEntity
+                                key={index}
                                 item={item}
                                 index={index}
-                                errors={errors}
-                                register={register}
-                                setValue={setValue}
-                                getValues={getValues}
-                                arrayName="productList"
-                                control={control}
+                                value={item}
                               />
                             ))}
                           </TableBody>
@@ -139,10 +155,14 @@ const Details = () => {
                   </TableContent>
                 </TableWrapper>
               </Grid>
-              <Grid container xs={12} alignItems="center">
+              <Grid container alignItems="center">
                 <Grid item lg={9} xs={0}></Grid>
                 <Grid item lg={3} xs={12} p={2}>
-                  <TotalBill control={control} setValue={setValue} />
+                  <TotalBill
+                    control={control}
+                    setValue={setValue}
+                    importReceipt={importReceipt}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -155,6 +175,7 @@ const Details = () => {
                     minRows={11}
                     name="description"
                     control={control}
+                    value={importReceipt?.description}
                     disabled
                   />
                 </Grid>

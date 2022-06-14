@@ -28,11 +28,23 @@ interface Props {
   disable?: boolean;
 }
 
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
+
 const validationSchema = yup.object().shape({
   name: yup
     .string()
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên dạng dùng.')
     .required('Vui lòng nhập tên dạng dùng.')
-    .trim('Vui lòng nhập tên dạng dùng.')
     .max(100, 'Tên dạng dùng không quá 100 ký tự.')
     .strict(true)
     .default(''),

@@ -14,6 +14,7 @@ interface Props<T> extends Omit<TextFieldProps, 'name'> {
   inputRef?: any;
   variant?: 'standard' | 'filled' | 'outlined' | undefined;
   type?: string;
+  error?: boolean;
 }
 
 const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
@@ -26,6 +27,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
     inputRef,
     variant = 'outlined',
     type,
+    error = false,
   } = props;
 
   if (value) {
@@ -42,9 +44,12 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
         thousandSeparator=","
         allowNegative={false}
         disabled={disabled}
+        defaultValue={defaultValue}
+        error={error}
       />
     );
   }
+
   if (type === 'percent') {
     return (
       <NumberFormat
@@ -53,6 +58,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
         defaultValue={defaultValue}
         name={name}
         inputRef={inputRef}
+        value={defaultValue}
         // @ts-ignore
         onValueChange={({ value: v }) => setValue(name, v ? Number(v) : null)}
         allowedDecimalSeparators={[',', '.']}
@@ -67,6 +73,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
           // @ts-ignore
           return !floatValue || (floatValue <= 100 && floatValue >= 0);
         }}
+        error={error}
       />
     );
   }
@@ -75,6 +82,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
       fullWidth
       customInput={TextField}
       defaultValue={defaultValue}
+      value={defaultValue}
       name={name}
       inputRef={inputRef}
       // @ts-ignore
@@ -86,6 +94,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
       allowNegative={false}
       variant={variant}
       disabled={disabled}
+      error={error}
     />
   );
 };

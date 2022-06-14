@@ -1,0 +1,91 @@
+import { Stack } from '@mui/material';
+import { ControllerTextarea } from 'components/Form';
+import ControllerNumberInput from 'components/Form/ControllerNumberInput';
+import { useWatch } from 'react-hook-form';
+import { numberFormat } from 'utils/numberFormat';
+
+interface IProps {
+  control: any;
+  setValue: any;
+  getValues: any;
+}
+
+const OrderDetail = ({ control, setValue, getValues }: IProps) => {
+  const createOrderDetailDtos = useWatch({
+    control,
+    name: 'createOrderDetailDtos',
+  });
+
+  const bill = createOrderDetailDtos
+    ? createOrderDetailDtos.reduce(
+        // @ts-ignore
+        (prev, cur) => prev + (Number(cur?.billPerProduct) || 0),
+        0
+      )
+    : 0;
+  const discountValue = useWatch({ control, name: 'discountValue' }) || 0;
+  const paid = useWatch({ control, name: 'paid' }) || 0;
+
+  return (
+    <Stack p={2} gap={2}>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <div>Loại hóa đơn</div>
+        <div>Khách bán lẻ</div>
+      </Stack>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <div>Tổng tiền: ({createOrderDetailDtos?.length || 0} sản phẩm)</div>
+        <div>{numberFormat(bill)}</div>
+      </Stack>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <div>Chiết khấu (%)</div>
+        <div>
+          <ControllerNumberInput
+            name="discountValue"
+            variant="standard"
+            setValue={setValue}
+            type="percent"
+            defaultValue={getValues(`discountValue`)}
+          />
+        </div>
+      </Stack>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <b>KHÁCH PHẢI TRẢ</b>
+        <div>{numberFormat(bill - (discountValue / 100) * bill)}</div>
+      </Stack>
+      <hr style={{ width: '100%' }} />
+      <Stack flexDirection="row" justifyContent="space-between">
+        <b>Tiền khách đưa</b>
+      </Stack>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <b>Tiền mặt</b>
+        <div>
+          <ControllerNumberInput
+            name="paid"
+            variant="standard"
+            setValue={setValue}
+            defaultValue={getValues(`paid`)}
+          />
+        </div>
+      </Stack>
+      <hr style={{ width: '100%' }} />
+      <Stack flexDirection="row" justifyContent="space-between">
+        <b>Tiền thừa trả khách</b>
+        <div>
+          {numberFormat(
+            paid - (bill - ((getValues(`discountValue`) || 0) / 100) * bill)
+          )}
+        </div>
+      </Stack>
+      <b>Ghi chú</b>
+
+      <ControllerTextarea
+        maxRows={11}
+        minRows={11}
+        name="description"
+        control={control}
+      />
+    </Stack>
+  );
+};
+
+export default OrderDetail;

@@ -6,16 +6,27 @@ import { memo, useState } from 'react';
 import { useDebounce } from 'react-use';
 import type { ChangeEvent, KeyDownEvent } from 'types';
 import type { BoxProps } from '@mui/material/Box';
+import { Stack } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface Props extends BoxProps {
   title?: string;
   placeHolder: string;
   onSearch: (searchTerm: string) => void;
   searchText: string;
+  haveIcon?: boolean;
 }
 
 const SearchField = (props: Props) => {
-  const { title, searchText, placeHolder, onSearch, children } = props;
+  const {
+    title,
+    searchText,
+    placeHolder,
+    onSearch,
+    children,
+    haveIcon,
+    ...rest
+  } = props;
   const [value, setValue] = useState<string>('');
 
   const handleChange: ChangeEvent = (event) => {
@@ -38,6 +49,54 @@ const SearchField = (props: Props) => {
     1500, //auto search each 1500 ms
     [value]
   );
+
+  if (haveIcon) {
+    return (
+      <Stack
+        flexDirection="row"
+        style={{ position: 'relative', width: '100%' }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mb: 2,
+            justifyContent: 'space-between',
+          }}
+        >
+          {title ? (
+            <FormLabel htmlFor="search">
+              <Typography gutterBottom sx={{ mb: 0, fontSize: '1.74rem' }}>
+                {title}
+              </Typography>
+            </FormLabel>
+          ) : null}
+          {children}
+        </Box>
+        <TextField
+          id="search"
+          fullWidth
+          placeholder={placeHolder}
+          // @ts-ignore
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          sx={{
+            mr: 1,
+            display: 'grid',
+            flexGrow: 1,
+            backgroundColor: 'white',
+            borderRadius: '4px',
+          }}
+          {...rest}
+        />
+        <SearchIcon
+          fontSize="medium"
+          style={{ position: 'absolute', right: '20', top: '23%' }}
+          color="disabled"
+        />
+      </Stack>
+    );
+  }
 
   return (
     <>
@@ -64,7 +123,12 @@ const SearchField = (props: Props) => {
         placeholder={placeHolder}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        sx={{ mr: 1, flexGrow: 1 }}
+        sx={{
+          mr: 1,
+          flexGrow: 1,
+          backgroundColor: 'white',
+          borderRadius: '4px',
+        }}
       />
     </>
   );

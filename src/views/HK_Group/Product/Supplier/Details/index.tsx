@@ -15,18 +15,31 @@ import TableData from '../../ProductList/TableData';
 import FormDialog from '../FormDialog';
 import Details from './Details';
 
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
+
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên nhà cung cấp.')
-    .trim('Vui lòng nhập tên nhà cung cấp.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên nhà cung cấp.')
     .max(150, 'Tên nhà cung cấp không quá 150 ký tự.')
     .strict(true)
     .default(''),
   telephoneNumber: yup
     .string()
     .required('Vui lòng nhập số điện thoại.')
-    .trim('Vui lòng nhập số điện thoại.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập số điện thoại.')
     .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
     .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
     .strict(true)

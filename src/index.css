@@ -98,3 +98,7 @@ input[type='number'] {
 .MuiChip-root.MuiChip-filled.Mui-disabled {
   opacity: 1;
 }
+
+.MuiTabs-flexContainer{
+  flex-wrap: wrap;
+}

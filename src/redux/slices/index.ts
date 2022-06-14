@@ -7,6 +7,7 @@ import productListReducer from './productList';
 import supplierReducer from './supplier';
 import treatmentGroupReducer from './treatmentGroup';
 import usageReducer from './usage';
+import salesOrderReducer from './salesOrder';
 
 export * from './auth';
 
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   productGroup: productGroupReducer,
   product: productReducer,
   productList: productListReducer,
+  salesOrder: salesOrderReducer,
 });
 
 export default rootReducer;

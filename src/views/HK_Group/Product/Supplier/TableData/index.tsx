@@ -13,7 +13,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
@@ -22,7 +22,7 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -33,7 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   changeStatus,
   deleteSupplier,
-  getAllSupplier
+  getAllSupplier,
 } from 'redux/slices/supplier';
 import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
@@ -265,7 +265,7 @@ const TableData = () => {
       </TableSearchField>
 
       <TableContent total={supplierList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -330,7 +330,7 @@ const TableData = () => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
 
