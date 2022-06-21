@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -27,8 +28,7 @@ import { ITenant } from 'interface';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-import { ClickEventCurrying, FilterParams } from 'types';
-import AddIcon from '@mui/icons-material/Add';
+import { FilterParams } from 'types';
 
 const getCells = (): Cells<ITenant> => [
   { id: 'id', label: 'STT' },
@@ -59,9 +59,7 @@ const TableData = () => {
     // const { payload, error } = await dispatch(getAllProduct(filters));
 
     // if (error) {
-    //   setNotification({
-    //     error: 'Lỗi khi tải danh sách sản phẩm!',
-    //   });
+    // setNotification({ error: 'Lỗi!' });
     //   return;
     // }
     // setTenantList(payload.tenantList);
@@ -182,7 +180,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteUsage(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa điểm bán!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({

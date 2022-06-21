@@ -69,9 +69,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllUsage(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách dạng dùng!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
 
@@ -153,7 +151,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteUsage(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa dạng dùng!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({

@@ -69,7 +69,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       const { error, payload } = await dispatch(updateMeasure(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật đơn vị đo lường!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -82,7 +82,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       const { error, payload } = await dispatch(createMeasure(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi thêm đơn vị đo lường!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }

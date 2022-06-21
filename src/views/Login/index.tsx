@@ -131,7 +131,6 @@ const Login = () => {
                   renderLabel={(field) => field.name}
                   placeholder=""
                   noOptionsText="Không tìm thấy điểm bán"
-                  // label="Điểm bán"
                   loading={loadingTenant}
                 />
               </FormGroup>

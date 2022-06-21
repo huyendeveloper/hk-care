@@ -6,6 +6,8 @@ import SearchField from './SearchField';
 import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { DatePicker } from '@mui/lab';
+import DateFns from 'utils/DateFns';
 
 interface Props extends BoxProps {
   placeHolder: string;
@@ -14,8 +16,10 @@ interface Props extends BoxProps {
   title?: string;
   headerTitle?: string;
   searchArea?: boolean;
-  setStart?: (date: string) => void;
-  setEnd?: (date: string) => void;
+  start?: Date | null;
+  end?: Date | null;
+  setStart?: (date: Date | null) => void;
+  setEnd?: (date: Date | null) => void;
 }
 
 const TableSearchField = (props: Props) => {
@@ -27,10 +31,14 @@ const TableSearchField = (props: Props) => {
     children,
     headerTitle,
     searchArea,
+    onDragStart,
+    start,
+    end,
     setStart,
     setEnd,
     ...rest
   } = props;
+
   return (
     <Wrapper {...rest}>
       {headerTitle && (
@@ -63,16 +71,41 @@ const TableSearchField = (props: Props) => {
           justifyContent="flex-end"
           sx={{ mt: 2 }}
         >
-          <TextField
-            type="date"
-            variant="outlined"
-            onChange={(e) => setStart && setStart(e.target.value)}
+          <DatePicker
+            // @ts-ignore
+            value={start}
+            onChange={(newValue) => {
+              setStart && setStart(newValue || null);
+            }}
+            inputFormat="dd/MM/yyyy"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                inputProps={{
+                  ...params.inputProps,
+                  placeholder: 'Từ',
+                }}
+              />
+            )}
           />
           <RemoveIcon />
-          <TextField
-            type="date"
-            variant="outlined"
-            onChange={(e) => setEnd && setEnd(e.target.value)}
+
+          <DatePicker
+            // @ts-ignore
+            value={end}
+            onChange={(newValue) => {
+              setEnd && setEnd(newValue || null);
+            }}
+            inputFormat="dd/MM/yyyy"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                inputProps={{
+                  ...params.inputProps,
+                  placeholder: 'Đến',
+                }}
+              />
+            )}
           />
         </Stack>
       )}

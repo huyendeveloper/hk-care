@@ -1,7 +1,7 @@
 import { TextField } from '@mui/material';
 import type { TextFieldProps } from '@mui/material/TextField';
 import React from 'react';
-import type { FieldPath, FieldValues } from 'react-hook-form';
+import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 import { UseFormSetValue } from 'react-hook-form';
 import NumberFormat from 'react-number-format';
 
@@ -10,11 +10,11 @@ interface Props<T> extends Omit<TextFieldProps, 'name'> {
   setValue: UseFormSetValue<T>;
   value?: number | null | undefined;
   disabled?: boolean;
-  defaultValue?: number;
   inputRef?: any;
   variant?: 'standard' | 'filled' | 'outlined' | undefined;
   type?: string;
-  error?: boolean;
+  control: Control<T>;
+  defaultValue?: number;
 }
 
 const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
@@ -23,78 +23,74 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
     value,
     setValue,
     disabled,
-    defaultValue,
     inputRef,
+    defaultValue = 0,
     variant = 'outlined',
     type,
-    error = false,
+    control,
   } = props;
-
-  if (value) {
-    return (
-      <NumberFormat
-        fullWidth
-        customInput={TextField}
-        value={value}
-        // @ts-ignore
-        onValueChange={({ value: v }) => setValue(name, v)}
-        allowedDecimalSeparators={[',', '.']}
-        decimalScale={0}
-        isNumericString
-        thousandSeparator=","
-        allowNegative={false}
-        disabled={disabled}
-        defaultValue={defaultValue}
-        error={error}
-      />
-    );
-  }
 
   if (type === 'percent') {
     return (
-      <NumberFormat
-        fullWidth
-        customInput={TextField}
-        defaultValue={defaultValue}
+      <Controller
+        render={({ field: { ref, ...others }, fieldState: { error } }) => (
+          <NumberFormat
+            fullWidth
+            value={value}
+            customInput={TextField}
+            name={name}
+            inputRef={ref}
+            onValueChange={({ value: v }) =>
+              // @ts-ignore
+              setValue(name, v ? Number(v) : null)
+            }
+            allowedDecimalSeparators={[',', '.']}
+            decimalScale={0}
+            isNumericString
+            thousandSeparator=","
+            allowNegative={false}
+            variant={variant}
+            disabled={disabled}
+            isAllowed={(values) => {
+              const { floatValue } = values;
+              // @ts-ignore
+              return !floatValue || (floatValue <= 100 && floatValue >= 0);
+            }}
+            error={Boolean(error)}
+          />
+        )}
         name={name}
-        inputRef={inputRef}
-        value={defaultValue}
-        // @ts-ignore
-        onValueChange={({ value: v }) => setValue(name, v ? Number(v) : null)}
-        allowedDecimalSeparators={[',', '.']}
-        decimalScale={0}
-        isNumericString
-        thousandSeparator=","
-        allowNegative={false}
-        variant={variant}
-        disabled={disabled}
-        isAllowed={(values) => {
-          const { floatValue } = values;
-          // @ts-ignore
-          return !floatValue || (floatValue <= 100 && floatValue >= 0);
-        }}
-        error={error}
+        control={control}
       />
     );
   }
+
   return (
-    <NumberFormat
-      fullWidth
-      customInput={TextField}
-      defaultValue={defaultValue}
-      value={defaultValue}
+    <Controller
+      render={({ field: { ref, ...others }, fieldState: { error } }) => (
+        <NumberFormat
+          fullWidth
+          customInput={TextField}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={({ value: v }) =>
+            // @ts-ignore
+            setValue(name, v ? Number(v) : null)
+          }
+          allowedDecimalSeparators={[',', '.']}
+          decimalScale={0}
+          isNumericString
+          thousandSeparator=","
+          allowNegative={false}
+          disabled={disabled}
+          error={Boolean(error)}
+          helperText={error?.message}
+          inputRef={ref}
+          variant={variant}
+        />
+      )}
       name={name}
-      inputRef={inputRef}
-      // @ts-ignore
-      onValueChange={({ value: v }) => setValue(name, v ? Number(v) : null)}
-      allowedDecimalSeparators={[',', '.']}
-      decimalScale={0}
-      isNumericString
-      thousandSeparator=","
-      allowNegative={false}
-      variant={variant}
-      disabled={disabled}
-      error={error}
+      control={control}
     />
   );
 };

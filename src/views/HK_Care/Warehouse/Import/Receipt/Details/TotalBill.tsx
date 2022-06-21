@@ -21,7 +21,7 @@ const TotalBill = ({ control, setValue, importReceipt }: IProps) => {
   return (
     <>
       {importReceipt && (
-        <table>
+        <table style={{float:'right'}}>
           <tbody>
             <tr>
               <td>Tổng tiền:</td>

@@ -26,12 +26,12 @@ interface Props extends AppBarProps {
 }
 
 const DashboardNavbar: FC<Props> = (props) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const mounted = useMounted();
   const { onToggleMobileSidebar, openDrawer } = props;
   // const { logout } = useAuth();
   const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
-  const mounted = useMounted();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleOpenLogoutDialog = () => {
     setOpenLogoutDialog(true);

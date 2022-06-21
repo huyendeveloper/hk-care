@@ -1,11 +1,12 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, TableCell, TableRow, TextField } from '@mui/material';
-import { ControllerDatePicker } from 'components/Form';
+import { Box, IconButton, TableCell, TableRow, TextField } from '@mui/material';
+import { ControllerDatePicker, ControllerTextField } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import moment from 'moment';
 import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import Bill from './Bill';
 
 interface IProps {
@@ -34,6 +35,8 @@ const ReceiptEntity = ({
   const { productId } = item;
   const object = `${arrayName}.${index}`;
 
+  const { id } = useParams();
+
   const importPrice = useWatch({
     control,
     name: `${object}.importPrice`,
@@ -43,131 +46,146 @@ const ReceiptEntity = ({
     control,
     name: `${object}.price`,
   });
-  const lotNumber = useWatch({
-    control,
-    name: `${object}.lotNumber`,
-  });
-  const numberRegister = useWatch({
-    control,
-    name: `${object}.numberRegister`,
-  });
 
   const dateManufacture = useWatch({
     control,
     name: `${object}.dateManufacture`,
   });
-  const outOfDate = useWatch({
+  const expiryDate = useWatch({
     control,
-    name: `${object}.outOfDate`,
+    name: `${object}.expiryDate`,
   });
 
   useEffect(() => {
     if (importPrice > price) {
       setValue(`${object}.price`, importPrice);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importPrice]);
 
   useEffect(() => {
+    if (id) return;
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(new Date().getDate() - 1);
-    if (moment(dateManufacture).isAfter(moment(yesterday))) {
+    if (moment(dateManufacture).isAfter(moment(today))) {
       setValue(`${object}.dateManufacture`, yesterday);
     }
-    if (moment(yesterday).isAfter(moment(outOfDate))) {
-      setValue(`${object}.outOfDate`, today);
+    if (moment(yesterday).isAfter(moment(expiryDate))) {
+      setValue(`${object}.expiryDate`, today);
     }
-  }, [outOfDate, dateManufacture]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expiryDate, dateManufacture]);
 
   return (
     <TableRow hover tabIndex={-1} key={productId}>
-      <TableCell>
-        {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>
+        <Box
+          sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
+        >
+          {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
+        </Box>
       </TableCell>
-      <TableCell>{getValues(`${object}.name`)}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {getValues(`${object}.measure`)}
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>
+        <Box
+          sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
+        >
+          {getValues(`${object}.name`)}
+        </Box>
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+      >
+        <Box
+          sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
+        >
+          {getValues(`${object}.measure`)}
+        </Box>
+      </TableCell>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+      >
         <ControllerNumberInput
           name={`${object}.amount`}
-          defaultValue={getValues(`${object}.amount`)}
           setValue={setValue}
+          control={control}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+      >
         <ControllerNumberInput
           name={`${object}.importPrice`}
           setValue={setValue}
-          defaultValue={getValues(`${object}.importPrice`)}
+          control={control}
+          value={getValues(`${object}.importPrice`)}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+      >
         <ControllerNumberInput
           name={`${object}.price`}
-          defaultValue={getValues(`${object}.price`)}
+          value={getValues(`${object}.price`)}
           setValue={setValue}
-          error={importPrice > price}
+          control={control}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+      >
         <ControllerNumberInput
           name={`${object}.discount`}
-          defaultValue={getValues(`${object}.discount`)}
+          // value={getValues(`${object}.discount`)}
           setValue={setValue}
+          control={control}
         />
       </TableCell>
-      <TableCell>
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>
         <Bill control={control} index={index} />
       </TableCell>
 
-      <TableCell sx={{ width: '130px' }}>
-        <TextField
-          fullWidth
-          type="number"
-          required
-          {...register(`${object}.lotNumber`)}
-          error={!lotNumber}
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '150px' }}
+      >
+        <ControllerTextField name={`${object}.lotNumber`} control={control} />
+      </TableCell>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '150px' }}
+      >
+        <ControllerTextField
+          name={`${object}.numberRegister`}
+          control={control}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        <TextField
-          fullWidth
-          type="number"
-          required
-          {...register(`${object}.numberRegister`)}
-          error={!numberRegister}
-        />
-      </TableCell>
-      <TableCell sx={{ width: '185px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '185px' }}
+      >
         <ControllerDatePicker
-          required
           name={`${object}.dateManufacture`}
           control={control}
           errors={errors}
-          error={
-            !dateManufacture ||
-            dateManufacture === '' ||
-            !moment(dateManufacture, 'dd/MM/yyyy', true).isValid()
-          }
         />
       </TableCell>
-      <TableCell sx={{ width: '185px' }}>
+      <TableCell
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '185px' }}
+      >
         <ControllerDatePicker
-          required
-          name={`${object}.outOfDate`}
+          name={`${object}.expiryDate`}
           control={control}
           errors={errors}
-          error={
-            !outOfDate ||
-            outOfDate === '' ||
-            !moment(outOfDate, 'dd/MM/yyyy', true).isValid() ||
-            moment(outOfDate).isBefore(moment(dateManufacture))
-          }
+          // error={(expiryDate || '') === ''}
+          // helperText={
+          //   (expiryDate || '') === ''
+          //     ? 'Vui lòng nhập!'
+          //     : moment(expiryDate).isBefore(moment(dateManufacture))
+          //     ? 'Hạn dùng sau ngày sản xuất!'
+          //     : ''
+          // }
         />
       </TableCell>
 
-      <TableCell align="left">
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }} align="left">
         <IconButton
           onClick={() => {
             remove(index);

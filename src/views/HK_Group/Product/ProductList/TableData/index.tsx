@@ -80,9 +80,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setProductList(payload.productList);
@@ -122,7 +120,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     // @ts-ignore
     const { error } = await dispatch(deleteProduct(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -188,7 +186,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       changeStatus({ id: currentID, status: true })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi vô hiệu hóa sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -207,9 +205,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       changeStatus({ id: currentID, status: false })
     );
     if (error) {
-      setNotification({
-        error: 'Lỗi khi kích hoạt hoạt động sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({

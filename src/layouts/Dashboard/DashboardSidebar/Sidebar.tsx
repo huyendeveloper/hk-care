@@ -130,6 +130,18 @@ const getSections = (): SectionItem[] => [
             title: 'Xuất kho',
             path: '/404',
             roles: ['hkl2_1_2'],
+            children: [
+              {
+                title: 'Xuất hủy',
+                path: '/hk_care/warehouse/export/cancel',
+                roles: ['hkl2_1_2'],
+              },
+              {
+                title: 'Xuất luân chuyển',
+                path: '/hk_care/warehouse/export/circulation_invoice',
+                roles: ['hkl2_1_2'],
+              },
+            ],
           },
           {
             title: 'Lập dự trù nhập kho',

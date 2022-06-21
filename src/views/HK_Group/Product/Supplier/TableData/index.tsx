@@ -70,9 +70,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllSupplier(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách nhà cung cấp!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
 
@@ -157,7 +155,7 @@ const TableData = () => {
       changeStatus({ id: currentID, status: 2 })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi vô hiệu hóa nhà cung cấp này!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -176,9 +174,7 @@ const TableData = () => {
       changeStatus({ id: currentID, status: 1 })
     );
     if (error) {
-      setNotification({
-        error: 'Lỗi khi kích hoạt hoạt động nhà cung cấp này!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -204,7 +200,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteSupplier(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa nhà cung cấp!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({

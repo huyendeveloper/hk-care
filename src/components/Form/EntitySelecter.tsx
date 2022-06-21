@@ -27,7 +27,6 @@ interface Props<T, O extends FieldValues[]>
   forcePopupIcon?: boolean;
   noOptionsText?: string;
   handleChangeInput?: (value: string) => void;
-  defaultValue?: string;
   loading?: boolean;
 }
 
@@ -48,7 +47,6 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     noOptionsText,
     getOptionDisabled,
     handleChangeInput,
-    defaultValue,
     loading = false,
     ...rest
   } = props;
@@ -80,35 +78,26 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           options={options.map((option) => {
             return renderValue ? option[renderValue] : option.id;
           })}
-          getOptionLabel={(option) => {
-            return labels[option]?.name || defaultValue || '';
-          }}
+          getOptionLabel={(option) => labels[option]?.name || ''}
           loading={loading}
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
-          renderInput={(params) => {
-            // @ts-ignore
-            params.inputProps.value = params.inputProps.value || defaultValue;
-            return (
-              <TextField
-                error={Boolean(error)}
-                helperText={error?.message && error.message}
-                placeholder={placeholder}
-                onChange={(e) => {
-                  setValueInput(e.target.value);
-                }}
-                {...params}
-                {...rest}
-              />
-            );
-          }}
+          renderInput={(params) => (
+            <TextField
+              error={Boolean(error)}
+              helperText={error?.message && error.message}
+              placeholder={placeholder}
+              {...params}
+              {...rest}
+            />
+          )}
           renderOption={(props, option: number) => {
             const { name, caption } = labels[option];
             return (
               <Box component="li" {...props} key={option}>
                 <Box>
-                  {name || defaultValue}
+                  {name || ''}
                   {caption && (
                     <Typography variant="caption" display="block">
                       {caption}

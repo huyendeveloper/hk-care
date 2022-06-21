@@ -67,9 +67,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllMeasure(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách đơn vị đo lường!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
 
@@ -151,7 +149,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteMeasure(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa đơn vị đo lường này!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({

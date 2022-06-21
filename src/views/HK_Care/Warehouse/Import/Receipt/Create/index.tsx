@@ -24,8 +24,10 @@ import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
+import { yupDate } from 'constants/typeInput';
 import { useNotification } from 'hooks';
-import { IReceipt } from 'interface';
+import { IProductReceiptWHDtos, IReceipt } from 'interface';
+import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,6 +41,7 @@ import { getAllProduct } from 'redux/slices/productList';
 import { RootState } from 'redux/store';
 import importReceiptService from 'services/importReceipt.service';
 import { FilterParams } from 'types';
+import DateFns from 'utils/DateFns';
 import * as yup from 'yup';
 import ReceiptEntity from './ReceiptEntity';
 import TotalBill from './TotalBill';
@@ -46,9 +49,59 @@ import TotalBill from './TotalBill';
 const validationSchema = yup.object().shape({
   productReceiptWHDtos: yup.array().of(
     yup.object().shape({
-      lotNumber: yup.string().required('Bắt buộc'),
+      lotNumber: yup
+        .string()
+        .required('Vui lòng nhập!')
+        .typeError('Vui lòng nhập!')
+        .default(''),
+      numberRegister: yup
+        .string()
+        .required('Vui lòng nhập!')
+        .typeError('Vui lòng nhập!')
+        .default(''),
+      dateManufacture: yup
+        .date()
+        .required('Vui lòng nhập!')
+        .typeError('Vui lòng nhập!')
+        .test('validateDateManufacture', 'Trước hạn sử dụng!', function (item) {
+          const dateManufacture = item;
+          const { expiryDate } = this.parent;
+          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
+            return false;
+          }
+          return true;
+        }),
+      expiryDate: yup
+        .date()
+        .required('Vui lòng nhập!')
+        .typeError('Vui lòng nhập!')
+        .test('validateExpiryDate', 'Sau ngày sản xuất!', function (item) {
+          const { dateManufacture } = this.parent;
+          const expiryDate = item;
+          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
+            return false;
+          }
+          return true;
+        }),
+      price: yup
+        .number()
+        .test('validatePrice', 'Giá bán không hợp lệ!', function (item) {
+          const { importPrice } = this.parent;
+          const price = item;
+          if (!importPrice || !price) {
+            return true;
+          }
+
+          if (importPrice > price) {
+            return false;
+          }
+          return true;
+        }),
     })
   ),
+  vat: yup.number().typeError('Vui lòng nhập!').default(0),
+  discountValue: yup.number().typeError('Vui lòng nhập!').default(0),
+  paid: yup.number().typeError('Vui lòng nhập!').default(0),
 });
 
 const getCells = (): Cells<IReceipt> => [
@@ -76,10 +129,15 @@ const CreateForm = () => {
   const { loading } = useSelector((state: RootState) => state.productList);
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [pathFile, setPathFile] = useState<string>('');
+  const [productChoosed, setProductChoosed] = useState<number | null>(null);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     pageSize: 1000,
   });
+
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -90,8 +148,12 @@ const CreateForm = () => {
 
   useEffect(() => {
     if (files.length > 0) {
-      // @ts-ignore
-      if (files[0].type === 'application/pdf') {
+      if (
+        // @ts-ignore
+        files[0].type === 'application/pdf' ||
+        // @ts-ignore
+        files[0].type.substr(0, 5) === 'image'
+      ) {
         getPathFile();
       } else {
         // @ts-ignore
@@ -126,9 +188,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getImportReceipt(id));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
 
@@ -141,7 +201,9 @@ const CreateForm = () => {
       });
 
     setFiles(fileList);
-    setPathFile(`${connectURL}/${importReceipt.pathFile}`);
+    importReceipt.pathFile
+      ? setPathFile(`${connectURL}/${importReceipt.pathFile}`)
+      : setPathFile('');
     setValue('description', importReceipt.description);
     setValue('vat', importReceipt.vat);
 
@@ -159,9 +221,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setProductList(payload.productList);
@@ -178,6 +238,24 @@ const CreateForm = () => {
       setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
       return;
     }
+    // @ts-ignore
+    data.productReceiptWHDtos.forEach((item) => {
+      if (moment(item.expiryDate).isBefore(moment(item.dateManufacture))) {
+        setNotification({ error: 'Hạn sử dụng sau ngày sản xuất!' });
+        return;
+      }
+
+      if (!id) {
+        if (moment(item.dateManufacture).isAfter(moment(today))) {
+          setNotification({ error: 'Ngày sản xuất trước ngày hôm nay!' });
+          return;
+        }
+        if (moment(yesterday).isAfter(moment(item.expiryDate))) {
+          setNotification({ error: 'Hạn sử dụng sau ngày hôm nay!' });
+          return;
+        }
+      }
+    });
     const newPayload = {
       ...data,
       vat: data.vat || 0,
@@ -185,15 +263,24 @@ const CreateForm = () => {
       discountValue: data.discountValue || 0,
       paid: data.paid || 0,
       // @ts-ignore
-      productReceiptWHDtos: data.productReceiptWHDtos.map((item) => ({
-        ...item,
-        amount: data.amount || 0,
-        discount: data.discount || 0,
-        importPrice: data.importPrice || 0,
-        price: data.price || data.importPrice || 0,
-        numberRegister: data.numberRegister || '',
-        lotNumber: data.lotNumber || '',
-      })),
+      productReceiptWHDtos: data.productReceiptWHDtos.map(
+        (item: IProductReceiptWHDtos) => {
+          return {
+            ...item,
+            amount: item.amount || 0,
+            discount: item.discount || 0,
+            importPrice: item.importPrice || 0,
+            price: item.price || item.importPrice || 0,
+            numberRegister: item.numberRegister || '',
+            lotNumber: item.lotNumber || '',
+            dateManufacture:
+              DateFns.formatDate(item.dateManufacture as Date, 'yyyy-MM-DD') ||
+              '',
+            expiryDate:
+              DateFns.formatDate(item.expiryDate as Date, 'yyyy-MM-DD') || '',
+          };
+        }
+      ),
     };
     if (id) {
       const { error } = await dispatch(
@@ -201,28 +288,28 @@ const CreateForm = () => {
         updateImportReceipt({ ...newPayload, pathFile, id })
       );
       if (error) {
-        setNotification({ error: 'Lỗi khi cập nhật hóa đơn nhập kho!' });
+        setNotification({ error: 'Lỗi!' });
         return;
       }
       setNotification({
         message: 'Cập nhật thành công',
         severity: 'success',
       });
-      return;
+      return navigate(`/hk_care/warehouse/import/receipt`);
     }
-    const { payload, error, ...res } = await dispatch(
+    const { payload, error } = await dispatch(
       // @ts-ignore
       createImportReceipt({ ...newPayload, pathFile })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi thêm hóa đơn nhập kho!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
       message: 'Thêm thành công',
       severity: 'success',
     });
-    return navigate(`/hk_care/warehouse/import/receipt/${payload.id}`);
+    return navigate(`/hk_care/warehouse/import/receipt`);
   };
 
   const handleOnSort = (field: string) => {
@@ -233,13 +320,17 @@ const CreateForm = () => {
   };
 
   const onChangeSelect = (value: number | null) => {
+    setProductChoosed(value);
     const productSelected = productList.filter((x) => x.productId === value)[0];
     append({
       ...productSelected,
       name: productSelected.productName,
       measure: productSelected.mesureNameLevelFirst,
       amount: 0,
+      discount: 0,
+      expiryDate: productSelected.outOfDate,
     });
+    setProductChoosed(null);
   };
 
   return (
@@ -255,9 +346,11 @@ const CreateForm = () => {
                   options={productList}
                   renderLabel={(field) => field.productName}
                   noOptionsText="Không tìm thấy sản phẩm"
+                  renderValue="productId"
                   placeholder=""
                   onChangeSelect={onChangeSelect}
                   loading={loading}
+                  value={productChoosed}
                 />
               </Grid>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
@@ -296,8 +389,8 @@ const CreateForm = () => {
                 </TableWrapper>
               </Grid>
               <Grid container alignItems="center">
-                <Grid item lg={9} xs={0}></Grid>
-                <Grid item lg={3} xs={12} p={2}>
+                <Grid item lg={8} xs={0}></Grid>
+                <Grid item lg={4} xs={12} p={2}>
                   <TotalBill
                     control={control}
                     setValue={setValue}
@@ -327,6 +420,7 @@ const CreateForm = () => {
                     files={files}
                     setFiles={setFiles}
                     max={1}
+                    accept="image/*,application/pdf"
                   />
                 </Grid>
               </Grid>

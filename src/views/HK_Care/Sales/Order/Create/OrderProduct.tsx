@@ -1,36 +1,39 @@
 import {
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
-  TextField,
 } from '@mui/material';
-import { EntitySelecter } from 'components/Form';
+import { ControllerTextField, EntitySelecter } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { TableHeader, TableWrapper } from 'components/Table';
+import { TableHeader } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface IProps {
   index: number;
   control: any;
   setValue: any;
+  getValues: any;
+  handleRemove: () => void;
 }
 
 interface Data {
-  morning: string;
+  mor: string;
   noon: string;
   night: string;
-  note: string;
+  description: string;
 }
 
 const getCells = (): Cells<Data> => [
   {
-    id: 'morning',
+    id: 'mor',
     label: 'Sáng',
   },
   {
@@ -42,12 +45,18 @@ const getCells = (): Cells<Data> => [
     label: 'Tối',
   },
   {
-    id: 'note',
+    id: 'description',
     label: 'Ghi chú',
   },
 ];
 
-const OrderProduct = ({ index, control, setValue }: IProps) => {
+const OrderProduct = ({
+  index,
+  control,
+  setValue,
+  getValues,
+  handleRemove,
+}: IProps) => {
   const product = useWatch({
     control,
     name: `createOrderDetailDtos[${index}]`,
@@ -55,7 +64,7 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
 
   const cells = useMemo(() => getCells(), []);
 
-  //@ts-ignore
+  // @ts-ignore
   const measures = [];
 
   if (product.priceLevelThird) {
@@ -80,15 +89,20 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
   }
 
   useEffect(() => {
+    const price = product.measure
+      ? // @ts-ignore
+        measures.find((x) => x.id === product.measure)?.price ||
+        // @ts-ignore
+        measures[0]?.price ||
+        0
+      : measures.length > 0
+      ? // @ts-ignore
+        measures[0]?.price
+      : 0;
+
     setValue(
       `createOrderDetailDtos[${index}].billPerProduct`,
-      (product.quantity || 0) *
-        //@ts-ignore
-        (measures.find((x) => x.id === product.measure)?.price ||
-          //@ts-ignore
-          measures[0]?.price ||
-          0) -
-        (product.discount || 0)
+      (product.quantity || 0) * price - (product.discount || 0)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.quantity, product.measure, product.discount]);
@@ -100,7 +114,12 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
       <TableCell sx={{ width: '50px !important' }}>
         {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
       </TableCell>
-      <TableCell>{product.productName}</TableCell>
+      <TableCell>
+        <IconButton onClick={handleRemove}>
+          <CloseIcon />
+        </IconButton>
+        {product.productName}
+      </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <EntitySelecter
           name={`createOrderDetailDtos[${index}].measure`}
@@ -116,6 +135,8 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
         <ControllerNumberInput
           name={`createOrderDetailDtos[${index}].quantity`}
           setValue={setValue}
+          value={getValues(`createOrderDetailDtos[${index}].quantity`)}
+          control={control}
         />
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
@@ -129,6 +150,8 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
         <ControllerNumberInput
           name={`createOrderDetailDtos[${index}].discount`}
           setValue={setValue}
+          value={getValues(`createOrderDetailDtos[${index}].discount`)}
+          control={control}
         />
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
@@ -147,27 +170,43 @@ const OrderProduct = ({ index, control, setValue }: IProps) => {
             <TableBody>
               <TableRow>
                 <TableCell sx={{ width: '100px !important' }}>
-                  <TextField
-                    name={`createOrderDetailDtos[${index}].morning`}
+                  <ControllerTextField
+                    name={`createOrderDetailDtos[${index}].mor`}
                     variant="standard"
+                    control={control}
+                    defaultValue={getValues(
+                      `createOrderDetailDtos[${index}].mor`
+                    )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '100px !important' }}>
-                  <TextField
+                  <ControllerTextField
                     name={`createOrderDetailDtos[${index}].noon`}
                     variant="standard"
+                    control={control}
+                    defaultValue={getValues(
+                      `createOrderDetailDtos[${index}].noon`
+                    )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '100px !important' }}>
-                  <TextField
+                  <ControllerTextField
                     name={`createOrderDetailDtos[${index}].night`}
                     variant="standard"
+                    control={control}
+                    defaultValue={getValues(
+                      `createOrderDetailDtos[${index}].night`
+                    )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '200px !important' }}>
-                  <TextField
-                    name={`createOrderDetailDtos[${index}].note`}
+                  <ControllerTextField
+                    name={`createOrderDetailDtos[${index}].description`}
                     variant="standard"
+                    control={control}
+                    defaultValue={getValues(
+                      `createOrderDetailDtos[${index}].description`
+                    )}
                   />
                 </TableCell>
               </TableRow>

@@ -22,9 +22,9 @@ class DateFns {
     return format(date, pattern);
   }
 
-  public formatDate(date: Date) {
+  public formatDate(date: Date, pattern?: string) {
     if (!date) return '';
-    return moment(date).format('DD/MM/yyyy');
+    return moment(date).format(pattern || 'DD/MM/yyyy');
   }
 
   public format(

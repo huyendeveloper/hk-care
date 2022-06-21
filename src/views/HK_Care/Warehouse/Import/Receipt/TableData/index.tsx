@@ -75,12 +75,11 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllImportReceipt(filters));
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách hóa đơn nhập kho!',
+        error: 'Lỗi!',
       });
       return;
     }
 
- 
     // setImportReceipt([
     //   { id: 1, creationTime: new Date('9/29/2021'), moneyToPay: 78, debts: 86 },
     //   { id: 2, creationTime: new Date('6/16/2021'), moneyToPay: 26, debts: 3 },
@@ -155,6 +154,8 @@ const TableData = () => {
         placeHolder="Tìm kiếm hóa đơn"
         onSearch={handleSearch}
         searchText={filters.searchText}
+        start={filters.startDate}
+        end={filters.lastDate}
         setStart={(val) => setFilters({ ...filters, startDate: val })}
         setEnd={(val) => setFilters({ ...filters, lastDate: val })}
         searchArea

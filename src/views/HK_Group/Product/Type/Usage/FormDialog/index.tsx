@@ -78,7 +78,7 @@ const FormDialog = ({
       const { error, payload } = await dispatch(updateUsage(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật dạng dùng!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -91,7 +91,7 @@ const FormDialog = ({
       const { error, payload } = await dispatch(createUsage(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi thêm dạng dùng!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -103,12 +103,15 @@ const FormDialog = ({
   };
 
   useEffect(() => {
-    reset();
     if (currentID) {
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('description', data?.description || '');
+      reset({
+        id: currentID,
+        name: data?.name || '',
+        description: data?.description || '',
+      });
+      return;
     }
+    reset({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 

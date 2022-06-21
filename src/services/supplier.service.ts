@@ -25,7 +25,7 @@ class SupplierService {
   create(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
 
-    params.append('name', payload.name);
+    params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
     params.append('telephoneNumber', payload.telephoneNumber);
@@ -56,7 +56,7 @@ class SupplierService {
 
   update(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
-    params.append('name', payload.name);
+    params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
     params.append('telephoneNumber', payload.telephoneNumber);

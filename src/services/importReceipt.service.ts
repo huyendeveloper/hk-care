@@ -3,6 +3,7 @@ import axios from 'axios';
 import { baseURL } from 'config';
 import { IImportReceipt } from 'interface';
 import { FilterParams } from 'types';
+import DateFns from 'utils/DateFns';
 import LocalStorage from 'utils/LocalStorage';
 
 class ImportReceiptService {
@@ -49,8 +50,10 @@ class ImportReceiptService {
       `${baseURL}/receiptwarehouse/SearchAll?Keyword=${searchText}&SkipCount=${
         (pageIndex - 1) * pageSize
       }&MaxResultCount=${pageSize}&startDate=${
-        startDate ? startDate + ' 00:00' : ''
-      }&lastDate=${lastDate ? lastDate + ' 23:59' : ''}`
+        startDate ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00' : ''
+      }&lastDate=${
+        lastDate ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59' : ''
+      }`
     );
   }
 
