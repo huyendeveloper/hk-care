@@ -38,7 +38,7 @@ const ReceiptEntity = ({ item, index, value }: IProps) => {
         {DateFns.formatDate(value.dateManufacture)}
       </TableCell>
       <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(value.outOfDate)}
+        {DateFns.formatDate(value.expiryDate)}
       </TableCell>
     </TableRow>
   );

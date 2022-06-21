@@ -16,7 +16,6 @@ interface Props<T> extends Omit<TextFieldProps, 'name'> {
   mask?: string;
   onChangeSelect?: (date: Date | null) => void;
   minDate?: Date;
-  error?: boolean;
 }
 
 const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
@@ -28,55 +27,43 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
     mask,
     onChangeSelect,
     minDate,
-    error = false,
     ...rest
   } = props;
 
-  if (control) {
-    return (
-      <Controller
-        render={({ field: { ref, ...others } }) => {
-          return (
-            <DatePicker
-              renderInput={(props) => {
-                const newProps = others.value
-                  ? props
-                  : {
-                      ...props,
-                      inputProps: { ...props.inputProps, value: '' },
-                    };
-                return (
-                  <TextField
-                    {...newProps}
-                    {...rest}
-                    fullWidth
-                    error={Boolean(errors[name]) || error}
-                    helperText={errors[name]?.message}
-                    id={name}
-                  />
-                );
-              }}
-              mask={mask}
-              {...others}
-              inputFormat="dd/MM/yyyy"
-              disabled={disabled}
-              minDate={minDate}
-              onChange={(value: Date | null) => {
-                others.onChange(value);
-                if (onChangeSelect) {
-                  onChangeSelect(value);
-                }
-              }}
+  return (
+    <Controller
+      render={({ field: { ref, ...others }, fieldState: { error } }) => (
+        <DatePicker
+          renderInput={(props) => (
+            <TextField
+              {...props}
+              {...rest}
+              fullWidth
+              error={Boolean(error)}
+              helperText={error?.message}
+              id={name}
             />
-          );
-        }}
-        name={name}
-        control={control}
-      />
-    );
-  }
-
-  return <TextField type="date" variant="outlined" {...props} />;
+          )}
+          mask={mask}
+          InputAdornmentProps={{
+            position: 'end',
+          }}
+          {...others}
+          disabled={disabled}
+          inputFormat="dd/MM/yyyy"
+          minDate={minDate}
+          onChange={(value: Date | null) => {
+            others.onChange(value);
+            if (onChangeSelect) {
+              onChangeSelect(value);
+            }
+          }}
+        />
+      )}
+      name={name}
+      control={control}
+    />
+  );
 };
 
 export default ControllerDatePicker;

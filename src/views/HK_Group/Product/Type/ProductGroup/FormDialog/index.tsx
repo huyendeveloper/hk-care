@@ -75,7 +75,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       const { error, payload } = await dispatch(updateProductGroup(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật loại sản phẩm!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -88,7 +88,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       const { error, payload } = await dispatch(createProductGroup(data));
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi thêm loại sản phẩm!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -100,12 +100,15 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
   };
 
   useEffect(() => {
-    reset();
     if (currentID) {
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('description', data?.description || '');
+      reset({
+        id: currentID,
+        name: data?.name || '',
+        description: data?.description || '',
+      });
+      return;
     }
+    reset({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 

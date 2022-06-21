@@ -5,18 +5,20 @@ import {
   FormContent,
   FormFooter,
   FormHeader,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { registProductList } from 'redux/slices/productList';
 import ProductListTableData from './ProductListTableData';
 import ProductTableData from './ProductTableData';
 
 const Create = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const setNotification = useNotification();
   const [registerList, setRegisterList] = useState<IProductList[]>([]);
   const [unregisterList, setUnregisterList] = useState<IProductList[]>([]);
@@ -49,12 +51,13 @@ const Create = () => {
         registProductList(registerList)
       );
       if (error) {
-        setNotification({ error: 'Lỗi khi đăng ký sản phẩm!' });
+        setNotification({ error: 'Lỗi!' });
         return;
       }
       setNotification({ message: 'Đăng ký thành công', severity: 'success' });
       setRerender((pre) => pre + 1);
       setRegisterList([]);
+      return navigate('/hk_care/product/list');
     }
   };
 

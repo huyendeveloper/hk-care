@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid } from '@mui/material';
+import { LoadingScreen } from 'components/common';
 import {
   ControllerMultiFile,
   ControllerTextarea,
@@ -29,6 +30,7 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   data?: ISupplier;
+  loading?: boolean;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -63,11 +65,16 @@ const validationSchema = yup.object().shape({
   address: yup.string().max(150, 'Địa chỉ không quá 150 ký tự.').default(''),
 });
 
-const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
+const FormDialogSupplier = ({
+  open,
+  handleClose,
+  currentID,
+  loading = false,
+}: Props) => {
   const [files, setFiles] = useState<File[] | object[]>([]);
   const setNotification = useNotification();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state: RootState) => state.supplier);
+  // const { loading } = useSelector((state: RootState) => state.supplier);
 
   const { control, handleSubmit, setValue, reset } = useForm<ISupplier>({
     mode: 'onChange',
@@ -91,7 +98,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
       );
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật nhà cung cấp!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }
@@ -106,7 +113,7 @@ const FormDialogSupplier = ({ open, handleClose, currentID }: Props) => {
       );
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi khi thêm nhà cung cấp!',
+          error: payload.response.data || 'Lỗi!',
         });
         return;
       }

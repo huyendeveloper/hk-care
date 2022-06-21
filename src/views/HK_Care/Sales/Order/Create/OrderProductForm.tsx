@@ -12,7 +12,7 @@ import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { ISearchProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProductSales } from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
@@ -22,6 +22,10 @@ import OrderProduct from './OrderProduct';
 
 interface IProps {
   identification: number;
+  control: any;
+  handleSubmit: any;
+  setValue: any;
+  getValues: any;
 }
 
 interface IForm {
@@ -47,6 +51,7 @@ interface IForm {
     noon: string;
     night: string;
     description: string;
+    billPerProduct: number;
   }[];
 }
 
@@ -61,16 +66,19 @@ const getCells = (): Cells<ISearchProduct> => [
   { id: 'routeOfUse', label: 'Liều dùng' },
 ];
 
-const OrderProductForm = ({ identification }: IProps) => {
+const OrderProductForm = ({
+  identification,
+  control,
+  handleSubmit,
+  getValues,
+  setValue,
+}: IProps) => {
   const cells = useMemo(() => getCells(), []);
   const { productSales } = useSelector((state: RootState) => state.salesOrder);
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     pageSize: 1000,
-  });
-  const { control, setValue, getValues, handleSubmit } = useForm<IForm>({
-    mode: 'onChange',
   });
 
   const handleOnSort = (field: string) => {
@@ -91,6 +99,7 @@ const OrderProductForm = ({ identification }: IProps) => {
       append(productSales);
       dispatch(addProductSales(null));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productSales]);
 
   const onSubmit = async (payload: IForm) => {
@@ -99,7 +108,7 @@ const OrderProductForm = ({ identification }: IProps) => {
     //   updateProduct({ ...payload, image })
     // );
     // if (error) {
-    //   setNotification({ error: 'Lỗi khi cập nhật sản phẩm!' });
+    //   setNotification({ error: 'Lỗi!' });
     //   return;
     // }
     // setNotification({
@@ -109,7 +118,7 @@ const OrderProductForm = ({ identification }: IProps) => {
   };
 
   return (
-    <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
+    <FormPaperGrid height="fit-content" onSubmit={handleSubmit(onSubmit)}>
       <FormHeader title="" />
       <FormContent>
         <Grid container sx={{ height: 1 }}>
@@ -133,8 +142,9 @@ const OrderProductForm = ({ identification }: IProps) => {
                               key={index}
                               index={index}
                               control={control}
-                              // handleRemove={() => remove(index)}
+                              handleRemove={() => remove(index)}
                               setValue={setValue}
+                              getValues={getValues}
                             />
                           ))}
                       </TableBody>

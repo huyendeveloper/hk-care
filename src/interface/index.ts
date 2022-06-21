@@ -108,13 +108,19 @@ export interface IProductList {
   mesureLevelThirdName: string;
 }
 
-interface IProductReceiptWHDtos {
+export interface IProductReceiptWHDtos {
   lotNumber: string;
   name: string;
   productName: string;
   mesureNameLevelFirst: string;
   measure: string;
   amount: number;
+  discount: number;
+  importPrice: number;
+  price: number;
+  numberRegister: string;
+  dateManufacture: Date | string;
+  expiryDate: Date | string;
 }
 
 export interface IReceipt {
@@ -139,7 +145,7 @@ export interface IReceipt {
   dateManufacture: Date;
   productReceiptWHDtos?: IProductReceiptWHDtos[];
   discount?: number;
-  outOfDate: Date;
+  expiryDate: Date;
   amount: number;
   mesureNameLevelFirst?: string;
   pathFile?: string;
@@ -151,6 +157,8 @@ export interface IReceipt {
   vat?: number;
   discountValue?: number;
   paid?: number;
+  __tenant?: string;
+  outOfDate: Date;
 }
 
 export interface ITenant {
@@ -202,4 +210,31 @@ export interface ISearchProduct {
   quantity?: number;
   discount?: number;
   price?: number;
+}
+
+export interface IProductExportCancel {
+  measureName: string;
+  amount: number;
+  importPrice: number;
+  lotNumber: string;
+  numberRegister: string;
+  expiryDate: Date;
+  dateManufacture: Date;
+  productId: number;
+  productName: string;
+  id: number;
+  creationTime: Date;
+}
+
+export interface IExportCancel {
+  totalFee: number;
+  code: string;
+  description: string;
+  from: number;
+  to: number;
+  exportType: number;
+  creationTime: Date;
+  id: number;
+  rotationPoint: string;
+  exportWHDetails: IProductExportCancel[];
 }

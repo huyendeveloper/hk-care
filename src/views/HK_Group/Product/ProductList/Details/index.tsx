@@ -27,7 +27,7 @@ import {
   ITreatmentGroup,
   IUsage,
 } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -80,9 +80,10 @@ const validationSchema = yup.object().shape({
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
-  const [product, setProduct] = useState<IProduct>();
-  const [taskQueue, setTaskQueue] = useState<boolean>(true);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const [productDetail, setProductDetail] = useState(null);
+  const [taskQueue, setTaskQueue] = useState<number>(0);
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -92,14 +93,13 @@ const DetailsForm = () => {
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
 
   const {
     control,
     setValue,
     getValues,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IProduct>({
     mode: 'onChange',
@@ -107,50 +107,82 @@ const DetailsForm = () => {
     defaultValues: validationSchema.getDefault(),
   });
 
+  useEffect(() => {
+    if (!productDetail) return;
+
+    const {
+      id,
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
+      usageO,
+      productGroupO,
+      treamentGroupO,
+      amountSecond,
+      amountThird,
+      mesureLevelFisrt,
+      mesureLevelSecond,
+      mesureLevelThird,
+      suppliers,
+      productImage,
+    } = productDetail;
+
+    reset({
+      id,
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
+      // @ts-ignore
+      usageId: usageO.id || null,
+      // @ts-ignore
+      productGroupId: productGroupO.id || null,
+      // @ts-ignore
+      treamentGroupId: treamentGroupO.id || null,
+      productImage,
+      amountSecond,
+      amountThird,
+      // @ts-ignore
+      mesureLevelFisrt: mesureLevelFisrt.id || null,
+      // @ts-ignore
+      mesureLevelSecond: mesureLevelSecond.id || null,
+      // @ts-ignore
+      mesureLevelThird: mesureLevelThird.id || null,
+      // @ts-ignore
+      productsSupplier: suppliers.map((x) => x.id),
+    });
+    productImage && setImage(`${connectURL}/${productImage}`);
+  }, [productDetail, reset]);
+
   const fetchData = async () => {
+    setTaskQueue((task) => task + 1);
     if (!crudId) return;
 
     const { data } = await productService.get(Number(crudId));
-
-    setValue('id', data?.id);
-    setValue('name', data?.name);
-    data?.numberRegister && setValue('numberRegister', data?.numberRegister);
-    data?.lotNumber && setValue('lotNumber', data?.lotNumber);
-    setValue('producer', data?.producer);
-    data?.dateManufacture && setValue('dateManufacture', data?.dateManufacture);
-    data?.outOfDate && setValue('outOfDate', data?.outOfDate);
-    setValue('importPrice', data?.importPrice);
-    setValue('price', data?.price);
-    setValue('packRule', data?.packRule);
-    setValue('content', data?.content);
-    setValue('dosage', data?.dosage);
-    setValue('routeOfUse', data?.routeOfUse);
-    setValue('description', data?.description);
-    setValue('hidden', data?.hidden);
-    setValue('usageId', data?.usageO.id);
-    setValue('usageName', data?.usageO.name);
-    setValue('productGroupId', data?.productGroupO.id);
-    setValue('productGroupName', data?.productGroupO.name);
-    setValue('treamentGroupId', data?.treamentGroupO.id);
-    setValue('treamentGroupName', data?.treamentGroupO.name);
-    setValue('productImage', data?.productImage);
-    data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountSecond', data?.amountSecond);
-    data?.amountThird && setValue('amountThird', data?.amountThird);
-    // setSupplierList(data?.suppliers);
-    setValue(
-      'productsSupplier',
-      // @ts-ignore
-      data?.suppliers.map((x) => x.id)
-    );
-    setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
-    setValue('mesureLevelFisrtName', data?.mesureLevelFisrt.name);
-    setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
-    setValue('mesureLevelSecondName', data?.mesureLevelSecond.name);
-    setValue('mesureLevelThird', data?.mesureLevelThird.id);
-    setValue('mesureLevelThirdName', data?.mesureLevelThird.name);
-    setProduct(data);
-    setTaskQueue(false);
+    if (!data) return;
+    setProductDetail(data);
+    setTaskQueue((task) => task - 1);
   };
 
   const fetchProductGroupList = () => {
@@ -213,22 +245,13 @@ const DetailsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crudId]);
 
-  if (taskQueue) {
-    return <LoadingScreen />;
-  }
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
-    fetchData();
-  };
-
   const onSubmit = async (payload: IProduct) => {
     const { error } = await dispatch(
       // @ts-ignore
       updateProduct({ ...payload, image })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi cập nhật sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -238,6 +261,10 @@ const DetailsForm = () => {
 
     setDisabled(true);
   };
+
+  if (taskQueue > 0) {
+    return <LoadingScreen />;
+  }
 
   return (
     <PageWrapper title="Chi tiết sản phẩm">
@@ -408,18 +435,22 @@ const DetailsForm = () => {
                 <FormLabel title="Giá nhập" name="importPrice" />
                 <ControllerNumberInput
                   name="importPrice"
-                  value={product?.importPrice}
+                  // @ts-ignore
+                  value={productDetail?.importPrice}
                   setValue={setValue}
                   disabled={disabled}
+                  control={control}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá bán" name="price" />
                 <ControllerNumberInput
                   name="price"
-                  value={product?.price}
+                  // @ts-ignore
+                  value={productDetail?.price}
                   setValue={setValue}
                   disabled={disabled}
+                  control={control}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -507,14 +538,6 @@ const DetailsForm = () => {
           )}
         </FormFooter>
       </FormPaperGrid>
-
-      <FormDialog
-        dataUpdate={product}
-        // @ts-ignore
-        currentID={product?.id}
-        open={openFormDialog}
-        handleClose={handleCloseUpdateDialog}
-      />
     </PageWrapper>
   );
 };

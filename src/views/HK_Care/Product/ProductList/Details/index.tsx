@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
+import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { connectURL } from 'config';
 import { useNotification } from 'hooks';
 import {
@@ -24,7 +25,7 @@ import {
   ITreatmentGroup,
   IUsage,
 } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -36,7 +37,6 @@ import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
-import FormDialog from '../FormDialog';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -49,8 +49,8 @@ const validationSchema = yup.object().shape({
 
 const DetailsForm = () => {
   const { id: crudId } = useParams();
-  const [taskQueue, setTaskQueue] = useState<boolean>(true);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -59,14 +59,15 @@ const DetailsForm = () => {
   const [usageList, setUsageList] = useState<IUsage[]>([]);
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
+  const [productDetail, setProductDetail] = useState(null);
+  const [taskQueue, setTaskQueue] = useState<number>(0);
 
   const {
     control,
     setValue,
     getValues,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IProduct>({
     mode: 'onChange',
@@ -74,41 +75,81 @@ const DetailsForm = () => {
     defaultValues: validationSchema.getDefault(),
   });
 
+  useEffect(() => {
+    if (!productDetail) return;
+
+    const {
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
+      usageO,
+      productGroupO,
+      treamentGroupO,
+      productImage,
+      amountSecond,
+      amountThird,
+      mesureLevelFisrt,
+      mesureLevelSecond,
+      mesureLevelThird,
+      suppliers,
+    } = productDetail;
+    productImage && setImage(`${connectURL}/${productImage}`);
+
+    reset({
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
+      // @ts-ignore
+      usageId: usageO.id,
+      // @ts-ignore
+      productGroupId: productGroupO.id,
+      // @ts-ignore
+      treamentGroupId: treamentGroupO.id,
+      productImage,
+      amountSecond,
+      amountThird,
+      // @ts-ignore
+      productsSupplier: suppliers.map((x) => x.id),
+      // @ts-ignore
+      mesureLevelFisrt: mesureLevelFisrt.id,
+      // @ts-ignore
+      mesureLevelSecond: mesureLevelSecond.id,
+      // @ts-ignore
+      mesureLevelThird: mesureLevelThird.id,
+    });
+  }, [productDetail, reset]);
+
   const fetchData = async () => {
+    setTaskQueue((task) => task + 1);
     if (!crudId) return;
 
     const { data } = await productListService.get(Number(crudId));
 
-    setValue('name', data?.name);
-    setValue('numberRegister', data?.numberRegister);
-    setValue('lotNumber', data?.lotNumber);
-    setValue('producer', data?.producer);
-    setValue('dateManufacture', data?.dateManufacture);
-    setValue('outOfDate', data?.outOfDate);
-    setValue('importPrice', data?.importPrice);
-    setValue('price', data?.price);
-    setValue('packRule', data?.packRule);
-    setValue('content', data?.content);
-    setValue('dosage', data?.dosage);
-    setValue('routeOfUse', data?.routeOfUse);
-    setValue('description', data?.description);
-    setValue('hidden', data?.hidden);
-    setValue('usageId', data?.usageO.id);
-    setValue('productGroupId', data?.productGroupO.id);
-    setValue('treamentGroupId', data?.treamentGroupO.id);
-    setValue('productImage', data?.productImage);
-    setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountSecond', data?.amountSecond);
-    setValue('amountThird', data?.amountThird);
-    setValue(
-      'productsSupplier',
-      // @ts-ignore
-      data?.suppliers.map((x) => x.id)
-    );
-    setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
-    setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
-    setValue('mesureLevelThird', data?.mesureLevelThird.id);
-    setTaskQueue(false);
+    if (!data) return;
+    setProductDetail(data);
+    setTaskQueue((task) => task - 1);
   };
 
   const fetchProductGroupList = () => {
@@ -171,22 +212,13 @@ const DetailsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crudId]);
 
-  if (taskQueue) {
-    return <LoadingScreen />;
-  }
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
-    fetchData();
-  };
-
   const onSubmit = async (payload: IProduct) => {
     const { error } = await dispatch(
       // @ts-ignore
       updateProduct({ ...payload, image })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi cập nhật sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -194,6 +226,10 @@ const DetailsForm = () => {
       severity: 'success',
     });
   };
+
+  if (taskQueue > 0) {
+    return <LoadingScreen />;
+  }
 
   return (
     <PageWrapper title="Chi tiết sản phẩm">
@@ -218,7 +254,6 @@ const DetailsForm = () => {
                   options={productGroupList}
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy nhóm sản phẩm"
-                  defaultValue={getValues('productGroupName')}
                   placeholder=""
                   disabled
                 />
@@ -244,7 +279,6 @@ const DetailsForm = () => {
                   options={treatmentGroupList}
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy nhóm điều trị"
-                  defaultValue={getValues('treamentGroupName')}
                   placeholder=""
                   disabled
                 />
@@ -266,7 +300,6 @@ const DetailsForm = () => {
                   options={usageList}
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy nhóm dạng dùng"
-                  defaultValue={getValues('usageName')}
                   placeholder=""
                   disabled
                 />
@@ -290,7 +323,6 @@ const DetailsForm = () => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelFisrtName')}
                       placeholder="Cấp 1 *"
                       disabled
                       required
@@ -311,7 +343,6 @@ const DetailsForm = () => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelSecondName')}
                       placeholder="Cấp 2"
                       disabled
                     />
@@ -330,7 +361,6 @@ const DetailsForm = () => {
                       options={measureList}
                       renderLabel={(field) => field.name}
                       noOptionsText="Không tìm thấy đơn vị đo lường"
-                      defaultValue={getValues('mesureLevelThirdName')}
                       placeholder="Cấp 3"
                       disabled
                     />
@@ -357,15 +387,25 @@ const DetailsForm = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá nhập" name="importPrice" />
-                <ControllerTextField
+
+                <ControllerNumberInput
                   name="importPrice"
+                  value={getValues('importPrice')}
+                  setValue={setValue}
                   disabled
                   control={control}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá bán" name="price" />
-                <ControllerTextField name="price" disabled control={control} />
+
+                <ControllerNumberInput
+                  name="price"
+                  value={getValues('price')}
+                  setValue={setValue}
+                  disabled
+                  control={control}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Nhà cung cấp" name="productsSupplier" />
@@ -438,19 +478,8 @@ const DetailsForm = () => {
           <LinkButton to="/hk_care/product/list">
             Quay lại danh sách sản phẩm
           </LinkButton>
-
-          {/* <Button variant="contained" onClick={handleOpenUpdateDialog}>
-            Chỉnh sửa thông tin sản phẩm
-          </Button> */}
         </FormFooter>
       </FormPaperGrid>
-
-      <FormDialog
-        // @ts-ignore
-        currentID={Number(crudId)}
-        open={openFormDialog}
-        handleClose={handleCloseUpdateDialog}
-      />
     </PageWrapper>
   );
 };

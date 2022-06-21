@@ -12,20 +12,23 @@ import { createTheme } from 'theme';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+ 
+import vi from "date-fns/locale/vi";
+import DateFnsUtils from "@date-io/date-fns";
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <HelmetProvider>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <ThemeProvider theme={createTheme()}>
-              {/* <AuthProvider> */}
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-              {/* </AuthProvider> */}
-            </ThemeProvider>
+          <LocalizationProvider dateAdapter={AdapterDateFns} locale={vi}>
+              <ThemeProvider theme={createTheme()}>
+                {/* <AuthProvider> */}
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+                {/* </AuthProvider> */}
+              </ThemeProvider>
           </LocalizationProvider>
         </HelmetProvider>
       </PersistGate>

@@ -75,7 +75,7 @@ const TableData = () => {
 
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách nhóm điều trị!',
+        error: 'Lỗi!',
       });
       return;
     }
@@ -158,7 +158,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteTreatmentGroup(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa nhóm điều trị!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -206,7 +206,7 @@ const TableData = () => {
       </TableSearchField>
 
       <TableContent total={treatmentGroupList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight:'60vh' }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader

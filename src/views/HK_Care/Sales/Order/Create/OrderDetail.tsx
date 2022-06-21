@@ -23,8 +23,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         0
       )
     : 0;
-  const discountValue = useWatch({ control, name: 'discountValue' }) || 0;
-  const paid = useWatch({ control, name: 'paid' }) || 0;
+  const discountValue = useWatch({ control, name: 'disCount' }) || 0;
+  const paid = useWatch({ control, name: 'giveMoney' }) || 0;
 
   return (
     <Stack p={2} gap={2}>
@@ -40,11 +40,12 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         <div>Chiết khấu (%)</div>
         <div>
           <ControllerNumberInput
-            name="discountValue"
+            name="disCount"
             variant="standard"
             setValue={setValue}
             type="percent"
-            defaultValue={getValues(`discountValue`)}
+            value={getValues(`disCount`)}
+            control={control}
           />
         </div>
       </Stack>
@@ -60,10 +61,11 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         <b>Tiền mặt</b>
         <div>
           <ControllerNumberInput
-            name="paid"
+            name="giveMoney"
             variant="standard"
             setValue={setValue}
-            defaultValue={getValues(`paid`)}
+            value={getValues(`giveMoney`)}
+            control={control}
           />
         </div>
       </Stack>
@@ -72,7 +74,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         <b>Tiền thừa trả khách</b>
         <div>
           {numberFormat(
-            paid - (bill - ((getValues(`discountValue`) || 0) / 100) * bill)
+            paid - (bill - ((getValues(`disCount`) || 0) / 100) * bill)
           )}
         </div>
       </Stack>

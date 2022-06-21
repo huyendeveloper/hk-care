@@ -91,7 +91,7 @@ const Details = () => {
 
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
+        error: 'Lỗi!',
       });
       return;
     }
@@ -99,7 +99,9 @@ const Details = () => {
     const fileList: object[] = [];
     files &&
       fileList.push({
-        name: `${connectURL}/${payload.importReceipt.pathFile}`,
+        name: payload.importReceipt.pathFile
+          ? `${connectURL}/${payload.importReceipt.pathFile}`
+          : '',
       });
     setFiles(fileList);
     setReceiptProduct(payload.importReceipt.listProductReceiptWH);
@@ -190,6 +192,7 @@ const Details = () => {
                     setFiles={setFiles}
                     max={1}
                     viewOnly
+                    accept="image/*,application/pdf"
                   />
                 </Grid>
               </Grid>

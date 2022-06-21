@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
@@ -16,7 +17,11 @@ const TotalBill = ({ control, index }: IProps) => {
     (Number(item?.amount) || 0) * (Number(item?.importPrice) || 0) -
     (Number(item?.discount) || 0);
 
-  return <>{numberFormat(bill < 0 ? 0 : bill)}</>;
+  return (
+    <Box sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}>
+      {numberFormat(bill < 0 ? 0 : bill)}
+    </Box>
+  );
 };
 
 export default TotalBill;

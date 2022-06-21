@@ -86,6 +86,17 @@ const breadcrumbConfig = (tennant: string) => {
       breadcrumb: 'Thêm hóa đơn',
       path: '/hk_care/warehouse/import/receipt/create',
     },
+    { breadcrumb: 'Xuất kho', path: '/hk_care/warehouse/export' },
+    { breadcrumb: 'Xuất hủy', path: '/hk_care/warehouse/export/cancel' },
+    {
+      breadcrumb: 'Xuất luân chuyển',
+      path: '/hk_care/warehouse/export/circulation_invoice',
+    },
+    {
+      exact: true,
+      breadcrumb: 'Cập nhật hóa đơn xuất hủy',
+      path: '/hk_care/warehouse/export/cancel/:id/update',
+    },
     // hk care sales
     { breadcrumb: 'Quản lý bán hàng', path: '/hk_care/sales' },
     { breadcrumb: 'Hóa đơn bán hàng', path: '/hk_care/sales/order' },

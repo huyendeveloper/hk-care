@@ -4,8 +4,7 @@ import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import type { FieldValues } from 'react-hook-form';
 import { useDebounce } from 'react-use';
 
 export interface Label extends FieldValues {
@@ -71,7 +70,7 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
       disabled={disabled}
       forcePopupIcon={forcePopupIcon}
       options={options.map((option) => {
-        return renderValue ? option[renderValue] : option.productId;
+        return renderValue ? option[renderValue] : '';
       })}
       getOptionLabel={(option) => {
         return labels[option]?.name || defaultValue || '';
@@ -84,9 +83,11 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
       renderInput={(params) => {
         // @ts-ignore
         params.inputProps.value = params.inputProps.value || defaultValue;
+
         return (
           <TextField
             placeholder={placeholder}
+            value={valueInput}
             onChange={(e) => {
               setValueInput(e.target.value);
             }}
@@ -110,9 +111,7 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
           </Box>
         );
       }}
-      // {...field}
       onChange={(_event, value: number | null) => {
-        // field.onChange(value);
         if (onChangeSelect) {
           onChangeSelect(value);
         }

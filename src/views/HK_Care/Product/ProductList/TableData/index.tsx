@@ -30,7 +30,6 @@ import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
-import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -66,9 +65,7 @@ const TableData = ({ active = 1 }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setProductList(payload.productList);
@@ -125,7 +122,7 @@ const TableData = ({ active = 1 }: IProps) => {
     // @ts-ignore
     const { error } = await dispatch(deleteProductList(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa sản phẩm ra khỏi danh sách bán!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
@@ -240,13 +237,6 @@ const TableData = ({ active = 1 }: IProps) => {
         open={openDeleteDialog}
         handleDelete={handleDelete}
         spanContent=" ra khỏi danh sách bán"
-      />
-
-      <FormDialog
-        // @ts-ignore
-        currentID={currentID}
-        open={openFormDialog}
-        handleClose={handleCloseUpdateDialog}
       />
     </TableWrapper>
   );

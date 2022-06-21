@@ -62,7 +62,7 @@ const ProductTableData = ({
 
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
+        error: 'Lỗi!',
       });
       return;
     }

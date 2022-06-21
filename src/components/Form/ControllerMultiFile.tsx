@@ -1,6 +1,7 @@
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Stack } from '@mui/material';
+import { useNotification } from 'hooks';
 import React from 'react';
 
 interface IProps {
@@ -8,6 +9,7 @@ interface IProps {
   setFiles: (files: File[] | object[]) => void;
   viewOnly?: boolean;
   max?: number;
+  accept?: string;
 }
 
 const ControllerMultiFile = ({
@@ -15,7 +17,9 @@ const ControllerMultiFile = ({
   setFiles,
   viewOnly,
   max = 6,
+  accept = 'application/pdf',
 }: IProps) => {
+  const setNotification = useNotification();
   const handleChangeFile = (e: any) => {
     const file = e?.target.files[0];
     if (file) {
@@ -26,9 +30,19 @@ const ControllerMultiFile = ({
   const handleChangeFileIndex = (e: any, index: number) => {
     const file = e?.target.files[0];
     if (file) {
-      const newFiles = [...files];
-      newFiles[index] = file;
-      setFiles(newFiles);
+      if (
+        file &&
+        (file.type === 'application/pdf' || file.type.substr(0, 5) === 'image')
+      ) {
+        const newFiles = [...files];
+        newFiles[index] = file;
+        setFiles(newFiles);
+      } else {
+        setNotification({
+          message: 'File không đúng định dạng',
+          severity: 'warning',
+        });
+      }
     }
   };
 
@@ -56,7 +70,7 @@ const ControllerMultiFile = ({
             <input
               type="file"
               name="bussinessLicense"
-              accept="application/pdf"
+              accept={accept}
               onChange={(e) => handleChangeFileIndex(e, index)}
               hidden
               disabled={viewOnly}
@@ -107,7 +121,7 @@ const ControllerMultiFile = ({
           <input
             type="file"
             name="bussinessLicense"
-            accept="application/pdf"
+            accept={accept}
             onChange={handleChangeFile}
             hidden
           />

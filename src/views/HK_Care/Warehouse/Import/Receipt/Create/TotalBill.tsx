@@ -34,7 +34,7 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
   const debts = moneyToPay - paid;
 
   return (
-    <table>
+    <table style={{ float: 'right' }}>
       <tbody>
         <tr>
           <td>Tổng tiền:</td>
@@ -48,7 +48,8 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
               variant="standard"
               setValue={setValue}
               type="percent"
-              defaultValue={getValues(`vat`)}
+              value={getValues(`vat`)}
+              control={control}
             />
           </td>
         </tr>
@@ -60,7 +61,8 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
               variant="standard"
               setValue={setValue}
               type="percent"
-              defaultValue={getValues(`discountValue`)}
+              value={getValues(`discountValue`)}
+              control={control}
             />
           </td>
         </tr>
@@ -77,7 +79,8 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
               name="paid"
               variant="standard"
               setValue={setValue}
-              defaultValue={getValues(`paid`)}
+              value={getValues(`paid`)}
+              control={control}
             />
           </td>
         </tr>

@@ -20,6 +20,7 @@ import {
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
+import { fil } from 'date-fns/locale';
 import { ISalesOrder } from 'interface';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -209,6 +210,8 @@ const TableData = () => {
         placeHolder="Tìm kiếm hóa đơn"
         onSearch={handleSearch}
         searchText={filters.searchText}
+        start={filters.startDate}
+        end={filters.lastDate}
         setStart={(val) => setFilters({ ...filters, startDate: val })}
         setEnd={(val) => setFilters({ ...filters, lastDate: val })}
         searchArea

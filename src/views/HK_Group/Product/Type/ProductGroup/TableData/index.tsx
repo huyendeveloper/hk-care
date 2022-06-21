@@ -72,9 +72,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllProductGroup(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách nhóm sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
 
@@ -156,7 +154,7 @@ const TableData = () => {
     // @ts-ignore
     const { error } = await dispatch(deleteProductGroup(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa nhóm sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
       return;
     }
     setNotification({
