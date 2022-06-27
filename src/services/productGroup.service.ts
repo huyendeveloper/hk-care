@@ -5,19 +5,18 @@ import { FilterParams } from 'types';
 
 class ProductGroupService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/product-group/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
+    return axiosClient.get(`${baseURL}/product-group/search-all`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllProductGroupp() {
     return axiosClient.get(`${baseURL}/product-group/search-all`);
-  }
-
-  get(id: number) {
-    return axiosClient.get(`${baseURL}/product-group/${id}`);
   }
 
   create(payload: IProductGroup) {

@@ -3,7 +3,7 @@ import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { version } from 'utils/constants';
+import { version } from 'config';
 
 const DashboardFooter = () => {
   return (
@@ -15,8 +15,7 @@ const DashboardFooter = () => {
             TMS Version {version}.
           </Typography>{' '}
           <Typography variant="caption">
-            Copyright ©{' '}
-            <Link href="#">www.example.com</Link>
+            Copyright © <Link href="#">www.example.com</Link>
           </Typography>
         </Box>
         <Typography variant="caption">

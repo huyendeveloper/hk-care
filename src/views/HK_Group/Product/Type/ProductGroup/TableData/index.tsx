@@ -12,7 +12,7 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import {
   TableContent,
@@ -32,7 +32,6 @@ import {
   getAllProductGroup,
 } from 'redux/slices/productGroup';
 import { RootState } from 'redux/store';
-import productGroupService from 'services/productGroup.service';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialog from '../FormDialog';

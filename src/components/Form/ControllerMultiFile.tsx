@@ -10,6 +10,7 @@ interface IProps {
   viewOnly?: boolean;
   max?: number;
   accept?: string;
+  message?: string;
 }
 
 const ControllerMultiFile = ({
@@ -18,12 +19,23 @@ const ControllerMultiFile = ({
   viewOnly,
   max = 6,
   accept = 'application/pdf',
+  message = 'File không đúng định dạng',
 }: IProps) => {
   const setNotification = useNotification();
   const handleChangeFile = (e: any) => {
     const file = e?.target.files[0];
     if (file) {
-      setFiles([...files, file]);
+      if (
+        file.type === 'application/pdf' ||
+        file.type.substr(0, 5) === 'image'
+      ) {
+        setFiles([...files, file]);
+      } else {
+        setNotification({
+          message,
+          severity: 'warning',
+        });
+      }
     }
   };
 
@@ -39,7 +51,7 @@ const ControllerMultiFile = ({
         setFiles(newFiles);
       } else {
         setNotification({
-          message: 'File không đúng định dạng',
+          message,
           severity: 'warning',
         });
       }

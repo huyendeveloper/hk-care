@@ -38,7 +38,7 @@ const ControllerImageField = ({
   const handleChange = () => {
     // @ts-ignore
     const file = inputRef?.current?.files[0];
-    if (file && file.type.substr(0, 5) === 'image') {
+    if (file && file.type && file.type.substr(0, 5) === 'image') {
       setImage(file);
     } else {
       setNotification({

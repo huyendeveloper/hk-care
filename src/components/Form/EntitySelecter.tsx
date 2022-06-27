@@ -50,23 +50,12 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     loading = false,
     ...rest
   } = props;
-
-  const [valueInput, setValueInput] = useState<string>('');
-
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.id;
     const caption = sublabel ? sublabel(option) : null;
     acc[id] = { id, name: renderLabel(option), caption };
     return acc;
   }, {});
-
-  useDebounce(
-    () => {
-      handleChangeInput && handleChangeInput(valueInput);
-    },
-    1500,
-    [valueInput]
-  );
 
   return (
     <Controller
@@ -83,15 +72,19 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
-          renderInput={(params) => (
-            <TextField
-              error={Boolean(error)}
-              helperText={error?.message && error.message}
-              placeholder={placeholder}
-              {...params}
-              {...rest}
-            />
-          )}
+          renderInput={(params) => {
+            // @ts-ignore
+            // params.inputProps.value = params.inputProps.value | defaultLabel;
+            return (
+              <TextField
+                error={Boolean(error)}
+                helperText={error?.message && error.message}
+                placeholder={placeholder}
+                {...params}
+                {...rest}
+              />
+            );
+          }}
           renderOption={(props, option: number) => {
             const { name, caption } = labels[option];
             return (

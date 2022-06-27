@@ -20,6 +20,7 @@ import {
   FormPaperGrid,
   Selecter,
 } from 'components/Form';
+import ChooseOption from 'components/Form/ChooseOption';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { connectURL } from 'config';
@@ -150,9 +151,11 @@ const CreateForm = () => {
     if (files.length > 0) {
       if (
         // @ts-ignore
-        files[0].type === 'application/pdf' ||
+        files[0].type &&
         // @ts-ignore
-        files[0].type.substr(0, 5) === 'image'
+        (files[0].type === 'application/pdf' ||
+          // @ts-ignore
+          files[0].type.substr(0, 5) === 'image')
       ) {
         getPathFile();
       } else {
@@ -342,7 +345,7 @@ const CreateForm = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-                <Selecter
+                <ChooseOption
                   options={productList}
                   renderLabel={(field) => field.productName}
                   noOptionsText="Không tìm thấy sản phẩm"
@@ -421,6 +424,7 @@ const CreateForm = () => {
                     setFiles={setFiles}
                     max={1}
                     accept="image/*,application/pdf"
+                    message="Tài liệu đính kèm chỉ cho phép file pdf và ảnh."
                   />
                 </Grid>
               </Grid>

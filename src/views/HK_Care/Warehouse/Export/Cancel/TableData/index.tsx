@@ -171,7 +171,7 @@ const TableData = () => {
                       </TableCell>
                       <TableCell>{code}</TableCell>
                       <TableCell>
-                        {moment(creationTime).format('DD/MM/YYYY HH:MM')}
+                        {moment(creationTime).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
                       <TableCell>{numberFormat(totalFee)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>

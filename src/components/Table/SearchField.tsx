@@ -77,6 +77,7 @@ const SearchField = (props: Props) => {
           id="search"
           fullWidth
           placeholder={placeHolder}
+          variant="outlined"
           // @ts-ignore
           onChange={handleChange}
           onKeyDown={handleKeyDown}

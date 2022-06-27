@@ -10,11 +10,13 @@ import {
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { ISearchProduct } from 'interface';
+import { useNotification } from 'hooks';
+import { ISalesOrder, ISearchProduct, OrderSales } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProductSales } from 'redux/slices/salesOrder';
+import { useNavigate, useParams } from 'react-router-dom';
+import { addProductSales, createSalesOrder } from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
 import OrderDetail from './OrderDetail';
@@ -72,8 +74,12 @@ const OrderProductForm = ({
   handleSubmit,
   getValues,
   setValue,
+  
 }: IProps) => {
+  const { id } = useParams();
   const cells = useMemo(() => getCells(), []);
+  const setNotification = useNotification();
+  const navigate = useNavigate();
   const { productSales } = useSelector((state: RootState) => state.salesOrder);
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<FilterParams>({
@@ -96,26 +102,43 @@ const OrderProductForm = ({
 
   useEffect(() => {
     if (productSales) {
-      append(productSales);
+      append({
+        ...productSales,
+        // @ts-ignore
+        measureId:
+          // @ts-ignore
+          productSales.measureListDtos.length > 0
+            ? // @ts-ignore
+              productSales.measureListDtos[0].id
+            : null,
+      });
       dispatch(addProductSales(null));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productSales]);
 
-  const onSubmit = async (payload: IForm) => {
-    // const { error } = await dispatch(
-    //   // @ts-ignore
-    //   updateProduct({ ...payload, image })
-    // );
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   return;
-    // }
-    // setNotification({
-    //   message: 'Cập nhật thành công',
-    //   severity: 'success',
-    // });
+  const onSubmit = async (payload: OrderSales) => {
+    console.log('payload', payload);
+    if (payload.createOrderDetailDtos.length < 1) {
+      setNotification({ error: 'Bạn chưa chọn sản phẩm nào!' });
+      return;
+    }
+    const { error } = await dispatch(
+      // @ts-ignore
+      createSalesOrder(payload)
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      return;
+    }
+    setNotification({
+      message: 'Tạo hóa đơn thành công',
+      severity: 'success',
+    });
+    return navigate(`/hk_care/sales/order`);
   };
+
+  
 
   return (
     <FormPaperGrid height="fit-content" onSubmit={handleSubmit(onSubmit)}>

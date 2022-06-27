@@ -1,6 +1,7 @@
 import { Stack } from '@mui/material';
 import { ControllerTextarea } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
+import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -24,7 +25,14 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       )
     : 0;
   const discountValue = useWatch({ control, name: 'disCount' }) || 0;
-  const paid = useWatch({ control, name: 'giveMoney' }) || 0;
+  const paid = useWatch({ control, name: 'moneyToPay' }) || 0;
+  const giveMoney = useWatch({ control, name: 'giveMoney' }) || 0;
+
+  useEffect(() => {
+    console.log('bill :>> ', bill);
+    console.log('discountValue :>> ', bill-(discountValue / 100)*bill);
+    setValue('giveMoney', bill - (discountValue / 100) * bill);
+  }, [bill, discountValue]);
 
   return (
     <Stack p={2} gap={2}>
@@ -51,7 +59,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
         <b>KHÁCH PHẢI TRẢ</b>
-        <div>{numberFormat(bill - (discountValue / 100) * bill)}</div>
+        <div>{numberFormat(giveMoney)}</div>
       </Stack>
       <hr style={{ width: '100%' }} />
       <Stack flexDirection="row" justifyContent="space-between">
@@ -61,10 +69,9 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         <b>Tiền mặt</b>
         <div>
           <ControllerNumberInput
-            name="giveMoney"
+            name="moneyToPay"
             variant="standard"
             setValue={setValue}
-            value={getValues(`giveMoney`)}
             control={control}
           />
         </div>

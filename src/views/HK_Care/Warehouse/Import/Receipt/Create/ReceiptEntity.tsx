@@ -109,6 +109,7 @@ const ReceiptEntity = ({
           name={`${object}.amount`}
           setValue={setValue}
           control={control}
+          defaultValue={getValues(`${object}.amount`)}
         />
       </TableCell>
       <TableCell

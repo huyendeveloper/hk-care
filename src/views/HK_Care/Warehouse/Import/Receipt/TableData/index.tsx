@@ -191,7 +191,7 @@ const TableData = () => {
                       </TableCell>
                       <TableCell>{code}</TableCell>
                       <TableCell>
-                        {moment(creationTime).format('DD/MM/YYYY HH:MM')}
+                        {moment(creationTime).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
                       <TableCell>{numberFormat(moneyToPay)}</TableCell>
                       <TableCell>{numberFormat(debts)}</TableCell>

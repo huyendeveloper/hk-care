@@ -1,36 +1,36 @@
+import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
-
-interface ImportReceipt {
-  toTalMoney: number;
-  vat: number;
-  discountValue: number;
-  moneyToPay: number;
-  paid: number;
-  debts: number;
-  description: string;
-  pathFile: string;
-}
 
 interface IProps {
   control: any;
   setValue: any;
-  importReceipt: ImportReceipt | undefined;
+  getValues: any;
 }
 
-const TotalBill = ({ control, setValue, importReceipt }: IProps) => {
+const TotalBill = ({ control, setValue, getValues }: IProps) => {
+  const exportWHDetails = useWatch({
+    control,
+    name: 'exportWHDetails',
+  });
+
+  const bill = exportWHDetails
+    ? exportWHDetails.reduce(
+        // @ts-ignore
+        (prev, cur) =>
+          prev + (Number(cur?.amount) || 0) * (Number(cur?.importPrice) || 0),
+        0
+      )
+    : 0;
+
   return (
-    <>
-      {importReceipt && (
-        <table style={{ float: 'right' }}>
-          <tbody>
-            <tr>
-              <td>Tổng giá trị hủy:</td>
-              <td>{numberFormat(importReceipt.toTalMoney)}</td>
-            </tr>
-          </tbody>
-        </table>
-      )}
-    </>
+    <table style={{ float: 'right' }}>
+      <tbody>
+        <tr>
+          <td>Tổng giá trị xuất:</td>
+          <td>{numberFormat(bill)}</td>
+        </tr>
+      </tbody>
+    </table>
   );
 };
 

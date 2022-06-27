@@ -293,8 +293,13 @@ const CreateForm = () => {
       data.forEach((item: IProductExportCancel) => {
         // @ts-ignore
         if (!fields.some((e) => e.orderId === item.id)) {
-          // @ts-ignore
-          append({ ...item, orderId: item.id });
+          if (id) {
+            // @ts-ignore
+            append({ ...item, orderId: item.id, id: 0 });
+          } else {
+            // @ts-ignore
+            append({ ...item, orderId: item.id });
+          }
         }
       });
       setFilters({ ...filters, sortBy: '' });

@@ -17,6 +17,7 @@ import UserRoutes from "./User";
 
 // Authentication
 const Login = Loadable(lazy(() => import("views/Login")));
+const NotFound = Loadable(lazy(() => import("views/NotFound")));
 
 const Home = Loadable(lazy(() => import("views/Home")));
 
@@ -30,7 +31,31 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    path: "404",
+    element: (
+      <PrivateRoute>
+        <NotFound />
+      </PrivateRoute>
+    ),
+  },
+  {
     path: "/hk_care/sales/order/create",
+    element: (
+      <PrivateRoute>
+        <CreateSalesOrder />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/hk_care/sales/order/:id/update",
+    element: (
+      <PrivateRoute>
+        <CreateSalesOrder />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/hk_care/sales/order/:id",
     element: (
       <PrivateRoute>
         <CreateSalesOrder />

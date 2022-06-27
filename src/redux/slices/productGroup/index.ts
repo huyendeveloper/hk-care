@@ -5,15 +5,18 @@ import {
   isPending,
   isRejected,
 } from '@reduxjs/toolkit';
+import { defaultFilters } from 'constants/defaultFilters';
+import { stat } from 'fs';
 import { IProductGroup } from 'interface';
 import productGroupService from 'services/productGroup.service';
 import { FilterParams } from 'types';
 
 interface IInitialState {
   loading: boolean;
+  filters: FilterParams;
 }
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = { loading: false, filters: defaultFilters };
 
 export const getAllProductGroup = createAsyncThunk(
   'productGroup/getAll',
@@ -76,13 +79,33 @@ const productGroupSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getAllProductGroup.pending, (state) => {
+    builder.addCase(createProductGroup.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getAllProductGroup.fulfilled, (state) => {
+    builder.addCase(createProductGroup.fulfilled, (state) => {
       state.loading = false;
     });
-    builder.addCase(getAllProductGroup.rejected, (state) => {
+    builder.addCase(createProductGroup.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(deleteProductGroup.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(deleteProductGroup.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(deleteProductGroup.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(updateProductGroup.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateProductGroup.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(updateProductGroup.rejected, (state) => {
       state.loading = false;
     });
   },

@@ -193,6 +193,7 @@ const Details = () => {
                     max={1}
                     viewOnly
                     accept="image/*,application/pdf"
+                    message="Tài liệu đính kèm chỉ cho phép file pdf và ảnh."
                   />
                 </Grid>
               </Grid>
