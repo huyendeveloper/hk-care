@@ -59,7 +59,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
   const { loading } = useSelector((state: RootState) => state.productGroup);
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const { control, handleSubmit, setValue, reset } = useForm<IProductGroup>({
+  const { control, handleSubmit, reset } = useForm<IProductGroup>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -72,10 +72,13 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
   const onSubmit = async (data: IProductGroup) => {
     if (data.id) {
       // @ts-ignore
-      const { error, payload } = await dispatch(updateProductGroup(data));
+      const { error, payload } = await dispatch(
+        // @ts-ignore
+        updateProductGroup({ ...data, name: data.name.trim() })
+      );
       if (error) {
         setNotification({
-          error: payload.response.data || 'Lỗi!',
+          error: payload?.response?.data.errorMessage || 'Lỗi!',
         });
         return;
       }
@@ -85,7 +88,10 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
       });
     } else {
       // @ts-ignore
-      const { error, payload } = await dispatch(createProductGroup(data));
+      const { error, payload } = await dispatch(
+        // @ts-ignore
+        createProductGroup({ ...data, name: data.name.trim() })
+      );
       if (error) {
         setNotification({
           error: payload.response.data || 'Lỗi!',

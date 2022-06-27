@@ -1,13 +1,20 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { TabContext, TabPanel } from '@mui/lab';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { addProductSales, updateOrderSales } from 'redux/slices/salesOrder';
+import { useNavigate, useParams } from 'react-router-dom';
+import { addProductSales, getSaleOrder, updateOrderSales } from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
 import { Header } from '../components';
 import OrderProductForm from './OrderProductForm';
+import * as yup from 'yup';
+import { useNotification } from 'hooks';
+
+const validationSchema = yup.object().shape({
+  disCount: yup.number().default(0),
+});
 
 interface IForm {
   name: string;
@@ -29,18 +36,23 @@ interface IForm {
     night: string;
     description: string;
     billPerProduct: number;
+    measureListDtos: { id: number; name: string; price: number }[];
   }[];
 }
 
 const Create = () => {
-  const [tab, setTab] = useState<string>('0');
-  const [ids, setIds] = useState<number[]>([1]);
+  const { id } = useParams();
+  const setNotification = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [tab, setTab] = useState<string>('0');
+  const [ids, setIds] = useState<number[]>([1]);
   const { orderSales } = useSelector((state: RootState) => state.salesOrder);
 
-  const { control, setValue, getValues, handleSubmit } = useForm<IForm>({
+  const { control, setValue, getValues, handleSubmit, reset } = useForm<IForm>({
     mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+    defaultValues: validationSchema.getDefault(),
   });
 
   const handleSaveCurrentTab = async (newTab: string) => {
@@ -51,7 +63,7 @@ const Create = () => {
     setValue('disCount', orderSale?.disCount || 0);
     setValue('giveMoney', orderSale?.giveMoney || 0);
     setValue('description', orderSale?.description || '');
-    setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
+    // setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
   };
 
   const handleAddTab = () => {
@@ -80,6 +92,37 @@ const Create = () => {
   const addItem = (item: any) => {
     dispatch(addProductSales(item));
   };
+
+  const fetchDataUpdate = async () => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(getSaleOrder(id));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      return;
+    }
+    const {
+      
+    } = payload.saleOrder;
+    console.log('payload.saleOrder', payload.saleOrder)
+
+    // reset({
+    //   totalFee,
+    //   code,
+    //   description,
+    //   from,
+    //   to,
+    //   rotationPoint,
+    //   exportWHDetails,
+    // });
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchDataUpdate();
+    }
+  }, []);
 
   return (
     <Fragment>

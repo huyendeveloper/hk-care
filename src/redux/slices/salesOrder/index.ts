@@ -1,4 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import orderSalesService from 'services/orderSales.service';
+import salesOrderService from 'services/salesOrder.service';
+import { FilterParams } from 'types';
 
 interface OrderSales {
   id: number;
@@ -41,6 +44,61 @@ const initialState: IInitialState = {
     },
   ],
 };
+
+export const createSalesOrder = createAsyncThunk(
+  'salesOrder/create',
+  async (payload: OrderSales, { rejectWithValue }) => {
+    try {
+      const { data } = await orderSalesService.create(payload);
+      // return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getAllSaleOrders = createAsyncThunk(
+  'salesOrder/getAll',
+  async (filters: FilterParams, { rejectWithValue }) => {
+    try {
+      const { data } = await salesOrderService.getAll(filters);
+
+      if (data.items) {
+        const salesOrder = data.items;
+        const totalCount = data.totalCount;
+
+        return {
+          salesOrder,
+          totalCount,
+        };
+      }
+
+      return rejectWithValue('Get data fail');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getSaleOrder = createAsyncThunk(
+  'salesOrder/get',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const { data } = await orderSalesService.get(id);
+      if (data.statusCode === 200) {
+        const saleOrder = data.data;
+
+        return {
+          saleOrder,
+        };
+      }
+
+      return rejectWithValue('Get data fail');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const salesOrderSlice = createSlice({
   name: 'salesOrder',

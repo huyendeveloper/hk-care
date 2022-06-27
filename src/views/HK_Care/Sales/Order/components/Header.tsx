@@ -13,6 +13,7 @@ import { ISearchProduct } from 'interface';
 import { connectURL } from 'config';
 import { TabList } from '@mui/lab';
 import { useFieldArray } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
 interface ITabContent {
   id: number;
@@ -40,6 +41,7 @@ const Header = ({
 }: // tabContents,
 // control,
 IProps) => {
+  const { id } = useParams();
   const [products, setProducts] = useState<ISearchProduct[]>([]);
   const [hidden, setHidden] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
@@ -188,7 +190,7 @@ IProps) => {
           ))}
         </TabList>
 
-        {ids.length < 9 && (
+        {ids.length < 9 && !id && (
           <Stack flexDirection="row" alignItems="center">
             <IconButton onClick={handleAddTab}>
               <AddIcon fontSize="large" style={{ color: 'white' }} />

@@ -354,7 +354,6 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                   </Grid>
                   <Grid item xs={12}>
                     <ControllerTextField
-                      type="number"
                       name="numberRegister"
                       control={control}
                     />
@@ -386,11 +385,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                     <FormLabel title="Số lô" name="lotNumber" />
                   </Grid>
                   <Grid item xs={12}>
-                    <ControllerTextField
-                      type="number"
-                      name="lotNumber"
-                      control={control}
-                    />
+                    <ControllerTextField name="lotNumber" control={control} />
                   </Grid>
                 </Grid>
 
@@ -507,7 +502,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                     <ControllerNumberInput
                       name="importPrice"
                       // @ts-ignore
-                      // value={productDetail?.importPrice || 0}
+                      defaultValue={productDetail?.importPrice || 0}
                       setValue={setValue}
                       control={control}
                     />
@@ -521,7 +516,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
                     <ControllerNumberInput
                       name="price"
                       // @ts-ignore
-                      // value={productDetail?.price || 0}
+                      defaultValue={productDetail?.price || 0}
                       setValue={setValue}
                       control={control}
                     />

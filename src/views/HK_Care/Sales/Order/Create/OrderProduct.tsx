@@ -59,34 +59,37 @@ const OrderProduct = ({
 }: IProps) => {
   const product = useWatch({
     control,
-    name: `createOrderDetailDtos[${index}]`,
+    name: `createOrderDetailDtos.${index}`,
   });
 
   const cells = useMemo(() => getCells(), []);
 
   // @ts-ignore
-  const measures = [];
+  const measures = useWatch({
+    control,
+    name: `createOrderDetailDtos.${index}.measureListDtos`,
+  });
 
-  if (product.priceLevelThird) {
-    measures.push({
-      id: product.mesureNameLevelThird,
-      price: product.priceLevelThird,
-    });
-  }
+  // if (product.priceLevelThird) {
+  //   measures.push({
+  //     id: product.mesureNameLevelThird,
+  //     price: product.priceLevelThird,
+  //   });
+  // }
 
-  if (product.priceLevelSecond) {
-    measures.push({
-      id: product.mesureNameLevelSecond,
-      price: product.priceLevelSecond,
-    });
-  }
+  // if (product.priceLevelSecond) {
+  //   measures.push({
+  //     id: product.mesureNameLevelSecond,
+  //     price: product.priceLevelSecond,
+  //   });
+  // }
 
-  if (product.priceLevelFirst) {
-    measures.push({
-      id: product.mesureNameLevelFirst,
-      price: product.priceLevelFirst,
-    });
-  }
+  // if (product.priceLevelFirst) {
+  //   measures.push({
+  //     id: product.mesureNameLevelFirst,
+  //     price: product.priceLevelFirst,
+  //   });
+  // }
 
   useEffect(() => {
     const price = product.measure
@@ -101,7 +104,7 @@ const OrderProduct = ({
       : 0;
 
     setValue(
-      `createOrderDetailDtos[${index}].billPerProduct`,
+      `createOrderDetailDtos.${index}.billPerProduct`,
       (product.quantity || 0) * price - (product.discount || 0)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,35 +125,37 @@ const OrderProduct = ({
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <EntitySelecter
-          name={`createOrderDetailDtos[${index}].measure`}
+          name={`createOrderDetailDtos.${index}.measureId`}
           control={control}
           options={measures}
-          renderLabel={(field) => field.id}
+          renderLabel={(field) => field.name}
           placeholder=""
           noOptionsText="Không có đơn vị nào có thể chọn"
-          defaultValue={measures.length > 0 ? measures[0].id : null}
         />
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <ControllerNumberInput
-          name={`createOrderDetailDtos[${index}].quantity`}
+          name={`createOrderDetailDtos.${index}.quantity`}
           setValue={setValue}
-          value={getValues(`createOrderDetailDtos[${index}].quantity`)}
+          value={getValues(`createOrderDetailDtos.${index}.quantity`)}
           control={control}
         />
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         {numberFormat(
-          measures.find((x) => x.id === product.measure)?.price ||
+          measures.find(
+            (x: { id: number; name: string; price: number }) =>
+              x.id === product.measure
+          )?.price ||
             measures[0]?.price ||
             0
         )}
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <ControllerNumberInput
-          name={`createOrderDetailDtos[${index}].discount`}
+          name={`createOrderDetailDtos.${index}.discount`}
           setValue={setValue}
-          value={getValues(`createOrderDetailDtos[${index}].discount`)}
+          value={getValues(`createOrderDetailDtos.${index}.discount`)}
           control={control}
         />
       </TableCell>
@@ -171,41 +176,41 @@ const OrderProduct = ({
               <TableRow>
                 <TableCell sx={{ width: '100px !important' }}>
                   <ControllerTextField
-                    name={`createOrderDetailDtos[${index}].mor`}
+                    name={`createOrderDetailDtos.${index}.mor`}
                     variant="standard"
                     control={control}
                     defaultValue={getValues(
-                      `createOrderDetailDtos[${index}].mor`
+                      `createOrderDetailDtos.${index}.mor`
                     )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '100px !important' }}>
                   <ControllerTextField
-                    name={`createOrderDetailDtos[${index}].noon`}
+                    name={`createOrderDetailDtos.${index}.noon`}
                     variant="standard"
                     control={control}
                     defaultValue={getValues(
-                      `createOrderDetailDtos[${index}].noon`
+                      `createOrderDetailDtos.${index}.noon`
                     )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '100px !important' }}>
                   <ControllerTextField
-                    name={`createOrderDetailDtos[${index}].night`}
+                    name={`createOrderDetailDtos.${index}.night`}
                     variant="standard"
                     control={control}
                     defaultValue={getValues(
-                      `createOrderDetailDtos[${index}].night`
+                      `createOrderDetailDtos.${index}.night`
                     )}
                   />
                 </TableCell>
                 <TableCell sx={{ width: '200px !important' }}>
                   <ControllerTextField
-                    name={`createOrderDetailDtos[${index}].description`}
+                    name={`createOrderDetailDtos.${index}.description`}
                     variant="standard"
                     control={control}
                     defaultValue={getValues(
-                      `createOrderDetailDtos[${index}].description`
+                      `createOrderDetailDtos.${index}.description`
                     )}
                   />
                 </TableCell>

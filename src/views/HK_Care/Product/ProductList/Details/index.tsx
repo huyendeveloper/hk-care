@@ -261,7 +261,6 @@ const DetailsForm = () => {
               <Grid item xs={12} md={6}>
                 <FormLabel title="Số đăng ký" name="numberRegister" />
                 <ControllerTextField
-                  type="number"
                   name="numberRegister"
                   control={control}
                   disabled
@@ -286,7 +285,6 @@ const DetailsForm = () => {
               <Grid item xs={12} md={6}>
                 <FormLabel title="Số lô" name="lotNumber" />
                 <ControllerTextField
-                  type="number"
                   name="lotNumber"
                   control={control}
                   disabled

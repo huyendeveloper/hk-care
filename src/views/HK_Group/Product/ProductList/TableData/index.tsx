@@ -272,7 +272,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={loading}>
+      <TableContent total={productList.length} loading={false}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -349,7 +349,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
 
       <DeleteDialog
         id={currentID}
-        tableName="sảm phẩm"
+        tableName="sản phẩm"
         name={productList.find((x) => x.id === currentID)?.name}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}

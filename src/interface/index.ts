@@ -188,11 +188,38 @@ export interface IImportReceipt {
 
 export interface ISalesOrder {
   id: number;
-  salesDate: Date;
+  saleDate: Date;
   customer: string;
   type: string;
   saler: string;
   pay: number;
+  code: string;
+  customerName: string;
+  orderType: string;
+  userName: string;
+  giveMoney: number;
+  orderId: number;
+}
+
+export interface OrderSales {
+  id: number;
+  disCount: number;
+  giveMoney: number;
+  description: string;
+  createOrderDetailDtos: {
+    productId: number;
+    productName: string;
+    quantity: number;
+    price: number;
+    measureId: number;
+    measureName: string;
+    discount: number;
+    mor: string;
+    noon: string;
+    night: string;
+    description: string;
+    billPerProduct: number;
+  }[];
 }
 
 export interface ISearchProduct {
@@ -224,6 +251,9 @@ export interface IProductExportCancel {
   productName: string;
   id: number;
   creationTime: Date;
+  cancellationPrice: number;
+  code: string;
+  exportWHId: number;
 }
 
 export interface IExportCancel {
@@ -237,4 +267,18 @@ export interface IExportCancel {
   id: number;
   rotationPoint: string;
   exportWHDetails: IProductExportCancel[];
+}
+
+export interface IExportWHRotation {
+  id: number;
+  totalFee: number;
+  code: string;
+  description: string;
+  from: number;
+  to: number;
+  exportType: number;
+  rotationPoint: string;
+  exportWHId: number;
+  exportWHDetails: IProductExportCancel[];
+  __tenant: string;
 }

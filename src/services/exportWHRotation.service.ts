@@ -1,6 +1,6 @@
 import axiosClient from 'api';
 import { baseURL } from 'config';
-import { IExportCancel } from 'interface';
+import { IExportWHRotation } from 'interface';
 import { FilterParams } from 'types';
 import DateFns from 'utils/DateFns';
 
@@ -10,32 +10,35 @@ interface IDetailAdd {
   to: number | null;
 }
 
-class ExportCancelService {
+class ExportWHRotationService {
   getProductList({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(`${baseURL}/exportWH/GetAllNameCancelExport`);
+    return axiosClient.get(`${baseURL}/exportWH/GetAllNameRotationExport`);
   }
 
-  addToListExportCancel({ productId, from, to }: IDetailAdd) {
+  addToListExportWHRotation(productId: number) {
     return axiosClient.get(
-      `${baseURL}/exportWH/AddToListExportCancel?productId=${productId}&from=${
-        from || '-1'
-      }&to=${to || '-1'}`
+      `${baseURL}/exportWH/AddToListExportRotation/${productId}`
     );
   }
 
-  create(payload: IExportCancel) {
-    return axiosClient.post(`${baseURL}/exportWH/Create`, payload);
-  }
-
-  update(payload: IExportCancel) {
-    return axiosClient.put(
-      `${baseURL}/exportWH/UpdateAsync/${payload.id}`,
+  create(payload: IExportWHRotation) {
+    return axiosClient.post(
+      `${baseURL}/exportWH/CreateExportRotation`,
       payload
     );
   }
 
-  getGetDetail(id: number) {
-    return axiosClient.get(`${baseURL}/exportWH/GetDetailUpdate/${id}`);
+  update(payload: IExportWHRotation) {
+    return axiosClient.put(
+      `${baseURL}/exportWH/UpdateExportRotation/${payload.exportWHId}`,
+      payload
+    );
+  }
+
+  getDetail(id: number, childId: number) {
+    return axiosClient.get(`${baseURL}/exportWH/GetDetailRotation/${id}`, {
+      params: { childId },
+    });
   }
 
   getAll({
@@ -47,7 +50,7 @@ class ExportCancelService {
     lastDate,
   }: FilterParams) {
     return axiosClient.get(
-      `${baseURL}/exportWH/SearchAll?Keyword=${searchText}&SkipCount=${
+      `${baseURL}/exportWH/GetAllRotationExport?Keyword=${searchText}&SkipCount=${
         (pageIndex - 1) * pageSize
       }&MaxResultCount=${pageSize}&startDate=${
         startDate ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00' : ''
@@ -58,4 +61,4 @@ class ExportCancelService {
   }
 }
 
-export default new ExportCancelService();
+export default new ExportWHRotationService();

@@ -55,9 +55,9 @@ const HKGroupRoutes: RouteObject = {
             { index: true, element: <CirculationInvoice /> },
             { path: "create", element: <CreateCirculationInvoice /> },
 
-            { path: ":id", element: <CirculationInvoiceDetail /> },
+            { path: ":id/:exportWHId", element: <CirculationInvoiceDetail /> },
             {
-              path: ":id/update",
+              path: ":id/:exportWHId/update",
               element: <CreateCirculationInvoice /> 
             },
           ],

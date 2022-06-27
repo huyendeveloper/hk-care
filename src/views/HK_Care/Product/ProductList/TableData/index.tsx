@@ -130,7 +130,8 @@ const TableData = ({ active = 1 }: IProps) => {
       severity: 'success',
     });
 
-    setProductList(productList.filter((x) => x.productId !== currentID));
+    // setProductList(productList.filter((x) => x.productId !== currentID));
+    fetchData();
   };
 
   const handleCloseUpdateDialog = () => {
@@ -176,7 +177,7 @@ const TableData = ({ active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={loading}>
+      <TableContent total={productList.length} loading={false}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

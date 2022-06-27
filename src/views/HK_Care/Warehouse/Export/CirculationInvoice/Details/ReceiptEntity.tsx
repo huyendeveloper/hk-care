@@ -1,36 +1,47 @@
 import { TableCell, TableRow } from '@mui/material';
+import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
-import { IReceipt } from 'interface';
-import DateFns from 'utils/DateFns';
+import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
   item: any;
   index: number;
-  value: IReceipt;
+  setValue: any;
+  getValues: any;
+  arrayName: string;
+  control: any;
 }
 
-const ReceiptEntity = ({ item, index, value }: IProps) => {
+const ReceiptEntity = ({
+  item,
+  index,
+  setValue,
+  getValues,
+  arrayName,
+  control,
+}: IProps) => {
   const { productId } = item;
+  const object = `${arrayName}.${index}`;
+
+  const amount = useWatch({
+    control,
+    name: `${object}.amount`,
+  });
 
   return (
     <TableRow hover tabIndex={-1} key={productId}>
       <TableCell>
         {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
       </TableCell>
-      <TableCell>{value.name}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{value.measure}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{value.amount}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(value.importPrice)}
+      <TableCell>{getValues(`${object}.productName`)}</TableCell>
+      <TableCell>{getValues(`${object}.measureName`)}</TableCell>
+      <TableCell sx={{ width: '150px !important' }}>
+        {numberFormat(getValues(`${object}.amount`))}
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>{numberFormat(value.price)}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        HK23467
-      </TableCell>
-       
-      <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(value.expiryDate)}
+      <TableCell>{numberFormat(getValues(`${object}.importPrice`))}</TableCell>
+      <TableCell>
+        {numberFormat(getValues(`${object}.importPrice`) * amount)}
       </TableCell>
     </TableRow>
   );
