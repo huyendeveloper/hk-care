@@ -8,6 +8,8 @@ interface OrderSales {
   disCount: number;
   giveMoney: number;
   description: string;
+  orderId?: number;
+  moneyToPay: number;
   createOrderDetailDtos: {
     productId: number;
     productName: string;
@@ -33,7 +35,6 @@ interface IInitialState {
 const initialState: IInitialState = {
   loading: false,
   productSales: null,
-
   orderSales: [
     {
       id: 1,
@@ -41,6 +42,7 @@ const initialState: IInitialState = {
       giveMoney: 0,
       description: '',
       createOrderDetailDtos: [],
+      moneyToPay: 0,
     },
   ],
 };
@@ -51,6 +53,17 @@ export const createSalesOrder = createAsyncThunk(
     try {
       const { data } = await orderSalesService.create(payload);
       // return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateSalesOrder = createAsyncThunk(
+  'salesOrder/update',
+  async (payload: OrderSales, { rejectWithValue }) => {
+    try {
+      await orderSalesService.update(payload);
     } catch (error) {
       return rejectWithValue(error);
     }

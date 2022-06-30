@@ -16,11 +16,13 @@ class ExportCancelService {
   }
 
   addToListExportCancel({ productId, from, to }: IDetailAdd) {
-    return axiosClient.get(
-      `${baseURL}/exportWH/AddToListExportCancel?productId=${productId}&from=${
-        from || '-1'
-      }&to=${to || '-1'}`
-    );
+    return axiosClient.get(`${baseURL}/exportWH/AddToListExportCancel`, {
+      params: {
+        productId,
+        from: from || -1,
+        to: to || -1,
+      },
+    });
   }
 
   create(payload: IExportCancel) {

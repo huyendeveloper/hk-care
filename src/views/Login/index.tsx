@@ -171,9 +171,11 @@ const Login = () => {
               </FormGroup>
               <LoadingButton
                 loading={loading}
+                loadingPosition="start"
                 fullWidth
                 type="submit"
                 sx={{ mt: 3, mb: 1.5 }}
+                startIcon={<></>}
               >
                 Đăng nhập
               </LoadingButton>

@@ -70,31 +70,20 @@ const OrderProduct = ({
     name: `createOrderDetailDtos.${index}.measureListDtos`,
   });
 
-  // if (product.priceLevelThird) {
-  //   measures.push({
-  //     id: product.mesureNameLevelThird,
-  //     price: product.priceLevelThird,
-  //   });
-  // }
+  const measureId = useWatch({
+    control,
+    name: `createOrderDetailDtos.${index}.measureId`,
+  });
 
-  // if (product.priceLevelSecond) {
-  //   measures.push({
-  //     id: product.mesureNameLevelSecond,
-  //     price: product.priceLevelSecond,
-  //   });
-  // }
-
-  // if (product.priceLevelFirst) {
-  //   measures.push({
-  //     id: product.mesureNameLevelFirst,
-  //     price: product.priceLevelFirst,
-  //   });
-  // }
+  const price = useWatch({
+    control,
+    name: `createOrderDetailDtos.${index}.price`,
+  });
 
   useEffect(() => {
-    const price = product.measure
+    const price = measureId
       ? // @ts-ignore
-        measures.find((x) => x.id === product.measure)?.price ||
+        measures.find((x) => x.id === measureId)?.price ||
         // @ts-ignore
         measures[0]?.price ||
         0
@@ -103,12 +92,14 @@ const OrderProduct = ({
         measures[0]?.price
       : 0;
 
+    setValue(`createOrderDetailDtos.${index}.price`, price);
+
     setValue(
       `createOrderDetailDtos.${index}.billPerProduct`,
       (product.quantity || 0) * price - (product.discount || 0)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.quantity, product.measure, product.discount]);
+  }, [product.quantity, measureId, product.discount]);
 
   const handleOnSort = (field: string) => {};
 
@@ -142,14 +133,7 @@ const OrderProduct = ({
         />
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
-        {numberFormat(
-          measures.find(
-            (x: { id: number; name: string; price: number }) =>
-              x.id === product.measure
-          )?.price ||
-            measures[0]?.price ||
-            0
-        )}
+        {numberFormat(price)}
       </TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <ControllerNumberInput

@@ -1,32 +1,24 @@
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
+import { TabList } from '@mui/lab';
 import { IconButton, Stack, Tab } from '@mui/material';
 import { Box } from '@mui/system';
 import { LinkIconButton } from 'components/common';
 import SearchField from 'components/Table/SearchField';
-import React, { useEffect, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
-import { FilterParams } from 'types';
-import { defaultFilters } from 'constants/defaultFilters';
-import salesOrderService from 'services/salesOrder.service';
-import { ISearchProduct } from 'interface';
 import { connectURL } from 'config';
-import { TabList } from '@mui/lab';
-import { useFieldArray } from 'react-hook-form';
+import { defaultFilters } from 'constants/defaultFilters';
+import { ISearchProduct } from 'interface';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-interface ITabContent {
-  id: number;
-  products: ISearchProduct[];
-}
+import salesOrderService from 'services/salesOrder.service';
+import { FilterParams } from 'types';
 
 interface IProps {
   tab: string;
-  // tabContents: ITabContent[];
   handleAddTab: () => void;
   handleRemoveTab: (index: number) => void;
   handleChange: (event: React.SyntheticEvent, newValue: string) => void;
-  // control: any;
   ids: number[];
   addItem: (item: any) => void;
 }
@@ -38,19 +30,11 @@ const Header = ({
   handleRemoveTab,
   handleChange,
   addItem,
-}: // tabContents,
-// control,
-IProps) => {
+}: IProps) => {
   const { id } = useParams();
   const [products, setProducts] = useState<ISearchProduct[]>([]);
   const [hidden, setHidden] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-
-  // const { fields, append, remove } = useFieldArray<ISearchProduct>({
-  //   control,
-  //   // @ts-ignore
-  //   name: `tabContents[${tab}].products`,
-  // });
 
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
@@ -126,8 +110,7 @@ IProps) => {
                   justifyContent="space-between"
                   alignItems="center"
                   key={index}
-                  // @ts-ignore
-                  onClick={() => addItem(item)}
+                  onClick={() => addItem({ ...item, quantity: 1 })}
                   p={2}
                   sx={{ borderBottom: '1px solid #d9d9d9' }}
                 >
@@ -137,8 +120,6 @@ IProps) => {
                       sx={{
                         width: '100px',
                         height: '70px',
-                        backgroundImage:
-                          'https://www.vigcenter.com/public/all/images/default-image.jpg',
                       }}
                       src={`${connectURL}/${item.productImage}`}
                       alt=""

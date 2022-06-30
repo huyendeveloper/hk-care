@@ -42,18 +42,16 @@ const TableHeader = <T extends Dictionary>(props: Props<T>) => {
                 <TableSortLabel
                   active={sortBy === id}
                   direction={
-                    sortBy === id && sortDirection ? sortDirection : undefined
+                    sortBy === id && sortDirection ? sortDirection : 'desc'
                   }
                   onClick={handleOnSort(id)}
                 >
                   {label}
-                  {sortBy === id ? (
-                    <Box component="span" sx={visuallyHidden}>
-                      {sortDirection === 'desc'
-                        ? 'sorted descending'
-                        : 'sorted ascending'}
-                    </Box>
-                  ) : null}
+                  <Box component="span" sx={visuallyHidden}>
+                    {sortDirection === 'desc'
+                      ? 'sorted descending'
+                      : 'sorted ascending'}
+                  </Box>
                 </TableSortLabel>
               ) : (
                 <div style={{ fontSize: '1.125rem' }}>{label}</div>

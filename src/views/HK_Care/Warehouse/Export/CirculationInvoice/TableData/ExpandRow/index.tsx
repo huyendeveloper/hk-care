@@ -49,7 +49,7 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
         <TableCell
           colSpan={1}
           sx={{
-            padding: '16px',
+            padding: '17px',
             display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',

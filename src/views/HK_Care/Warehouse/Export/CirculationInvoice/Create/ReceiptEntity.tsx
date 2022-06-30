@@ -1,4 +1,5 @@
-import { TableCell, TableRow } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { IconButton, TableCell, TableRow } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useWatch } from 'react-hook-form';
@@ -11,6 +12,7 @@ interface IProps {
   getValues: any;
   arrayName: string;
   control: any;
+  remove: any;
 }
 
 const ReceiptEntity = ({
@@ -20,6 +22,7 @@ const ReceiptEntity = ({
   getValues,
   arrayName,
   control,
+  remove,
 }: IProps) => {
   const { productId } = item;
   const object = `${arrayName}.${index}`;
@@ -47,6 +50,15 @@ const ReceiptEntity = ({
       <TableCell>{numberFormat(getValues(`${object}.importPrice`))}</TableCell>
       <TableCell>
         {numberFormat(getValues(`${object}.importPrice`) * amount)}
+      </TableCell>
+      <TableCell align="right">
+        <IconButton
+          onClick={() => {
+            remove(index);
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </TableCell>
     </TableRow>
   );

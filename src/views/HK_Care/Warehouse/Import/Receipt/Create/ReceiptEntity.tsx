@@ -137,7 +137,7 @@ const ReceiptEntity = ({
       >
         <ControllerNumberInput
           name={`${object}.discount`}
-          // value={getValues(`${object}.discount`)}
+          defaultValue={getValues(`${object}.discount`)}
           setValue={setValue}
           control={control}
         />

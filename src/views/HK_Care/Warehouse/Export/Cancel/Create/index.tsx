@@ -37,20 +37,13 @@ import {
 } from 'redux/slices/exportCancel';
 import { RootState } from 'redux/store';
 import exportCancelService from 'services/exportCancel.service';
-import importReceiptService from 'services/importReceipt.service';
 import { FilterParams } from 'types';
 import * as yup from 'yup';
 import TableHeader from '../components/TableHeader';
 import ReceiptEntity from './ReceiptEntity';
 import TotalBill from './TotalBill';
 
-const validationSchema = yup.object().shape({
-  exportWHDetails: yup.array().of(
-    yup.object().shape({
-      lotNumber: yup.string().required('Bắt buộc'),
-    })
-  ),
-});
+const validationSchema = yup.object().shape({});
 
 interface IDetailAdd {
   productId: number | null;
@@ -96,17 +89,16 @@ const CreateForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const setNotification = useNotification();
+
+  const { loading : loadingProduct } = useSelector((state: RootState) => state.productList);
   const [productList, setProductList] = useState<IProductListName[]>([]);
-  const { loading } = useSelector((state: RootState) => state.productList);
-  const [files, setFiles] = useState<File[] | object[]>([]);
-  const [pathFile, setPathFile] = useState<string>('');
-  const [totalRows, setTotalRows] = useState<number>(0);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [loading, setLoading] = useState<boolean>(false);
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     productId: null,
-    from: -1,
-    to: -1,
+    from: null,
+    to: null,
   });
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -123,31 +115,7 @@ const CreateForm = () => {
     }));
   };
 
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-
   const cells = useMemo(() => getCells(), []);
-
-  const getPathFile = async () => {
-    const { data } = await importReceiptService.getPathFileReceipt(files[0]);
-    setPathFile(data);
-  };
-
-  useEffect(() => {
-    if (files.length > 0) {
-      // @ts-ignore
-      if (files[0].type === 'application/pdf') {
-        getPathFile();
-      } else {
-        // @ts-ignore
-        setPathFile(files[0].name);
-      }
-    } else {
-      setPathFile('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]);
 
   const {
     control,
@@ -177,22 +145,13 @@ const CreateForm = () => {
       });
       return;
     }
-    const {
-      totalFee,
-      code,
-      description,
-      from,
-      to,
-      rotationPoint,
-      exportWHDetails,
-    } = payload.exportCancel;
+    const { totalFee, code, description, rotationPoint, exportWHDetails } =
+      payload.exportCancel;
 
     reset({
       totalFee,
       code,
       description,
-      from,
-      to,
       rotationPoint,
       exportWHDetails,
     });
@@ -214,16 +173,18 @@ const CreateForm = () => {
   };
 
   useEffect(() => {
+    if (detailAdd.from !== -1 && detailAdd.to === -1) {
+      setDetailAdd({ ...detailAdd, to: 3 });
+    }
+  }, [detailAdd]);
+
+  useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmit = async (data: IExportCancel) => {
-    // @ts-ignore
-    if (data?.exportWHDetails?.length < 1) {
-      setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
-      return;
-    }
+    setLoading(true);
     const newPayload = {
       ...data,
       totalFee:
@@ -250,7 +211,7 @@ const CreateForm = () => {
       });
       return navigate(`/hk_care/warehouse/export/cancel`);
     }
-    const { payload, error } = await dispatch(
+    const { error } = await dispatch(
       // @ts-ignore
       createExportWH(newPayload)
     );
@@ -262,6 +223,7 @@ const CreateForm = () => {
       message: 'Thêm thành công',
       severity: 'success',
     });
+    setLoading(false);
     return navigate(`/hk_care/warehouse/export/cancel`);
   };
 
@@ -269,21 +231,13 @@ const CreateForm = () => {
     setFilters((state) => ({
       ...state,
       sortBy: field,
-      sortDirection:
-        state.sortBy !== field
-          ? 'asc'
-          : state.sortDirection === 'asc'
-          ? 'desc'
-          : 'asc',
+      sortDirection: state.sortDirection === 'asc' ? 'desc' : 'asc',
     }));
   };
 
   const addProduct = async () => {
-    if (!detailAdd.productId) {
-      setNotification({
-        message: 'Chưa chọn sản phẩm!',
-        severity: 'warning',
-      });
+    if (detailAdd.from === null || detailAdd.to === null) {
+      setNotification({ error: 'Chưa chọn khoảng thời gian sử dụng!' });
       return;
     }
     try {
@@ -310,16 +264,16 @@ const CreateForm = () => {
 
   const handleSort = () => {
     if (filters.sortBy) {
-      const fieldsSort = [
-        ...fields.sort((a, b) => {
-          // @ts-ignore
-          const c = a[filters.sortBy];
-          // @ts-ignore
-          const d = b[filters.sortBy];
-          // @ts-ignore
-          return c - d;
-        }),
-      ];
+      const fieldsSort = [...fields];
+      fieldsSort.sort((a, b) => {
+        // @ts-ignore
+        const c = new Date(a[filters.sortBy]);
+        // @ts-ignore
+        const d = new Date(b[filters.sortBy]);
+        // @ts-ignore
+        return c - d;
+      });
+
       setValue(
         'exportWHDetails',
         filters.sortDirection === 'desc' ? fieldsSort.reverse() : fieldsSort
@@ -334,6 +288,7 @@ const CreateForm = () => {
 
   useEffect(() => {
     handleSort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.sortBy, filters.sortDirection]);
 
   return (
@@ -346,20 +301,6 @@ const CreateForm = () => {
       >
         <Grid container spacing={2}>
           <Grid item xs={12} md={5}>
-            <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-            <Selecter
-              renderValue="id"
-              options={productList}
-              renderLabel={(field) => field.name}
-              noOptionsText="Không tìm thấy sản phẩm"
-              placeholder=""
-              onChangeSelect={(value: number | null) =>
-                setDetailAdd({ ...detailAdd, productId: value })
-              }
-              loading={loading}
-            />
-          </Grid>
-          <Grid item xs={12} md={7}>
             <FormLabel title="Thời gian sử dụng còn" name="name" />
             <Grid container spacing={1}>
               <Grid
@@ -374,7 +315,7 @@ const CreateForm = () => {
                   noOptionsText="Không tìm thấy sản phẩm"
                   renderValue="id"
                   placeholder=""
-                  defaultValue={'<0'}
+                  defaultValue=""
                   onChangeSelect={(value: number | null) =>
                     setDetailAdd({ ...detailAdd, from: value })
                   }
@@ -387,15 +328,38 @@ const CreateForm = () => {
               >
                 <FormLabel title="Đến:" name="name" />
                 <Selecter
-                  options={toList}
+                  options={
+                    detailAdd.from === -1 || detailAdd.from === null
+                      ? toList
+                      : [...toList].splice(2, toList.length)
+                  }
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy sản phẩm"
                   renderValue="id"
                   placeholder=""
-                  defaultValue={'<0'}
+                  defaultValue=""
                   onChangeSelect={(value: number | null) =>
                     setDetailAdd({ ...detailAdd, to: value })
                   }
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} md={7}>
+            <FormLabel title="Tìm kiếm sản phẩm" name="name" />
+            <Grid container spacing={1}>
+              <Grid item xs={8}>
+                <Selecter
+                  renderValue="id"
+                  options={productList}
+                  renderLabel={(field) => field.name}
+                  noOptionsText="Không tìm thấy sản phẩm"
+                  placeholder=""
+                  onChangeSelect={(value: number | null) =>
+                    setDetailAdd({ ...detailAdd, productId: value })
+                  }
+                  defaultValue=""
+                  loading={loadingProduct}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -412,17 +376,6 @@ const CreateForm = () => {
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
-              {/* <Grid item xs={12}>
-                <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-                <Selecter
-                  options={productList}
-                  renderLabel={(field) => field.productName}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  placeholder=""
-                  onChangeSelect={onChangeSelect}
-                  loading={loading}
-                />
-              </Grid> */}
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
                   <TableContent total={1} noDataText=" " loading={false}>
@@ -504,7 +457,7 @@ const CreateForm = () => {
         <FormFooter>
           <LinkButton to="/hk_care/warehouse/export/cancel">Hủy</LinkButton>
 
-          <LoadingButton type="submit">
+          <LoadingButton loading={loading} type="submit">
             {id ? 'Lưu' : 'Xuất hàng'}
           </LoadingButton>
         </FormFooter>

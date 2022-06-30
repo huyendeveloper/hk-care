@@ -8,7 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
@@ -17,16 +17,15 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deleteProductList, getAllProduct } from 'redux/slices/productList';
-import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
@@ -54,7 +53,7 @@ const TableData = ({ active = 1 }: IProps) => {
   const [productList, setProductList] = useState<IProductList[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.productList);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
 
@@ -70,10 +69,13 @@ const TableData = ({ active = 1 }: IProps) => {
     }
     setProductList(payload.productList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
@@ -177,7 +179,7 @@ const TableData = ({ active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={false}>
+      <TableContent total={productList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
