@@ -59,7 +59,7 @@ const TableData = () => {
   const [exportCancel, setImportReceipt] = useState<IExportCancel[]>([]);
 
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.usage);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
@@ -74,9 +74,11 @@ const TableData = () => {
 
     setImportReceipt(payload.exportWHList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);

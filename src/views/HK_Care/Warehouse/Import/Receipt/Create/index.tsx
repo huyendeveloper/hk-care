@@ -174,6 +174,7 @@ const CreateForm = () => {
     getValues,
     handleSubmit,
     register,
+    reset,
     formState: { errors },
   } = useForm<IReceipt>({
     mode: 'onChange',
@@ -195,25 +196,31 @@ const CreateForm = () => {
       return;
     }
 
-    const importReceipt = payload.importReceipt;
+    const {
+      pathFile,
+      description,
+      vat,
+      discountValue,
+      paid,
+      listProductReceiptWH,
+    } = payload.importReceipt;
 
     const fileList: object[] = [];
-    importReceipt.pathFile &&
+    pathFile &&
       fileList.push({
-        name: `${connectURL}/${importReceipt.pathFile}`,
+        name: `${connectURL}/${pathFile}`,
       });
 
     setFiles(fileList);
-    importReceipt.pathFile
-      ? setPathFile(`${connectURL}/${importReceipt.pathFile}`)
-      : setPathFile('');
-    setValue('description', importReceipt.description);
-    setValue('vat', importReceipt.vat);
+    pathFile ? setPathFile(`${connectURL}/${pathFile}`) : setPathFile('');
 
-    setValue('discountValue', importReceipt.discountValue);
-    setValue('paid', importReceipt.paid);
-
-    setValue('productReceiptWHDtos', importReceipt.listProductReceiptWH);
+    reset({
+      description,
+      vat,
+      discountValue,
+      paid,
+      productReceiptWHDtos: listProductReceiptWH,
+    });
   };
 
   const fetchData = async () => {
@@ -286,12 +293,12 @@ const CreateForm = () => {
       ),
     };
     if (id) {
-      const { error } = await dispatch(
+      const { error, payload } = await dispatch(
         // @ts-ignore
         updateImportReceipt({ ...newPayload, pathFile, id })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
         return;
       }
       setNotification({
@@ -300,7 +307,7 @@ const CreateForm = () => {
       });
       return navigate(`/hk_care/warehouse/import/receipt`);
     }
-    const { payload, error } = await dispatch(
+    const {  error } = await dispatch(
       // @ts-ignore
       createImportReceipt({ ...newPayload, pathFile })
     );

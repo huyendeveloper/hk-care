@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
@@ -11,35 +12,30 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
-import { BlockDialog, UnBlockDialog } from 'components/Dialog';
+import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
-  changeStatus,
-  getAllProduct,
-  deleteProduct,
+  changeStatus, deleteProduct, getAllProduct
 } from 'redux/slices/product';
-import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
 import FormDialog from '../FormDialog';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { DeleteDialog } from 'components/Dialog';
 
 const getCells = (): Cells<IProduct> => [
   { id: 'id', label: 'STT' },
@@ -66,7 +62,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.product);
+  const [loading, setLoading] = useState<boolean>(true);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
@@ -85,9 +81,11 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     }
     setProductList(payload.productList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -272,7 +270,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={false}>
+      <TableContent total={productList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

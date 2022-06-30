@@ -29,9 +29,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
   const giveMoney = useWatch({ control, name: 'giveMoney' }) || 0;
 
   useEffect(() => {
-    console.log('bill :>> ', bill);
-    console.log('discountValue :>> ', bill-(discountValue / 100)*bill);
     setValue('giveMoney', bill - (discountValue / 100) * bill);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bill, discountValue]);
 
   return (
@@ -54,6 +53,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             type="percent"
             value={getValues(`disCount`)}
             control={control}
+            inputProps={{ style: { textAlign: 'right' } }}
           />
         </div>
       </Stack>
@@ -73,6 +73,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             variant="standard"
             setValue={setValue}
             control={control}
+            value={getValues('moneyToPay')}
+            inputProps={{ style: { textAlign: 'right' } }}
           />
         </div>
       </Stack>

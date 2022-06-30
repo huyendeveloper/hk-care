@@ -1,6 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import { Grid, Paper, Table, TableBody, TableContainer } from '@mui/material';
-import { Scrollbar } from 'components/common';
+import { LinkButton, Scrollbar } from 'components/common';
 import {
   FormContent,
   FormFooter,
@@ -16,7 +16,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addProductSales, createSalesOrder } from 'redux/slices/salesOrder';
+import {
+  addProductSales,
+  createSalesOrder,
+  updateSalesOrder,
+} from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
 import OrderDetail from './OrderDetail';
@@ -28,6 +32,7 @@ interface IProps {
   handleSubmit: any;
   setValue: any;
   getValues: any;
+  handleDelete: () => void;
 }
 
 interface IForm {
@@ -74,7 +79,7 @@ const OrderProductForm = ({
   handleSubmit,
   getValues,
   setValue,
-  
+  handleDelete,
 }: IProps) => {
   const { id } = useParams();
   const cells = useMemo(() => getCells(), []);
@@ -118,27 +123,40 @@ const OrderProductForm = ({
   }, [productSales]);
 
   const onSubmit = async (payload: OrderSales) => {
-    console.log('payload', payload);
     if (payload.createOrderDetailDtos.length < 1) {
       setNotification({ error: 'Bạn chưa chọn sản phẩm nào!' });
       return;
     }
-    const { error } = await dispatch(
-      // @ts-ignore
-      createSalesOrder(payload)
-    );
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      return;
+    if (id) {
+      const { error } = await dispatch(
+        // @ts-ignore
+        updateSalesOrder({ ...payload, orderId: id })
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi!' });
+        return;
+      }
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+      return navigate(`/hk_care/sales/order`);
+    } else {
+      const { error } = await dispatch(
+        // @ts-ignore
+        createSalesOrder(payload)
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi!' });
+        return;
+      }
+      setNotification({
+        message: 'Tạo hóa đơn thành công',
+        severity: 'success',
+      });
+      handleDelete();
     }
-    setNotification({
-      message: 'Tạo hóa đơn thành công',
-      severity: 'success',
-    });
-    return navigate(`/hk_care/sales/order`);
   };
-
-  
 
   return (
     <FormPaperGrid height="fit-content" onSubmit={handleSubmit(onSubmit)}>
@@ -187,7 +205,8 @@ const OrderProductForm = ({
         </Grid>
       </FormContent>
       <FormFooter>
-        <LoadingButton type="submit">THANH TOÁN</LoadingButton>
+        {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
+        <LoadingButton type="submit">{id ? 'Lưu' : 'Thanh toán'}</LoadingButton>
       </FormFooter>
     </FormPaperGrid>
   );

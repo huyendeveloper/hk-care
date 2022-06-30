@@ -15,7 +15,6 @@ const CreateForm = () => {
     useState<IExportWHRotation | null>(null);
 
   const fetchDataUpdate = async () => {
-    console.log('first');
     // @ts-ignore
     const { payload, error } = await dispatch(
       // @ts-ignore
@@ -26,8 +25,6 @@ const CreateForm = () => {
       setNotification({ error: 'Lỗi!' });
       return;
     }
-
-    console.log('payload.exportWHRotation', payload.exportWHRotation);
 
     setExportWHRotation(payload.exportWHRotation);
   };

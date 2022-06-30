@@ -48,7 +48,7 @@ const getCells = (): Cells<IExportCancel> => [
   { id: 'code', label: 'Giá vốn' },
   { id: 'code', label: 'Giá trị hủy' },
   { id: 'code', label: 'Số lô' },
-  { id: 'code', label: 'Ngày nhập' },
+  { id: 'creationTime', label: 'Ngày nhập' },
   { id: 'code', label: 'Hạn sử dụng' },
 ];
 

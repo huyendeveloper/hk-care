@@ -99,6 +99,41 @@ input[type='number'] {
   opacity: 1;
 }
 
-.MuiTabs-flexContainer{
+.MuiTabs-flexContainer {
   flex-wrap: wrap;
+}
+
+svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionAsc {
+  opacity: 0.3;
+}
+
+svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionDesc {
+  opacity: 0.3;
+}
+
+.Mui-active .MuiTableSortLabel-icon {
+  opacity: 1 !important;
+}
+
+.print {
+  font-size: 13px;
+  line-height: 22px; 
+}
+
+.print table {
+  border-collapse: separate;
+  border-spacing: 0px;
+}
+
+.print thead td {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.print td {
+  padding: 5px 0;
+}
+
+.print em {
+  font-size: 12px;
 }

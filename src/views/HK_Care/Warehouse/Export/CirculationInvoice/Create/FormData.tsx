@@ -84,6 +84,7 @@ const getCells = (): Cells<IExportWHRotation> => [
   { id: 'code', label: 'Số lượng' },
   { id: 'code', label: 'Giá vốn' },
   { id: 'code', label: 'Giá trị xuất' },
+  { id: 'code', label: '' },
 ];
 
 const FormData = ({ defaultValue }: IProps) => {
@@ -126,7 +127,7 @@ const FormData = ({ defaultValue }: IProps) => {
       defaultValues: defaultValue || validationSchema.getDefault(),
     });
 
-  const { fields, append } = useFieldArray<IExportWHRotation>({
+  const { fields, append, remove } = useFieldArray<IExportWHRotation>({
     control,
     name: 'exportWHDetails',
   });
@@ -159,6 +160,7 @@ const FormData = ({ defaultValue }: IProps) => {
   useEffect(() => {
     fetchTenants();
     fetchData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -168,6 +170,15 @@ const FormData = ({ defaultValue }: IProps) => {
       setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
       return;
     }
+
+    data?.exportWHDetails.forEach((item) => {
+      if (item.maxQuantity && item.amount > item.maxQuantity) {
+        setNotification({
+          error: `Sản phẩm ${item.productName} có số lượng lớn nhất là ${item.maxQuantity}`,
+        });
+        return;
+      }
+    });
     const newPayload = {
       ...data,
       totalFee:
@@ -180,12 +191,12 @@ const FormData = ({ defaultValue }: IProps) => {
       exportType: 3,
     };
     if (id || exportWHId) {
-      const { error } = await dispatch(
+      const { error, payload } = await dispatch(
         // @ts-ignore
         updateExportWH({ ...newPayload, id, exportWHId })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         return;
       }
       setNotification({
@@ -247,11 +258,22 @@ const FormData = ({ defaultValue }: IProps) => {
         // @ts-ignore
         if (!fields.some((e) => e.orderId === item.id)) {
           if (id) {
-            // @ts-ignore
-            append({ ...item, orderId: item.id, id: 0 });
+            append({
+              ...item,
+              amount: 1,
+              maxQuantity: item.amount,
+              // @ts-ignore
+              orderId: item.id,
+              id: 0,
+            });
           } else {
             // @ts-ignore
-            append({ ...item, orderId: item.id });
+            append({
+              ...item,
+              amount: 1,
+              maxQuantity: item.amount, // @ts-ignore
+              orderId: item.id,
+            });
           }
         }
       });
@@ -263,12 +285,12 @@ const FormData = ({ defaultValue }: IProps) => {
 
   return (
     <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm hóa đơn'}>
-      <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
-        <FormHeader title=" " />
-        <FormContent>
-          <FormGroup>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={8}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
+          <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
+            <FormHeader title=" " />
+            <FormContent>
+              <FormGroup>
                 <Grid item xs={12} mb={2}>
                   <FormLabel title="Tìm kiếm sản phẩm" name="name" />
 
@@ -304,34 +326,40 @@ const FormData = ({ defaultValue }: IProps) => {
                           zIndex: 99,
                         }}
                       >
-                        {productList.map((item, index) => (
-                          <Stack
-                            flexDirection="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            key={index}
-                            // @ts-ignore
-                            onClick={() => addItem(item)}
-                            p={2}
-                            sx={{ borderBottom: '1px solid #d9d9d9' }}
-                          >
-                            <Stack flexDirection="row">
-                              <Box
-                                component="img"
-                                sx={{
-                                  width: '100px',
-                                  height: '70px',
-                                  backgroundImage:
-                                    'https://www.vigcenter.com/public/all/images/default-image.jpg',
-                                }}
-                                src={`${connectURL}/${item.path}`}
-                                alt=""
-                              />
-                              <Box pl={2}>{item.name}</Box>
+                        {productList
+                          .filter((x) =>
+                            x.name
+                              .toLocaleLowerCase()
+                              .includes(filters.searchText.toLocaleLowerCase())
+                          )
+                          .map((item, index) => (
+                            <Stack
+                              flexDirection="row"
+                              justifyContent="space-between"
+                              alignItems="center"
+                              key={index}
+                              // @ts-ignore
+                              onClick={() => addItem(item)}
+                              p={2}
+                              sx={{ borderBottom: '1px solid #d9d9d9' }}
+                            >
+                              <Stack flexDirection="row">
+                                <Box
+                                  component="img"
+                                  sx={{
+                                    width: '100px',
+                                    height: '70px',
+                                    backgroundImage:
+                                      'https://www.vigcenter.com/public/all/images/default-image.jpg',
+                                  }}
+                                  src={`${connectURL}/${item.path}`}
+                                  alt=""
+                                />
+                                <Box pl={2}>{item.name}</Box>
+                              </Stack>
+                              {/* <div>Có thể bán: {item.amount}</div> */}
                             </Stack>
-                            <div>Có thể bán: {item.amount}</div>
-                          </Stack>
-                        ))}
+                          ))}
                       </Stack>
                     )}
                   </Box>
@@ -362,6 +390,7 @@ const FormData = ({ defaultValue }: IProps) => {
                                   getValues={getValues}
                                   arrayName="exportWHDetails"
                                   control={control}
+                                  remove={remove}
                                 />
                               ))}
                             </TableBody>
@@ -390,59 +419,61 @@ const FormData = ({ defaultValue }: IProps) => {
                     />
                   </Grid>
                 </Grid>
-              </Grid>
+              </FormGroup>
+            </FormContent>
+            <FormFooter>
+              <LinkButton to="/hk_care/warehouse/export/circulation_invoice">
+                Hủy
+              </LinkButton>
 
-              <Grid item xs={12} md={4}>
-                <Typography
-                  color="text.secondary"
-                  sx={{ mb: 1.5, fontWeight: 'regular', fontSize: '1.74rem' }}
-                >
-                  Thông tin phiếu chuyển
-                </Typography>
-                {tenantList.length > 0 && (
-                  <>
-                    <Grid item xs={12}>
-                      <FormLabel title="Điểm bán nhận" name="description" />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <EntitySelecter
-                        name="rotationPoint"
-                        control={control}
-                        options={tenantList}
-                        renderLabel={(field) => field.name}
-                        noOptionsText="Không tìm thấy điểm bán"
-                        loading={loadingTenant}
-                        placeholder=""
-                      />
-                    </Grid>
-                  </>
-                )}
+              <LoadingButton type="submit">
+                {id ? 'Lưu' : 'Xuất hàng'}
+              </LoadingButton>
+            </FormFooter>
+          </FormPaperGrid>
+        </Grid>
 
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2 }}>
+            <Typography
+              color="text.secondary"
+              sx={{ mb: 1.5, fontWeight: 'regular', fontSize: '1.74rem' }}
+            >
+              Thông tin phiếu chuyển
+            </Typography>
+            {tenantList.length > 0 && (
+              <>
                 <Grid item xs={12}>
-                  <FormLabel title="Ghi chú" name="description" />
+                  <FormLabel title="Điểm bán nhận" name="description" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextarea
-                    maxRows={11}
-                    minRows={11}
-                    name="description"
+                  <EntitySelecter
+                    name="rotationPoint"
                     control={control}
+                    options={tenantList}
+                    renderLabel={(field) => field.name}
+                    noOptionsText="Không tìm thấy điểm bán"
+                    loading={loadingTenant}
+                    placeholder=""
                   />
                 </Grid>
-              </Grid>
-            </Grid>
-          </FormGroup>
-        </FormContent>
-        <FormFooter>
-          <LinkButton to="/hk_care/warehouse/export/circulation_invoice">
-            Hủy
-          </LinkButton>
+              </>
+            )}
 
-          <LoadingButton type="submit">
-            {id ? 'Lưu' : 'Xuất hàng'}
-          </LoadingButton>
-        </FormFooter>
-      </FormPaperGrid>
+            <Grid item xs={12}>
+              <FormLabel title="Ghi chú" name="description" />
+            </Grid>
+            <Grid item xs={12}>
+              <ControllerTextarea
+                maxRows={11}
+                minRows={11}
+                name="description"
+                control={control}
+              />
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
     </PageWrapperFullwidth>
   );
 };

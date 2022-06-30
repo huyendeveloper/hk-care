@@ -1,7 +1,6 @@
 import axiosClient from 'api';
 import axios from 'axios';
 import { baseURL } from 'config';
-import { IImportReceipt } from 'interface';
 import { FilterParams } from 'types';
 import DateFns from 'utils/DateFns';
 import LocalStorage from 'utils/LocalStorage';
@@ -10,6 +9,7 @@ interface OrderSales {
   id: number;
   disCount: number;
   giveMoney: number;
+  orderId?: number;
   description: string;
   createOrderDetailDtos: {
     productId: number;
@@ -52,9 +52,9 @@ class ImportReceiptService {
     return axiosClient.post(`${baseURL}/BillOfSale/CreateBillOfSale`, payload);
   }
 
-  update(payload: IImportReceipt) {
+  update(payload: OrderSales) {
     return axiosClient.put(
-      `${baseURL}/receiptwarehouse/Update/${payload.id}`,
+      `${baseURL}/BillOfSale/UpdateBillOfSale`,
       payload
     );
   }

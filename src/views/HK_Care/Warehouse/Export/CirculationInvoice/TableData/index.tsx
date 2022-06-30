@@ -1,16 +1,12 @@
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Paper,
-  Table,
-  TableBody, TableContainer
-} from '@mui/material';
+import { Paper, Table, TableBody, TableContainer } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -51,7 +47,7 @@ const TableData = () => {
   const [importReceipt, setImportReceipt] = useState<object>([]);
 
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [loading,setLoading]=useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
@@ -75,14 +71,13 @@ const TableData = () => {
       return group;
     }, {});
 
-
     setImportReceipt(exportWHRotationList);
     setTotalRows(payload.totalCount);
-    setLoading(false)
+    setLoading(false);
   };
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -140,24 +135,31 @@ const TableData = () => {
       </TableSearchField>
 
       <TableContent total={10} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+        <TableContainer sx={{ p: 1.5 }}>
+          {/* <Scrollbar> */}
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
-                {Object.keys(importReceipt).map((key) => {
-                  // @ts-ignore
-                  return <ExpandRow key={key} groupName={key} list={importReceipt[key]} filters={filters}/>;
-                })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
+            <TableBody>
+              {Object.keys(importReceipt).map((key) => {
+                // @ts-ignore
+                return (
+                  <ExpandRow
+                    key={key}
+                    groupName={key} // @ts-ignore
+                    list={importReceipt[key]}
+                    filters={filters}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+          {/* </Scrollbar> */}
         </TableContainer>
 
         <TablePagination

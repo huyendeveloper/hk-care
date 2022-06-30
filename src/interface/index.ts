@@ -186,6 +186,22 @@ export interface IImportReceipt {
   code: string;
 }
 
+export interface OrderDetailDtos {
+  productId: number;
+  productName: string;
+  quantity: number;
+  price: number;
+  measureId: number;
+  measureName: string;
+  discount: number;
+  mor: string;
+  noon: string;
+  night: string;
+  description: string;
+  billPerProduct: number;
+  total: number;
+}
+
 export interface ISalesOrder {
   id: number;
   saleDate: Date;
@@ -199,6 +215,9 @@ export interface ISalesOrder {
   userName: string;
   giveMoney: number;
   orderId: number;
+  disCount: number;
+  description: string;
+  orderDetailDtos: OrderDetailDtos[];
 }
 
 export interface OrderSales {
@@ -254,6 +273,7 @@ export interface IProductExportCancel {
   cancellationPrice: number;
   code: string;
   exportWHId: number;
+  maxQuantity: number;
 }
 
 export interface IExportCancel {

@@ -28,6 +28,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
     variant = 'outlined',
     type,
     control,
+    inputProps,
   } = props;
 
   if (type === 'percent') {
@@ -57,6 +58,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
               return !floatValue || (floatValue <= 100 && floatValue >= 0);
             }}
             error={Boolean(error)}
+            inputProps={inputProps}
           />
         )}
         name={name}
@@ -87,6 +89,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
           helperText={error?.message}
           inputRef={ref}
           variant={variant}
+          inputProps={inputProps}
         />
       )}
       name={name}

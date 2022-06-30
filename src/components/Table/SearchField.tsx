@@ -90,11 +90,11 @@ const SearchField = (props: Props) => {
           }}
           {...rest}
         />
-        <SearchIcon
+        {/* <SearchIcon
           fontSize="medium"
           style={{ position: 'absolute', right: '20', top: '23%' }}
           color="disabled"
-        />
+        /> */}
       </Stack>
     );
   }

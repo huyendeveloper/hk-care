@@ -119,11 +119,6 @@ const getSections = (): SectionItem[] => [
                 path: '/hk_care/warehouse/import/receipt',
                 roles: ['hkl2_1_2'],
               },
-              {
-                title: 'Biên bản nhập kho',
-                path: '/404',
-                roles: ['hkl2_1_2'],
-              },
             ],
           },
           {

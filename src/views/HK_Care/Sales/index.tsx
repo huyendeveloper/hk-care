@@ -9,6 +9,6 @@ export const CreateSalesOrder = Loadable(
   lazy(() => import('views/HK_Care/Sales/Order/Create'))
 );
 
-// export const ImportReceiptDetail = Loadable(
-//   lazy(() => import('views/HK_Care/Warehouse/Import/Receipt/Details'))
-// );
+export const PrintSalesOrder = Loadable(
+  lazy(() => import('views/HK_Care/Sales/Order/Print'))
+);

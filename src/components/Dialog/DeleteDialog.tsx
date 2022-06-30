@@ -58,7 +58,7 @@ const DeleteDialog = (props: Props) => {
           sx={{ textAlign: 'center' }}
         >
           {message ||
-            `Bạn có chắc chắn bạn muốn xóa ${tableName} ${name}${spanContent}?`}
+            `Bạn có chắc chắn bạn muốn ${type.toLocaleLowerCase()} ${tableName} ${name}${spanContent}?`}
         </Typography>
       </DialogContent>
       <Divider />

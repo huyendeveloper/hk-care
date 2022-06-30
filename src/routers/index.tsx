@@ -4,7 +4,7 @@ import DashboardLayout from "layouts/Dashboard";
 import MainLayout from "layouts/Main";
 import { lazy } from "react";
 import { Navigate, RouteObject, useRoutes } from "react-router-dom";
-import { CreateSalesOrder } from "views/HK_Care/Sales";
+import { CreateSalesOrder, PrintSalesOrder } from "views/HK_Care/Sales";
 import CRUDRoutes from "./CRUDExample";
 import HKCareProductRoutes from "./HKCareProduct";
 import HKCareSales from "./HKCareSales";
@@ -55,10 +55,10 @@ const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/hk_care/sales/order/:id",
+    path: "/hk_care/sales/order/:id/print",
     element: (
       <PrivateRoute>
-        <CreateSalesOrder />
+        <PrintSalesOrder />
       </PrivateRoute>
     ),
   },

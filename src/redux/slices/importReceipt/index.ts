@@ -75,8 +75,6 @@ export const createImportReceipt = createAsyncThunk(
   }
 );
 
-
-
 // export const updateImportReceipt = createAsyncThunk(
 //   'importReceipt/update',
 //   async (payload: IImportReceipt, { rejectWithValue }) => {
