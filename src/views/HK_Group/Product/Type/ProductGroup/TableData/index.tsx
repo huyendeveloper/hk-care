@@ -3,7 +3,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -12,28 +14,23 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { Scrollbar } from 'components/common';
-import { DeleteDialog } from 'components/Dialog';
-import {
-  TableContent,
-  TableHeader,
-  TablePagination,
-  TableSearchField,
-  TableWrapper,
-} from 'components/Table';
-import type { Cells } from 'components/Table/TableHeader';
+import Scrollbar from 'components/common/Scrollbar';
+import DeleteDialog from 'components/Dialog/DeleteDialog';
+import TableContent from 'components/Table/TableContent';
+import TableHeader, { Cells } from 'components/Table/TableHeader';
+import TablePagination from 'components/Table/TablePagination';
+import TableSearchField from 'components/Table/TableSearchField';
+import TableWrapper from 'components/Table/TableWrapper';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
+import useNotification from 'hooks/useNotification';
 import { IProductGroup } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   deleteProductGroup,
   getAllProductGroup,
 } from 'redux/slices/productGroup';
-import { RootState } from 'redux/store';
-import { ClickEventCurrying } from 'types';
-import type { FilterParams } from 'types/common';
+import { ClickEventCurrying, FilterParams } from 'types';
 import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<IProductGroup> => [
@@ -52,17 +49,17 @@ const getCells = (): Cells<IProductGroup> => [
 ];
 
 const TableData = () => {
-  const [disableView, setDisableView] = useState<boolean>(false);
-  const setNotification = useNotification();
   const dispatch = useDispatch();
-  const [currentID, setCurrentID] = useState<number | null>(null);
-  const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.productGroup);
+  const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [totalRows, setTotalRows] = useState<number>(0);
+  const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
+  const [currentID, setCurrentID] = useState<number | null>(null);
+  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [disableView, setDisableView] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -72,23 +69,39 @@ const TableData = () => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
     setProductGroupList(payload.productGroupList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
+
+  const handleSearch = (searchText: string) => {
+    setFilters((state) => ({
+      ...state,
+      searchText,
+    }));
+  };
 
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
       ...state,
       sortBy: field,
     }));
+  };
+
+  const handleOpenCreateDialog = () => {
+    setCurrentID(null);
+    setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleChangePage = (pageIndex: number) => {
@@ -106,31 +119,6 @@ const TableData = () => {
     }));
   };
 
-  const handleSearch = (searchText: string) => {
-    setFilters((state) => ({
-      ...state,
-      searchText,
-    }));
-  };
-
-  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
-    setCurrentID(id);
-    setDisableView(true);
-    setOpenFormDialog(true);
-  };
-
-  const handleOpenCreateDialog = () => {
-    setCurrentID(null);
-    setOpenFormDialog(true);
-    setDisableView(false);
-  };
-
-  const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
-    setCurrentID(id);
-    setOpenFormDialog(true);
-    setDisableView(false);
-  };
-
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
     setOpenDeleteDialog(true);
@@ -140,28 +128,39 @@ const TableData = () => {
     setOpenDeleteDialog(false);
   };
 
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
+  const handleCloseFormDialog = () => {
     setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
   };
 
   const handleDelete = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
     // @ts-ignore
     const { error } = await dispatch(deleteProductGroup(currentID));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
       message: 'Xóa thành công!',
       severity: 'success',
     });
+    fetchData();
+    setShowBackdrop(false);
+  };
 
-    setProductGroupList(productGroupList.filter((x) => x.id !== currentID));
+  const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenFormDialog(true);
+    setDisableView(false);
+  };
+
+  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setDisableView(true);
+    setOpenFormDialog(true);
   };
 
   const renderAction = (row: IProductGroup) => {
@@ -248,6 +247,7 @@ const TableData = () => {
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
+        loading={showBackdrop}
       />
 
       <FormDialog
@@ -256,7 +256,16 @@ const TableData = () => {
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
         disable={disableView}
+        fetchData={fetchData}
       />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

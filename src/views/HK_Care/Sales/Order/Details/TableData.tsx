@@ -86,7 +86,6 @@ interface IProps {
 
 const TableData = ({ orderDetailDtos }: IProps) => {
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const { loading } = useSelector((state: RootState) => state.usage);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -101,7 +100,7 @@ const TableData = ({ orderDetailDtos }: IProps) => {
 
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
-      <TableContent total={orderDetailDtos.length} loading={loading}>
+      <TableContent total={orderDetailDtos.length} loading={false}>
         <TableContainer sx={{ p: 1.5, maxHeight: '100vh' }}>
           <Typography variant="h5" sx={{ mb: 3 }}>
             Thông tin sản phẩm

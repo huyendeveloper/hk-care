@@ -6,7 +6,7 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Typography
+  Typography,
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -17,13 +17,13 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import {
   TableContent,
   TableHeader,
   TablePagination,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -87,7 +87,7 @@ const Details = ({ defaultValue }: IProps) => {
 
   const fetchTenants = async () => {
     try {
-      const { data } = await tenantService.getAll();
+      const { data } = await tenantService.getTenants();
       setTenantList(
         data.filter(
           (item: ITenant) => item.name !== LocalStorage.get('tennant')

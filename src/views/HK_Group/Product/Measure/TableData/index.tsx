@@ -3,7 +3,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -12,25 +14,20 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
-import { DeleteDialog } from 'components/Dialog';
-import {
-  TableContent,
-  TableHeader,
-  TablePagination,
-  TableSearchField,
-  TableWrapper,
-} from 'components/Table';
-import type { Cells } from 'components/Table/TableHeader';
+import Scrollbar from 'components/common/Scrollbar';
+import DeleteDialog from 'components/Dialog/DeleteDialog';
+import TableContent from 'components/Table/TableContent';
+import TableHeader, { Cells } from 'components/Table/TableHeader';
+import TablePagination from 'components/Table/TablePagination';
+import TableSearchField from 'components/Table/TableSearchField';
+import TableWrapper from 'components/Table/TableWrapper';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
+import useNotification from 'hooks/useNotification';
 import { IMeasure } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deleteMeasure, getAllMeasure } from 'redux/slices/measure';
-import { RootState } from 'redux/store';
-import { ClickEventCurrying } from 'types';
-import type { FilterParams } from 'types/common';
+import { ClickEventCurrying, FilterParams } from 'types';
 import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<IMeasure> => [
@@ -49,16 +46,17 @@ const getCells = (): Cells<IMeasure> => [
 ];
 
 const TableData = () => {
-  const setNotification = useNotification();
-  const [currentID, setCurrentID] = useState<number | null>(null);
-  const [measureList, setMeasureList] = useState<IMeasure[]>([]);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.measure);
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [disableView, setDisableView] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [totalRows, setTotalRows] = useState<number>(0);
+  const [measureList, setMeasureList] = useState<IMeasure[]>([]);
+  const [currentID, setCurrentID] = useState<number | null>(null);
+  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [disableView, setDisableView] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -68,23 +66,39 @@ const TableData = () => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
     setMeasureList(payload.measureList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
+
+  const handleSearch = (searchText: string) => {
+    setFilters((state) => ({
+      ...state,
+      searchText,
+    }));
+  };
 
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
       ...state,
       sortBy: field,
     }));
+  };
+
+  const handleOpenCreateDialog = () => {
+    setCurrentID(null);
+    setOpenFormDialog(true);
+    setDisableView(false);
   };
 
   const handleChangePage = (pageIndex: number) => {
@@ -102,17 +116,36 @@ const TableData = () => {
     }));
   };
 
-  const handleSearch = (searchText: string) => {
-    setFilters((state) => ({
-      ...state,
-      searchText,
-    }));
+  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenDeleteDialog(true);
   };
 
-  const handleOpenCreateDialog = () => {
-    setCurrentID(null);
-    setOpenFormDialog(true);
-    setDisableView(false);
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleCloseFormDialog = () => {
+    setOpenFormDialog(false);
+  };
+
+  const handleDelete = async () => {
+    setShowBackdrop(true);
+    if (!currentID) return;
+    handleCloseDeleteDialog();
+    // @ts-ignore
+    const { error } = await dispatch(deleteMeasure(currentID));
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Xóa thành công!',
+      severity: 'success',
+    });
+    fetchData();
+    setShowBackdrop(false);
   };
 
   const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
@@ -127,47 +160,12 @@ const TableData = () => {
     setOpenFormDialog(true);
   };
 
-  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
-    setCurrentID(id);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
-    setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!currentID) return;
-    handleCloseDeleteDialog();
-    // @ts-ignore
-    const { error } = await dispatch(deleteMeasure(currentID));
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      return;
-    }
-    setNotification({
-      message: 'Xóa thành công!',
-      severity: 'success',
-    });
-
-    setMeasureList(measureList.filter((x) => x.id !== currentID));
-  };
-
   const renderAction = (row: IMeasure) => {
     return (
       <>
-        {/* <LinkIconButton to={`${row.id}`}> */}
         <IconButton onClick={handleOpenViewDialog(row.id)}>
           <VisibilityIcon />
         </IconButton>
-        {/* </LinkIconButton> */}
 
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
@@ -246,6 +244,7 @@ const TableData = () => {
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
+        loading={showBackdrop}
       />
 
       <FormDialog
@@ -254,7 +253,16 @@ const TableData = () => {
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
         disable={disableView}
+        fetchData={fetchData}
       />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

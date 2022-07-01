@@ -154,7 +154,7 @@ const DetailsForm = () => {
 
   const fetchProductGroupList = () => {
     productGroupService
-      .getAllProductGroupp()
+      .getAllProductGroup()
       .then(({ data }) => {
         setProductGroupList(data.items);
       })

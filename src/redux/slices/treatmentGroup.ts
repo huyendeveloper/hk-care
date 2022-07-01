@@ -1,19 +1,11 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isFulfilled,
-  isPending,
-  isRejected,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ITreatmentGroup } from 'interface';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllTreatmentGroup = createAsyncThunk(
   'treatmentGroup/getAll',
@@ -31,7 +23,35 @@ export const getAllTreatmentGroup = createAsyncThunk(
         };
       }
 
-      return rejectWithValue('Get data fail');
+      return rejectWithValue('Error');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const createTreatmentGroup = createAsyncThunk(
+  'treatmentGroup/create',
+  async (payload: ITreatmentGroup, { rejectWithValue }) => {
+    try {
+      await treatmentGroupService.create({
+        ...payload,
+        name: payload.name.trim(),
+      });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateTreatmentGroup = createAsyncThunk(
+  'treatmentGroup/update',
+  async (payload: ITreatmentGroup, { rejectWithValue }) => {
+    try {
+      await treatmentGroupService.update({
+        ...payload,
+        name: payload.name.trim(),
+      });
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -49,43 +69,11 @@ export const deleteTreatmentGroup = createAsyncThunk(
   }
 );
 
-export const createTreatmentGroup = createAsyncThunk(
-  'treatmentGroup/create',
-  async (payload: ITreatmentGroup, { rejectWithValue }) => {
-    try {
-      await treatmentGroupService.create(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const updateTreatmentGroup = createAsyncThunk(
-  'treatmentGroup/update',
-  async (payload: ITreatmentGroup, { rejectWithValue }) => {
-    try {
-      await treatmentGroupService.update(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
 const treatmentGroupSlice = createSlice({
   name: 'treatmentGroup',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllTreatmentGroup.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllTreatmentGroup.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllTreatmentGroup.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default treatmentGroupSlice.reducer;

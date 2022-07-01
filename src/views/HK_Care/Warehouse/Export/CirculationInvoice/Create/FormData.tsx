@@ -145,7 +145,7 @@ const FormData = ({ defaultValue }: IProps) => {
 
   const fetchTenants = async () => {
     try {
-      const { data } = await tenantService.getAll();
+      const { data } = await tenantService.getTenants();
       setTenantList(
         data.filter(
           (item: ITenant) => item.name !== LocalStorage.get('tennant')
@@ -171,14 +171,6 @@ const FormData = ({ defaultValue }: IProps) => {
       return;
     }
 
-    data?.exportWHDetails.forEach((item) => {
-      if (item.maxQuantity && item.amount > item.maxQuantity) {
-        setNotification({
-          error: `Sản phẩm ${item.productName} có số lượng lớn nhất là ${item.maxQuantity}`,
-        });
-        return;
-      }
-    });
     const newPayload = {
       ...data,
       totalFee:
@@ -254,29 +246,27 @@ const FormData = ({ defaultValue }: IProps) => {
         setNotification({ error: 'Số lượng không đủ.' });
         return;
       }
-      data.forEach((item: IProductExportCancel) => {
-        // @ts-ignore
-        if (!fields.some((e) => e.orderId === item.id)) {
-          if (id) {
-            append({
-              ...item,
-              amount: 1,
-              maxQuantity: item.amount,
-              // @ts-ignore
-              orderId: item.id,
-              id: 0,
-            });
-          } else {
+      // @ts-ignore
+      if (!fields.some((e) => e.productId === data.productId)) {
+        if (id) {
+          append({
+            ...data,
+            amount: 1,
+            maxQuantity: data.amount,
             // @ts-ignore
-            append({
-              ...item,
-              amount: 1,
-              maxQuantity: item.amount, // @ts-ignore
-              orderId: item.id,
-            });
-          }
+            orderId: data.id,
+            id: 0,
+          });
+        } else {
+          // @ts-ignore
+          append({
+            ...data,
+            amount: 1,
+            maxQuantity: data.amount, // @ts-ignore
+            orderId: data.id,
+          });
         }
-      });
+      }
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
       setNotification({ error: 'Lỗi!' });

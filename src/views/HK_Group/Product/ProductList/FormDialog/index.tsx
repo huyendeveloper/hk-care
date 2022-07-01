@@ -134,7 +134,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
 
   const fetchProductGroupList = () => {
     productGroupService
-      .getAllProductGroupp()
+      .getAllProductGroup()
       .then(({ data }) => {
         setProductGroupList(data.items);
       })

@@ -5,19 +5,18 @@ import { FilterParams } from 'types';
 
 class MeasureService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/measure/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
+    return axiosClient.get(`${baseURL}/measure/search-all`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllMeasure() {
     return axiosClient.get(`${baseURL}/measure/search-all`);
-  }
-
-  get(id: number) {
-    return axiosClient.get(`${baseURL}/measure/${id}`);
   }
 
   create(payload: IMeasure) {

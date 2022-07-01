@@ -48,10 +48,6 @@ const PrintOrder = () => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log('order', order);
-  }, [order]);
-
   if (loading) {
     return <LoadingScreen />;
   }

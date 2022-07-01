@@ -1,19 +1,11 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isFulfilled,
-  isPending,
-  isRejected,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IMeasure } from 'interface';
 import measureService from 'services/measure.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllMeasure = createAsyncThunk(
   'measure/getAll',
@@ -31,7 +23,35 @@ export const getAllMeasure = createAsyncThunk(
         };
       }
 
-      return rejectWithValue('Get data fail');
+      return rejectWithValue('Error');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const createMeasure = createAsyncThunk(
+  'measure/create',
+  async (payload: IMeasure, { rejectWithValue }) => {
+    try {
+      await measureService.create({
+        ...payload,
+        name: payload.name.trim(),
+      });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateMeasure = createAsyncThunk(
+  'measure/update',
+  async (payload: IMeasure, { rejectWithValue }) => {
+    try {
+      await measureService.update({
+        ...payload,
+        name: payload.name.trim(),
+      });
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -49,43 +69,11 @@ export const deleteMeasure = createAsyncThunk(
   }
 );
 
-export const createMeasure = createAsyncThunk(
-  'measure/create',
-  async (payload: IMeasure, { rejectWithValue }) => {
-    try {
-      await measureService.create(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const updateMeasure = createAsyncThunk(
-  'measure/update',
-  async (payload: IMeasure, { rejectWithValue }) => {
-    try {
-      await measureService.update(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
 const measureSlice = createSlice({
   name: 'measure',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllMeasure.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllMeasure.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllMeasure.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default measureSlice.reducer;
