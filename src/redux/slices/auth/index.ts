@@ -2,11 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ILogin } from 'interface';
 import authService from 'services/auth.service';
 import userService from 'services/user.service';
-import { UserInfo } from 'types';
+import { Role, UserInfo } from 'types';
 import LocalStorage from 'utils/LocalStorage';
 
 interface IInitialState {
-  userRoles: string[];
+  userRoles: Role[];
   user: UserInfo | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
@@ -21,17 +21,17 @@ const initialState: IInitialState = {
   loading: false,
 };
 
-export const login = createAsyncThunk(
-  'auth/login',
+export const connectToken = createAsyncThunk(
+  'auth/connectToken',
   async (body: ILogin, { rejectWithValue }) => {
     try {
-      const res = await authService.login(body);
+      const res = await authService.connectToken(body);
 
       if (res.data.access_token) {
         const access_Token = res.data.access_token as string;
         LocalStorage.set('accessToken', access_Token);
         LocalStorage.set('tennant', body.tenant || '');
-        const { data } = await userService.getRoles();
+        const { data } = await userService.getRoleCurrent();
 
         return {
           access_Token,
@@ -39,7 +39,7 @@ export const login = createAsyncThunk(
         };
       }
 
-      return rejectWithValue('Login fail');
+      return rejectWithValue('Error');
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -51,7 +51,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     updateRoles: (state, action: PayloadAction<string[]>) => {
-      state.userRoles = action.payload;
+      state.userRoles = action.payload as Role[];
     },
     logout: (state) => {
       LocalStorage.remove('accessToken');
@@ -60,12 +60,12 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(login.pending, (state) => {
+    builder.addCase(connectToken.pending, (state) => {
       state.loading = true;
     });
 
     builder.addCase(
-      login.fulfilled,
+      connectToken.fulfilled,
       (
         state,
         action: PayloadAction<{
@@ -74,14 +74,14 @@ const authSlice = createSlice({
         }>
       ) => {
         const userRoles = action.payload.userRoles;
-        state.userRoles = userRoles;
+        state.userRoles = userRoles as Role[];
         state.isAuthenticated = true;
         state.isInitialized = true;
         state.loading = false;
       }
     );
 
-    builder.addCase(login.rejected, (state) => {
+    builder.addCase(connectToken.rejected, (state) => {
       state.isInitialized = true;
       state.loading = false;
     });

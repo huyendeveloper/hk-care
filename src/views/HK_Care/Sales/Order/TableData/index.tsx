@@ -70,7 +70,6 @@ const TableData = () => {
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [salesOrder, setSalesOrder] = useState<ISalesOrder[]>([]);
-  const { loading } = useSelector((state: RootState) => state.usage);
   const [totalRows, setTotalRows] = useState<number>(0);
   const setNotification = useNotification();
 
@@ -163,7 +162,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={salesOrder.length} loading={loading}>
+      <TableContent total={salesOrder.length} loading={false}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

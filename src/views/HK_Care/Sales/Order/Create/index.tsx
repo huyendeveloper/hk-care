@@ -159,8 +159,6 @@ const Create = () => {
     setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
   };
 
-  useEffect(() => {}, [orderSales]);
-
   return (
     <Fragment>
       <Helmet>

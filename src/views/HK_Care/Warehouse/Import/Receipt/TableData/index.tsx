@@ -65,7 +65,7 @@ const TableData = () => {
   const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
 
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.usage);
+  // const { loading } = useSelector((state: RootState) => state.usage);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
@@ -170,7 +170,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={importReceipt.length} loading={loading}>
+      <TableContent total={importReceipt.length} loading={false}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

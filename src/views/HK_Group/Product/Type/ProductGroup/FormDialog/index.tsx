@@ -13,14 +13,13 @@ import {
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IProductGroup } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   createProductGroup,
   updateProductGroup,
 } from 'redux/slices/productGroup';
-import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 interface Props {
@@ -29,6 +28,7 @@ interface Props {
   currentID?: number | null;
   data?: IProductGroup;
   disable: boolean;
+  fetchData: () => void;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -48,15 +48,23 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập tên nhóm sản phẩm.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập tên nhóm sản phẩm.')
+    .min(2, 'Tên nhóm sản phẩm ít nhất 2 ký tự.')
     .max(100, 'Tên nhóm sản phẩm không quá 100 ký tự.')
     .strict(true)
     .default(''),
   description: yup.string().strict(true).default(''),
 });
 
-const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
+const FormDialog = ({
+  open,
+  handleClose,
+  currentID,
+  data,
+  disable,
+  fetchData,
+}: Props) => {
   const [disabled, setDisabled] = useState<boolean>(disable);
-  const { loading } = useSelector((state: RootState) => state.productGroup);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const dispatch = useDispatch();
   const setNotification = useNotification();
   const { control, handleSubmit, reset } = useForm<IProductGroup>({
@@ -69,40 +77,47 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
     setDisabled(disable);
   }, [disable, open]);
 
-  const onSubmit = async (data: IProductGroup) => {
-    if (data.id) {
-      // @ts-ignore
-      const { error, payload } = await dispatch(
-        // @ts-ignore
-        updateProductGroup({ ...data, name: data.name.trim() })
-      );
-      if (error) {
-        setNotification({
-          error: payload?.response?.data.errorMessage || 'Lỗi!',
-        });
-        return;
-      }
+  const handleUpdate = async (data: IProductGroup) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(updateProductGroup(data));
+    if (error) {
       setNotification({
-        message: 'Cập nhật thành công',
-        severity: 'success',
+        error: payload.response.data || 'Lỗi!',
       });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Cập nhật thành công',
+      severity: 'success',
+    });
+  };
+
+  const handleAdd = async (data: IProductGroup) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(createProductGroup(data));
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({ message: 'Thêm thành công', severity: 'success' });
+  };
+
+  const onSubmit = async (data: IProductGroup) => {
+    setShowBackdrop(true);
+    if (data.id) {
+      await handleUpdate(data);
     } else {
-      // @ts-ignore
-      const { error, payload } = await dispatch(
-        // @ts-ignore
-        createProductGroup({ ...data, name: data.name.trim() })
-      );
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi!',
-        });
-        return;
-      }
-      setNotification({ message: 'Thêm thành công', severity: 'success' });
+      await handleAdd(data);
     }
 
+    fetchData();
     reset();
-    handleClose(true);
+    handleClose();
+    setShowBackdrop(false);
   };
 
   useEffect(() => {
@@ -169,7 +184,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
             </Button>
           )}
           {!disabled && (
-            <LoadingButton loading={loading} type="submit">
+            <LoadingButton loading={showBackdrop} type="submit">
               Lưu
             </LoadingButton>
           )}

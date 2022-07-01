@@ -134,7 +134,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={10} loading={loading}>
+      <TableContent total={Object.keys(importReceipt).length} loading={loading}>
         <TableContainer sx={{ p: 1.5 }}>
           {/* <Scrollbar> */}
           <Table sx={{ minWidth: 'max-content' }} size="small">

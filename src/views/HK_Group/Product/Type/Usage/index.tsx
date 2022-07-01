@@ -1,7 +1,7 @@
 import { PageWrapper } from 'components/common';
 import TableData from './TableData';
 
-const UsageGroup = () => {
+const Usage = () => {
   return (
     <PageWrapper title="Dạng dùng">
       <TableData />
@@ -9,4 +9,4 @@ const UsageGroup = () => {
   );
 };
 
-export default UsageGroup;
+export default Usage;

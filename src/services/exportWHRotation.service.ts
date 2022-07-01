@@ -17,7 +17,7 @@ class ExportWHRotationService {
 
   addToListExportWHRotation(productId: number) {
     return axiosClient.get(
-      `${baseURL}/exportWH/AddToListExportRotation/${productId}`
+      `${baseURL}/exportWH/AddExportRotation/${productId}`
     );
   }
 

@@ -1,5 +1,11 @@
+import { PageWrapper } from 'components/common';
+
 const Home = () => {
-  return <h1></h1>;
+  return (
+    <PageWrapper title="Trang chủ">
+      <></>
+    </PageWrapper>
+  );
 };
 
 export default Home;

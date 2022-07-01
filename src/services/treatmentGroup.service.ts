@@ -5,19 +5,18 @@ import { FilterParams } from 'types';
 
 class TreatmentGroupService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/treatment-group/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
+    return axiosClient.get(`${baseURL}/treatment-group/search-all`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllTreatmentGroup() {
     return axiosClient.get(`${baseURL}/treatment-group/search-all`);
-  }
-
-  get(id: number) {
-    return axiosClient.get(`${baseURL}/treatment-group/${id}`);
   }
 
   create(payload: ITreatmentGroup) {

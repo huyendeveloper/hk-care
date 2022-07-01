@@ -20,6 +20,7 @@ interface Props {
   spanContent?: string;
   message?: string;
   type?: string;
+  loading?: boolean;
 }
 
 const DeleteDialog = (props: Props) => {
@@ -32,6 +33,7 @@ const DeleteDialog = (props: Props) => {
     spanContent = '',
     message,
     type = 'Xóa',
+    loading,
   } = props;
 
   return (
@@ -68,7 +70,7 @@ const DeleteDialog = (props: Props) => {
             Hủy
           </Button>
 
-          <LoadingButton color="error" onClick={handleDelete}>
+          <LoadingButton color="error" loading={loading} onClick={handleDelete}>
             {type}
           </LoadingButton>
         </Stack>

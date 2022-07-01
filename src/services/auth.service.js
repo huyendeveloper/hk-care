@@ -2,10 +2,10 @@ import axios from 'axios';
 import { connectURL } from 'config';
 
 class AuthService {
-  login(body) {
+  connectToken(body) {
     const params = new URLSearchParams();
-    params.append('username', body.username.toString());
-    params.append('password', body.password.toString());
+    params.append('username', body.username.toString().trim());
+    params.append('password', body.password.toString().trim());
     params.append('client_id', 'Care_App');
     params.append('client_secret', '1q2w3e*');
     params.append('grant_type', 'password');

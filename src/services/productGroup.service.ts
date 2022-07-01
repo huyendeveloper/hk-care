@@ -15,7 +15,7 @@ class ProductGroupService {
     });
   }
 
-  getAllProductGroupp() {
+  getAllProductGroup() {
     return axiosClient.get(`${baseURL}/product-group/search-all`);
   }
 

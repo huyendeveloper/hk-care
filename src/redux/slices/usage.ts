@@ -1,19 +1,11 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isFulfilled,
-  isPending,
-  isRejected,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IUsage } from 'interface';
 import usageService from 'services/usage.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllUsage = createAsyncThunk(
   'usage/getAll',
@@ -31,7 +23,35 @@ export const getAllUsage = createAsyncThunk(
         };
       }
 
-      return rejectWithValue('Get data fail');
+      return rejectWithValue('Error');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const createUsage = createAsyncThunk(
+  'usage/create',
+  async (payload: IUsage, { rejectWithValue }) => {
+    try {
+      await usageService.create({
+        ...payload,
+        name: payload.name.trim(),
+      });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateUsage = createAsyncThunk(
+  'usage/update',
+  async (payload: IUsage, { rejectWithValue }) => {
+    try {
+      await usageService.update({
+        ...payload,
+        name: payload.name.trim(),
+      });
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -49,43 +69,11 @@ export const deleteUsage = createAsyncThunk(
   }
 );
 
-export const createUsage = createAsyncThunk(
-  'usage/create',
-  async (payload: IUsage, { rejectWithValue }) => {
-    try {
-      await usageService.create(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const updateUsage = createAsyncThunk(
-  'usage/update',
-  async (payload: IUsage, { rejectWithValue }) => {
-    try {
-      await usageService.update(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
 const usageSlice = createSlice({
   name: 'usage',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllUsage.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllUsage.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllUsage.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default usageSlice.reducer;
