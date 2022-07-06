@@ -78,7 +78,7 @@ const getSections = (): SectionItem[] => [
       },
       {
         title: 'Quản trị người dùng',
-        path: '/404',
+        path: '/hk_group/users',
         roles: ['hkl1', 'hkl2'],
       },
     ],

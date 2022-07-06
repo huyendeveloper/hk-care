@@ -25,10 +25,9 @@ import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { ITenant } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
+import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
+import FormDialog from '../FormDialog';
 
 const getCells = (): Cells<ITenant> => [
   { id: 'id', label: 'STT' },
@@ -40,15 +39,17 @@ const getCells = (): Cells<ITenant> => [
 ];
 
 const TableData = () => {
+  const setNotification = useNotification();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
-  const { loading } = useSelector((state: RootState) => state.product);
-  const cells = useMemo(() => getCells(), []);
-  const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentID, setCurrentID] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [disableView, setDisableView] = useState<boolean>(false);
+
+  const cells = useMemo(() => getCells(), []);
 
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
@@ -138,6 +139,7 @@ const TableData = () => {
     ];
     setTenantList(tenantList);
     setTotalRows(tenantList.length);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -196,20 +198,37 @@ const TableData = () => {
     setOpenDeleteDialog(true);
   };
 
+  const handleOpenUpdateDialog = (id: string) => () => {
+    setCurrentID(id);
+    setOpenFormDialog(true);
+    setDisableView(false);
+  };
+
+  const handleOpenViewDialog = (id: string) => () => {
+    setCurrentID(id);
+    setDisableView(true);
+    setOpenFormDialog(true);
+  };
+
   const handleOpenCreateDialog = () => {
     setCurrentID(null);
     setOpenFormDialog(true);
   };
 
+  const handleCloseFormDialog = (updated: boolean | undefined) => {
+    setOpenFormDialog(false);
+    if (updated) {
+      fetchData();
+    }
+  };
+
   const renderAction = (row: ITenant) => {
     return (
       <>
-        <LinkIconButton to={`/hk_group/product/list/${row.id}`}>
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        </LinkIconButton>
-        <IconButton>
+        <IconButton onClick={handleOpenViewDialog(row.id)}>
+          <VisibilityIcon />
+        </IconButton>
+        <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
         </IconButton>
         {!row.status && (
@@ -285,6 +304,14 @@ const TableData = () => {
           rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
+
+      <FormDialog
+        currentID={currentID}
+        data={tenantList.find((x) => x.id === currentID)}
+        open={openFormDialog}
+        handleClose={handleCloseFormDialog}
+        disable={disableView}
+      />
 
       <DeleteDialog
         id={currentID}

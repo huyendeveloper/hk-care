@@ -98,6 +98,7 @@ const FormData = ({ defaultValue }: IProps) => {
   const [loadingTenant, setLoadingTenant] = useState<boolean>(true);
   const [hidden, setHidden] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -133,6 +134,7 @@ const FormData = ({ defaultValue }: IProps) => {
   });
 
   const fetchData = async () => {
+    setLoading(true);
     // @ts-ignore
     const { payload, error } = await dispatch(getAllProduct(filters));
 
@@ -141,6 +143,7 @@ const FormData = ({ defaultValue }: IProps) => {
       return;
     }
     setProductList(payload.productList);
+    setLoading(false);
   };
 
   const fetchTenants = async () => {
@@ -275,10 +278,10 @@ const FormData = ({ defaultValue }: IProps) => {
 
   return (
     <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm hóa đơn'}>
-      <Grid container spacing={2}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={8}>
           <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
-            <FormHeader title=" " />
+            <FormHeader title=" " hidden />
             <FormContent>
               <FormGroup>
                 <Grid item xs={12} mb={2}>
@@ -352,6 +355,39 @@ const FormData = ({ defaultValue }: IProps) => {
                           ))}
                       </Stack>
                     )}
+                    {!hidden &&
+                      productList.filter((x) =>
+                        x.name
+                          .toLocaleLowerCase()
+                          .includes(filters.searchText.toLocaleLowerCase())
+                      ).length === 0 && (
+                        <Stack
+                          sx={{
+                            position: 'absolute',
+                            top: '55px',
+                            right: '0px',
+                            left: 0,
+                            marginRight: '8px',
+                            borderRadius: '4px',
+                            background: 'white',
+                            border: '1px solid #d9d9d9',
+                            maxHeight: '350px',
+                            zIndex: 99,
+                          }}
+                        >
+                          <Stack
+                            flexDirection="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            p={2}
+                            sx={{ borderBottom: '1px solid #d9d9d9' }}
+                          >
+                            {loading
+                              ? 'Đang tải . . .'
+                              : 'Không tìm thấy kết quả nào.'}
+                          </Stack>
+                        </Stack>
+                      )}
                   </Box>
                 </Grid>
                 <Grid item xs={12} sx={{ minHeight: '200px' }}>
@@ -424,7 +460,7 @@ const FormData = ({ defaultValue }: IProps) => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, mb: 2 }}>
             <Typography
               color="text.secondary"
               sx={{ mb: 1.5, fontWeight: 'regular', fontSize: '1.74rem' }}
@@ -449,7 +485,8 @@ const FormData = ({ defaultValue }: IProps) => {
                 </Grid>
               </>
             )}
-
+          </Paper>
+          <Paper sx={{ p: 2 }}>
             <Grid item xs={12}>
               <FormLabel title="Ghi chú" name="description" />
             </Grid>

@@ -42,9 +42,9 @@ const SearchField = (props: Props) => {
 
   useDebounce(
     () => {
-      if (searchText !== value) {
-        onSearch(value);
-      }
+      // if (searchText !== value) {
+      onSearch(value);
+      // }
     },
     1500, //auto search each 1500 ms
     [value]

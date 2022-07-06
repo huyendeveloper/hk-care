@@ -52,7 +52,7 @@ export const createSalesOrder = createAsyncThunk(
   async (payload: OrderSales, { rejectWithValue }) => {
     try {
       const { data } = await orderSalesService.create(payload);
-      // return { id: data.id };
+      return { id: data.orderId };
     } catch (error) {
       return rejectWithValue(error);
     }

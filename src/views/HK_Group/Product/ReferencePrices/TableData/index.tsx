@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import {
@@ -14,15 +14,12 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
 import { IReferencePricesMock } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
+import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
 
 const getCells = (): Cells<IReferencePricesMock> => [
@@ -41,9 +38,8 @@ const TableData = () => {
   const [referencePrices, setReferencePrices] = useState<
     IReferencePricesMock[]
   >([]);
-  const { loading } = useSelector((state: RootState) => state.product);
+  const [loading, setLoading] = useState<boolean>(true);
   const cells = useMemo(() => getCells(), []);
-  const setNotification = useNotification();
 
   const fetchData = async () => {
     // @ts-ignore
@@ -141,6 +137,7 @@ const TableData = () => {
     ];
     setReferencePrices(mockReferencePrices);
     setTotalRows(mockReferencePrices.length);
+    setLoading(false);
   };
 
   useEffect(() => {

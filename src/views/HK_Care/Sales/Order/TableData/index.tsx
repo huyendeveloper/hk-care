@@ -72,6 +72,7 @@ const TableData = () => {
   const [salesOrder, setSalesOrder] = useState<ISalesOrder[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
   const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchData = async () => {
     // @ts-ignore
@@ -81,10 +82,12 @@ const TableData = () => {
       setNotification({
         error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
     setSalesOrder(payload.salesOrder);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -162,7 +165,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={salesOrder.length} loading={false}>
+      <TableContent total={salesOrder.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

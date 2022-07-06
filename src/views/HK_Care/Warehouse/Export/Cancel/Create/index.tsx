@@ -90,10 +90,15 @@ const CreateForm = () => {
   const navigate = useNavigate();
   const setNotification = useNotification();
 
-  const { loading : loadingProduct } = useSelector((state: RootState) => state.productList);
   const [productList, setProductList] = useState<IProductListName[]>([]);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
+
+  const { loading: loadingProduct } = useSelector(
+    (state: RootState) => state.productList
+  );
+
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     productId: null,
     from: null,
@@ -117,18 +122,16 @@ const CreateForm = () => {
 
   const cells = useMemo(() => getCells(), []);
 
-  const {
+  const { control, setValue, getValues, handleSubmit, reset } =
+    useForm<IExportCancel>({
+      mode: 'onChange',
+      resolver: yupResolver(validationSchema),
+      defaultValues: validationSchema.getDefault(),
+    });
+
+  const exportWHDetails = useWatch({
     control,
-    setValue,
-    getValues,
-    handleSubmit,
-    register,
-    reset,
-    formState: { errors },
-  } = useForm<IExportCancel>({
-    mode: 'onChange',
-    resolver: yupResolver(validationSchema),
-    defaultValues: validationSchema.getDefault(),
+    name: 'exportWHDetails',
   });
 
   const { fields, append, remove } = useFieldArray<IExportCancel>({
@@ -240,10 +243,16 @@ const CreateForm = () => {
       setNotification({ error: 'Chưa chọn khoảng thời gian sử dụng!' });
       return;
     }
+    setLoadingAdd(true);
     try {
       const { data } = await exportCancelService.addToListExportCancel(
         detailAdd
       );
+      if (data.length === 0) {
+        setNotification({ error: 'Không có sản phẩm nào!' });
+        setLoadingAdd(false);
+        return;
+      }
       data.forEach((item: IProductExportCancel) => {
         // @ts-ignore
         if (!fields.some((e) => e.orderId === item.id)) {
@@ -259,7 +268,9 @@ const CreateForm = () => {
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoadingAdd(false);
     }
+    setLoadingAdd(false);
   };
 
   const handleSort = () => {
@@ -281,11 +292,6 @@ const CreateForm = () => {
     }
   };
 
-  const exportWHDetails = useWatch({
-    control,
-    name: 'exportWHDetails',
-  });
-
   useEffect(() => {
     handleSort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,7 +308,7 @@ const CreateForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={5}>
             <FormLabel title="Thời gian sử dụng còn" name="name" />
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid
                 item
                 xs={4}
@@ -363,9 +369,15 @@ const CreateForm = () => {
                 />
               </Grid>
               <Grid item xs={4}>
-                <Button onClick={addProduct} sx={{ height: 1 }}>
+                <LoadingButton
+                  onClick={addProduct}
+                  loading={loadingAdd}
+                  loadingPosition="start"
+                  startIcon={<></>}
+                  sx={{ height: 1, width: '100px' }}
+                >
                   Thêm
-                </Button>
+                </LoadingButton>
               </Grid>
             </Grid>
           </Grid>
@@ -393,21 +405,20 @@ const CreateForm = () => {
                             {exportWHDetails &&
                               [...exportWHDetails]
                                 .splice(
-                                  (filters.pageIndex - 1) * 10,
-                                  filters.pageIndex * 10
+                                  (filters.pageIndex - 1) * filters.pageSize,
+                                  filters.pageSize
                                 )
                                 .map((item, index) => (
                                   <ReceiptEntity
                                     item={item}
                                     key={index}
-                                    index={index}
+                                    index={
+                                      (filters.pageIndex - 1) *
+                                        filters.pageSize +
+                                      index +
+                                      1
+                                    }
                                     remove={remove}
-                                    errors={errors}
-                                    register={register}
-                                    setValue={setValue}
-                                    getValues={getValues}
-                                    arrayName="exportWHDetails"
-                                    control={control}
                                   />
                                 ))}
                           </TableBody>

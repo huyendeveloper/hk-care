@@ -156,8 +156,12 @@ const TableData = () => {
         searchText={filters.searchText}
         start={filters.startDate}
         end={filters.lastDate}
-        setStart={(val) => setFilters({ ...filters, startDate: val })}
-        setEnd={(val) => setFilters({ ...filters, lastDate: val })}
+        setStart={(val) =>
+          setFilters({ ...filters, pageIndex: 1, startDate: val })
+        }
+        setEnd={(val) =>
+          setFilters({ ...filters, pageIndex: 1, lastDate: val })
+        }
         searchArea
       >
         <LinkButton

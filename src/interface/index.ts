@@ -12,6 +12,13 @@ export interface ILoginResponse {
 
 export interface IUser {
   token: string;
+  name: string;
+  phone: string;
+  email: string;
+  role: string;
+  tenant: string;
+  status: boolean;
+  id: number;
 }
 
 export interface IProductGroup {
@@ -167,6 +174,9 @@ export interface ITenant {
   address: string;
   hotline: string;
   status: boolean;
+  nameContact?: string;
+  description?: string;
+  phone?: string;
 }
 
 export interface IReferencePricesMock {
