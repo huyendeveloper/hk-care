@@ -19,8 +19,8 @@ class ExportCancelService {
     return axiosClient.get(`${baseURL}/exportWH/AddToListExportCancel`, {
       params: {
         productId,
-        from: from || -1,
-        to: to || -1,
+        from,
+        to,
       },
     });
   }

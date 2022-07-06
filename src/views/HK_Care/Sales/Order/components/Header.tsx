@@ -35,6 +35,7 @@ const Header = ({
   const [products, setProducts] = useState<ISearchProduct[]>([]);
   const [hidden, setHidden] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
@@ -47,9 +48,11 @@ const Header = ({
   const fetchProductSearchList = async () => {
     const { data } = await salesOrderService.getSearchProductList(filters);
     setProducts(data.items);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchProductSearchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -129,6 +132,32 @@ const Header = ({
                   <div>Có thể bán: {item.stockQuantity}</div>
                 </Stack>
               ))}
+            </Stack>
+          )}
+          {!hidden && products.length === 0 && (
+            <Stack
+              sx={{
+                position: 'absolute',
+                top: '55px',
+                right: '-200px',
+                left: 0,
+                marginRight: '8px',
+                borderRadius: '4px',
+                background: 'white',
+                border: '1px solid #d9d9d9',
+                maxHeight: '350px',
+                zIndex: 99,
+              }}
+            >
+              <Stack
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+                p={2}
+                sx={{ borderBottom: '1px solid #d9d9d9' }}
+              >
+                {loading ? 'Đang tải . . .' : 'Không tìm thấy kết quả nào.'}
+              </Stack>
             </Stack>
           )}
         </Box>

@@ -1,6 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, TableCell, TableRow } from '@mui/material';
-import { defaultFilters } from 'constants/defaultFilters';
 import DateFns from 'utils/DateFns';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -8,63 +7,36 @@ interface IProps {
   item: any;
   index: number;
   remove: any;
-  errors: any;
-  register: any;
-  setValue: any;
-  getValues: any;
-  arrayName: string;
-  control: any;
 }
 
-const ReceiptEntity = ({
-  item,
-  index,
-  remove,
-  errors,
-  register,
-  setValue,
-  getValues,
-  arrayName,
-  control,
-}: IProps) => {
+const ReceiptEntity = ({ item, index, remove }: IProps) => {
   const { productId } = item;
-  const object = `${arrayName}.${index}`;
 
   return (
     <TableRow hover tabIndex={-1} key={productId}>
-      <TableCell>
-        {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
-      </TableCell>
-      <TableCell>{getValues(`${object}.productName`)}</TableCell>
+      <TableCell>{index}</TableCell>
+      <TableCell>{item.productName}</TableCell>
+      <TableCell sx={{ width: '130px' }}>{item.measureName}</TableCell>
+      <TableCell sx={{ width: '130px' }}>{numberFormat(item.amount)}</TableCell>
       <TableCell sx={{ width: '130px' }}>
-        {getValues(`${object}.measureName`)}
-      </TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(getValues(`${object}.amount`))}
+        {numberFormat(item.importPrice)}
       </TableCell>
       <TableCell sx={{ width: '130px' }}>
-        {numberFormat(getValues(`${object}.importPrice`))}
+        {numberFormat(item.amount * item.importPrice)}
       </TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(
-          getValues(`${object}.amount`) * getValues(`${object}.importPrice`)
-        )}
-      </TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {getValues(`${object}.lotNumber`)}
-      </TableCell>
+      <TableCell sx={{ width: '130px' }}>{item.lotNumber}</TableCell>
 
       <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(getValues(`${object}.creationTime`))}
+        {DateFns.formatDate(item.creationTime)}
       </TableCell>
       <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(getValues(`${object}.expiryDate`))}
+        {DateFns.formatDate(item.expiryDate)}
       </TableCell>
 
       <TableCell align="left">
         <IconButton
           onClick={() => {
-            remove(index);
+            remove(index - 1);
           }}
         >
           <CloseIcon />

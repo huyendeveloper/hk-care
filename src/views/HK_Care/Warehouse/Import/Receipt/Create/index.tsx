@@ -97,7 +97,8 @@ const validationSchema = yup.object().shape({
             return false;
           }
           return true;
-        }),
+        })
+        .typeError('Giá bán không hợp lệ!'),
     })
   ),
   vat: yup.number().typeError('Vui lòng nhập!').default(0),
@@ -307,7 +308,7 @@ const CreateForm = () => {
       });
       return navigate(`/hk_care/warehouse/import/receipt`);
     }
-    const {  error } = await dispatch(
+    const { error } = await dispatch(
       // @ts-ignore
       createImportReceipt({ ...newPayload, pathFile })
     );

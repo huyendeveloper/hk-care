@@ -9,6 +9,10 @@ const breadcrumbConfig = (tennant: string) => {
       breadcrumb: 'Thông tin điểm bán',
       path: '/hk_group/tenant',
     },
+    {
+      breadcrumb: 'Quản trị người dùng',
+      path: '/hk_group/users',
+    },
     // hk group product
     {
       exact: true,

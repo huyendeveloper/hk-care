@@ -5,20 +5,14 @@ import MainLayout from "layouts/Main";
 import { lazy } from "react";
 import { Navigate, RouteObject, useRoutes } from "react-router-dom";
 import { CreateSalesOrder, PrintSalesOrder } from "views/HK_Care/Sales";
-import CRUDRoutes from "./CRUDExample";
-import HKCareProductRoutes from "./HKCareProduct";
-import HKCareSales from "./HKCareSales";
-import HKCareWarehouse from "./HKCareWarehouse";
+import HKCare from './HKCare';
 import HKGroup from "./HKGroup";
-import HKGroupProductRoutes from "./HKGroupProduct";
 import HKTrading from "./HKTrading";
 import Loadable from "./Loadable";
 import UserRoutes from "./User";
 
-// Authentication
 const Login = Loadable(lazy(() => import("views/Login")));
 const NotFound = Loadable(lazy(() => import("views/NotFound")));
-
 const Home = Loadable(lazy(() => import("views/Home")));
 
 const routes: RouteObject[] = [
@@ -75,15 +69,10 @@ const routes: RouteObject[] = [
     ),
     children: [
       { index: true, element: <Home /> },
-      CRUDRoutes,
       UserRoutes,
-      HKGroupProductRoutes,
-      HKCareProductRoutes,
-      HKCareWarehouse,
-      HKCareSales,
+      HKCare,
       HKTrading,
       HKGroup,
-      //if has other Routes, push it in here
     ],
   },
 

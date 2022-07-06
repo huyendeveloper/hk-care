@@ -5,13 +5,13 @@ import {
   FormContent,
   FormFooter,
   FormHeader,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { ISalesOrder, ISearchProduct, OrderSales } from 'interface';
+import { ISearchProduct, OrderSales } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,7 +19,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   addProductSales,
   createSalesOrder,
-  updateSalesOrder,
+  updateSalesOrder
 } from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
@@ -122,15 +122,15 @@ const OrderProductForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productSales]);
 
-  const onSubmit = async (payload: OrderSales) => {
-    if (payload.createOrderDetailDtos.length < 1) {
+  const onSubmit = async (body: OrderSales) => {
+    if (body.createOrderDetailDtos.length < 1) {
       setNotification({ error: 'Bạn chưa chọn sản phẩm nào!' });
       return;
     }
     if (id) {
       const { error } = await dispatch(
         // @ts-ignore
-        updateSalesOrder({ ...payload, orderId: id })
+        updateSalesOrder({ ...body, orderId: id })
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
@@ -140,11 +140,12 @@ const OrderProductForm = ({
         message: 'Cập nhật thành công',
         severity: 'success',
       });
+      window.open(`/hk_care/sales/order/${id}/print`);
       return navigate(`/hk_care/sales/order`);
     } else {
-      const { error } = await dispatch(
+      const { error, payload } = await dispatch(
         // @ts-ignore
-        createSalesOrder(payload)
+        createSalesOrder(body)
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
@@ -154,6 +155,9 @@ const OrderProductForm = ({
         message: 'Tạo hóa đơn thành công',
         severity: 'success',
       });
+      if (payload.id) {
+        window.open(`/hk_care/sales/order/${payload.id}/print`);
+      }
       handleDelete();
     }
   };
