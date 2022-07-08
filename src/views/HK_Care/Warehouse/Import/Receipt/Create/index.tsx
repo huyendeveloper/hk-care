@@ -50,55 +50,41 @@ import TotalBill from './TotalBill';
 const validationSchema = yup.object().shape({
   productReceiptWHDtos: yup.array().of(
     yup.object().shape({
-      lotNumber: yup
-        .string()
-        .required('Vui lòng nhập!')
-        .typeError('Vui lòng nhập!')
-        .default(''),
-      numberRegister: yup
-        .string()
-        .required('Vui lòng nhập!')
-        .typeError('Vui lòng nhập!')
-        .default(''),
+      lotNumber: yup.string().default(''),
+      numberRegister: yup.string().default(''),
       dateManufacture: yup
         .date()
-        .required('Vui lòng nhập!')
-        .typeError('Vui lòng nhập!')
+        .notRequired()
+        .nullable(true)
+        .typeError('Sai định dạng')
         .test('validateDateManufacture', 'Trước hạn sử dụng!', function (item) {
           const dateManufacture = item;
           const { expiryDate } = this.parent;
-          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
-            return false;
-          }
-          return true;
-        }),
-      expiryDate: yup
-        .date()
-        .required('Vui lòng nhập!')
-        .typeError('Vui lòng nhập!')
-        .test('validateExpiryDate', 'Sau ngày sản xuất!', function (item) {
-          const { dateManufacture } = this.parent;
-          const expiryDate = item;
-          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
-            return false;
-          }
-          return true;
-        }),
-      price: yup
-        .number()
-        .test('validatePrice', 'Giá bán không hợp lệ!', function (item) {
-          const { importPrice } = this.parent;
-          const price = item;
-          if (!importPrice || !price) {
+          if (!dateManufacture || !expiryDate) {
             return true;
           }
-
-          if (importPrice > price) {
+          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
             return false;
           }
           return true;
         })
-        .typeError('Giá bán không hợp lệ!'),
+        .default(null),
+      expiryDate: yup
+        .date()
+        .notRequired()
+        .nullable(true)
+        .typeError('Sai định dạng')
+        .test('validateExpiryDate', 'Sau ngày sản xuất!', function (item) {
+          const { dateManufacture } = this.parent;
+          const expiryDate = item;
+          if (!dateManufacture || !expiryDate) {
+            return true;
+          }
+          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
+            return false;
+          }
+          return true;
+        }),
     })
   ),
   vat: yup.number().typeError('Vui lòng nhập!').default(0),
@@ -108,17 +94,17 @@ const validationSchema = yup.object().shape({
 
 const getCells = (): Cells<IReceipt> => [
   { id: 'productId', label: 'STT' },
-  { id: 'productName', label: 'Tên sản phẩm' },
-  { id: 'mesure', label: 'Đơn vị' },
-  { id: 'mesure', label: 'Số lượng' },
+  { id: 'productName', label: 'Tên SP' },
+  { id: 'mesure', label: 'Đ.Vị' },
+  { id: 'mesure', label: 'SL' },
   { id: 'mesure', label: 'Giá nhập' },
   { id: 'mesure', label: 'Giá bán' },
-  { id: 'productGroup', label: 'Chiết khấu' },
-  { id: 'stockQuantity', label: 'Thành tiền' },
+  { id: 'productGroup', label: 'C.Khấu' },
+  { id: 'stockQuantity', label: 'T.T' },
   { id: 'importPrice', label: 'Số lô' },
-  { id: 'price', label: 'Số đăng ký' },
-  { id: 'price', label: 'Ngày sản xuất' },
-  { id: 'mesure', label: 'Hạn dùng' },
+  { id: 'price', label: 'Số ĐK' },
+  { id: 'price', label: 'NSX' },
+  { id: 'mesure', label: 'HSD' },
   { id: 'mesure', label: '' },
 ];
 
@@ -180,6 +166,7 @@ const CreateForm = () => {
   } = useForm<IReceipt>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
+    // @ts-ignore
     defaultValues: validationSchema.getDefault(),
   });
 
@@ -308,12 +295,12 @@ const CreateForm = () => {
       });
       return navigate(`/hk_care/warehouse/import/receipt`);
     }
-    const { error } = await dispatch(
+    const { error, payload } = await dispatch(
       // @ts-ignore
       createImportReceipt({ ...newPayload, pathFile })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: payload.response.data.join(' ') || 'Lỗi!' });
       return;
     }
     setNotification({
@@ -333,6 +320,7 @@ const CreateForm = () => {
   const onChangeSelect = (value: number | null) => {
     setProductChoosed(value);
     const productSelected = productList.filter((x) => x.productId === value)[0];
+    // @ts-ignore
     append({
       ...productSelected,
       name: productSelected.productName,

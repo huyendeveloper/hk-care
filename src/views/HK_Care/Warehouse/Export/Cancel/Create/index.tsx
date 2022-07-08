@@ -4,11 +4,11 @@ import {
   FormGroup,
   Grid,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableContainer,
 } from '@mui/material';
-import Button from '@mui/material/Button';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import {
@@ -58,14 +58,14 @@ interface IProductListName {
 
 const getCells = (): Cells<IProductExportCancel> => [
   { id: 'id', label: 'STT' },
-  { id: 'productName', label: 'Tên sản phẩm' },
-  { id: 'measureName', label: 'Đơn vị' },
-  { id: 'amount', label: 'Số lượng' },
+  { id: 'productName', label: 'Tên SP' },
+  { id: 'measureName', label: 'Đ.Vị' },
+  { id: 'amount', label: 'SL' },
   { id: 'importPrice', label: 'Giá vốn' },
   { id: 'importPrice', label: 'Giá trị hủy' },
   { id: 'lotNumber', label: 'Số lô' },
   { id: 'creationTime', label: 'Ngày nhập' },
-  { id: 'expiryDate', label: 'Hạn sử dụng' },
+  { id: 'expiryDate', label: 'HSD' },
   { id: 'lotNumber', label: '' },
 ];
 
@@ -181,8 +181,42 @@ const CreateForm = () => {
     }
   }, [detailAdd]);
 
+  const fetchExpiredProduct = async () => {
+    setLoadingAdd(true);
+    try {
+      const { data } = await exportCancelService.addToListExportCancel({
+        productId: null,
+        from: -1,
+        to: -1,
+      });
+      if (data.length === 0) {
+        setNotification({ error: 'Không có sản phẩm nào!' });
+        setLoadingAdd(false);
+        return;
+      }
+      data.forEach((item: IProductExportCancel) => {
+        // @ts-ignore
+        if (!fields.some((e) => e.orderId === item.id)) {
+          if (id) {
+            // @ts-ignore
+            append({ ...item, orderId: item.id, id: 0 });
+          } else {
+            // @ts-ignore
+            append({ ...item, orderId: item.id });
+          }
+        }
+      });
+      setFilters({ ...filters, sortBy: '' });
+    } catch (error) {
+      setNotification({ error: 'Lỗi!' });
+      setLoadingAdd(false);
+    }
+    setLoadingAdd(false);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchExpiredProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -309,45 +343,41 @@ const CreateForm = () => {
           <Grid item xs={12} md={5}>
             <FormLabel title="Thời gian sử dụng còn" name="name" />
             <Grid container spacing={2}>
-              <Grid
-                item
-                xs={4}
-                sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}
-              >
-                <FormLabel title="Từ:" name="name" />
-                <Selecter
-                  options={fromList}
-                  renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  renderValue="id"
-                  placeholder=""
-                  defaultValue=""
-                  onChangeSelect={(value: number | null) =>
-                    setDetailAdd({ ...detailAdd, from: value })
-                  }
-                />
+              <Grid item xs={4}>
+                <Stack flexDirection="row" alignItems="center" gap="10px">
+                  <FormLabel title="Từ:" name="name" />
+                  <Selecter
+                    options={fromList}
+                    renderLabel={(field) => field.name}
+                    noOptionsText="Không tìm thấy sản phẩm"
+                    renderValue="id"
+                    placeholder=""
+                    defaultValue=""
+                    onChangeSelect={(value: number | null) =>
+                      setDetailAdd({ ...detailAdd, from: value })
+                    }
+                  />
+                </Stack>
               </Grid>
-              <Grid
-                item
-                xs={4}
-                sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}
-              >
-                <FormLabel title="Đến:" name="name" />
-                <Selecter
-                  options={
-                    detailAdd.from === -1 || detailAdd.from === null
-                      ? toList
-                      : [...toList].splice(2, toList.length)
-                  }
-                  renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  renderValue="id"
-                  placeholder=""
-                  defaultValue=""
-                  onChangeSelect={(value: number | null) =>
-                    setDetailAdd({ ...detailAdd, to: value })
-                  }
-                />
+              <Grid item xs={4} sx={{ gap: '10px' }}>
+                <Stack flexDirection="row" alignItems="center" gap="10px">
+                  <FormLabel title="Đến:" name="name" />
+                  <Selecter
+                    options={
+                      detailAdd.from === -1 || detailAdd.from === null
+                        ? toList
+                        : [...toList].splice(2, toList.length)
+                    }
+                    renderLabel={(field) => field.name}
+                    noOptionsText="Không tìm thấy sản phẩm"
+                    renderValue="id"
+                    placeholder=""
+                    defaultValue=""
+                    onChangeSelect={(value: number | null) =>
+                      setDetailAdd({ ...detailAdd, to: value })
+                    }
+                  />
+                </Stack>
               </Grid>
             </Grid>
           </Grid>
@@ -469,7 +499,7 @@ const CreateForm = () => {
           <LinkButton to="/hk_care/warehouse/export/cancel">Hủy</LinkButton>
 
           <LoadingButton loading={loading} type="submit">
-            {id ? 'Lưu' : 'Xuất hàng'}
+            {id ? 'Lưu' : 'Xuất hủy'}
           </LoadingButton>
         </FormFooter>
       </FormPaperGrid>

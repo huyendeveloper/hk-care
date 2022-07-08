@@ -122,7 +122,7 @@ const TableData = ({ orderDetailDtos }: IProps) => {
                     quantity,
                     price,
                     discount,
-                    total,
+                    measureName,
                     mor,
                     noon,
                     night,
@@ -134,11 +134,13 @@ const TableData = ({ orderDetailDtos }: IProps) => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{productName}</TableCell>
-                      <TableCell>{'Đơn vị'}</TableCell>
+                      <TableCell>{measureName}</TableCell>
                       <TableCell>{quantity}</TableCell>
                       <TableCell>{numberFormat(price)}</TableCell>
                       <TableCell>{numberFormat(discount)}</TableCell>
-                      <TableCell>{numberFormat(Math.abs(total))}</TableCell>
+                      <TableCell>
+                        {numberFormat(quantity * price - discount)}
+                      </TableCell>
                       <TableCell>
                         <TableContainer>
                           <Table>
@@ -165,7 +167,7 @@ const TableData = ({ orderDetailDtos }: IProps) => {
               </TableBody>
             </Table>
           </Scrollbar>
-          <Stack flexDirection="row" sx={{ mt: 3 }} justifyContent='flex-end'>
+          <Stack flexDirection="row" sx={{ mt: 3 }} justifyContent="flex-end">
             <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>
           </Stack>
         </TableContainer>

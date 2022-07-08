@@ -1,11 +1,18 @@
 import { LoadingButton } from '@mui/lab';
-import { Grid, Paper, Table, TableBody, TableContainer } from '@mui/material';
+import {
+  Grid,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableContainer,
+} from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import {
   FormContent,
   FormFooter,
   FormHeader,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
@@ -19,7 +26,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   addProductSales,
   createSalesOrder,
-  updateSalesOrder
+  updateSalesOrder,
 } from 'redux/slices/salesOrder';
 import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
@@ -163,14 +170,19 @@ const OrderProductForm = ({
   };
 
   return (
-    <FormPaperGrid height="fit-content" onSubmit={handleSubmit(onSubmit)}>
-      <FormHeader title="" />
+    <FormPaperGrid
+      height="fit-content"
+      style={{ margin: '-24px', height: 'calc(100vh - 58px)' }}
+      onSubmit={handleSubmit(onSubmit)}
+      gridTemplateRows="1fr"
+    >
+      <FormHeader title="" hidden />
       <FormContent>
         <Grid container sx={{ height: 1 }}>
           <Grid item xs={12} md={9}>
             <TableWrapper sx={{ height: 1 }} component={Paper}>
               <TableContent total={1} loading={false}>
-                <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+                <TableContainer sx={{ p: 1.5, maxHeight: '30vh' }}>
                   <Scrollbar>
                     <Table sx={{ minWidth: 'max-content' }} size="small">
                       <TableHeader
@@ -205,13 +217,19 @@ const OrderProductForm = ({
               setValue={setValue}
               getValues={getValues}
             />
+            <Stack p={2} gap={2} flexDirection="row" justifyContent="flex-end">
+              {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
+              <LoadingButton
+                type="submit"
+                sx={id ? {} : { fontSize: '28px', width: '100%' }}
+              >
+                {id ? 'Lưu' : 'Thanh toán'}
+              </LoadingButton>
+            </Stack>
           </Grid>
         </Grid>
       </FormContent>
-      <FormFooter>
-        {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
-        <LoadingButton type="submit">{id ? 'Lưu' : 'Thanh toán'}</LoadingButton>
-      </FormFooter>
+      <FormFooter hidden></FormFooter>
     </FormPaperGrid>
   );
 };

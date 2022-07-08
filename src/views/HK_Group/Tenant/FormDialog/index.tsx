@@ -125,7 +125,6 @@ const FormDialog = ({
   }, [currentID, open]);
 
   const onSubmit = async (tenant: ITenant) => {
-    console.log('first');
     // if (files.length === 0) {
     //   setNotification({
     //     message: 'Chưa có giấy chứng nhận',
@@ -133,8 +132,6 @@ const FormDialog = ({
     //   });
     //   return;
     // }
-    console.log('tenant :>> ', tenant);
-
     // if (tenant.id) {
     //   const { error, payload } = await dispatch(
     //     // @ts-ignore
@@ -163,7 +160,6 @@ const FormDialog = ({
     //   }
     //   setNotification({ message: 'Thêm thành công', severity: 'success' });
     // }
-
     // reset({});
     // setFiles([]);
     // handleClose(true);

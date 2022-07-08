@@ -16,6 +16,8 @@ const CirculationInvoiceDetail = Loadable(lazy(() => import("views/HK_Care/Wareh
 const ProductList = Loadable(lazy(() => import('views/HK_Care/Product/ProductList')));
 const ProductListCreate = Loadable(lazy(() => import('views/HK_Care/Product/ProductList/Create')));
 const ProductDetails = Loadable(lazy(() => import('views/HK_Care/Product/ProductList/Details')));
+const RequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Request')));
+const CreateRequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Request/Create')));
 
 const HKCareRoutes: RouteObject = {
   path: "hk_care",
@@ -88,6 +90,18 @@ const HKCareRoutes: RouteObject = {
     {
       path: "product/list/:id",
       children: [{ index: true, element: <ProductDetails /> }],
+    },
+    {
+      path: "warehouse/request",
+      children: [{ index: true, element: <RequestImport /> }],
+    },
+    {
+      path: "warehouse/request/:id",
+      children: [{ index: true, element: <CreateRequestImport /> }],
+    },
+    {
+      path: "warehouse/request/create",
+      children: [{ index: true, element: <CreateRequestImport /> }],
     },
   ],
 };

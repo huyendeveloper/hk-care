@@ -8,7 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
@@ -17,7 +17,7 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -29,6 +29,7 @@ import { deleteProductList, getAllProduct } from 'redux/slices/productList';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
+import QuotaUpdate from './QuotaUpdate';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -38,6 +39,7 @@ const getCells = (): Cells<IProductList> => [
   { id: 'stockQuantity', label: 'Hàng tồn' },
   { id: 'importPrice', label: 'Giá nhập' },
   { id: 'price', label: 'Giá bán' },
+  { id: 'quota', label: 'Định mức' },
   { id: 'price', label: 'Thao tác' },
 ];
 
@@ -200,6 +202,7 @@ const TableData = ({ active = 1 }: IProps) => {
                     price,
                     mesure,
                     stockQuantity,
+                    quota,
                   } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={productId}>
@@ -212,7 +215,9 @@ const TableData = ({ active = 1 }: IProps) => {
                       <TableCell>{stockQuantity}</TableCell>
                       <TableCell>{numberFormat(importPrice)}</TableCell>
                       <TableCell>{numberFormat(price)}</TableCell>
-
+                      <TableCell width="120px">
+                        <QuotaUpdate quota={quota} />
+                      </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
                   );

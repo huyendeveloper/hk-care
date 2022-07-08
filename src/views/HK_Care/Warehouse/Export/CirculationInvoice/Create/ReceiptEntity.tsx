@@ -39,7 +39,7 @@ const ReceiptEntity = ({
       </TableCell>
       <TableCell>{getValues(`${object}.productName`)}</TableCell>
       <TableCell>{getValues(`${object}.measureName`)}</TableCell>
-      <TableCell sx={{ width: '150px !important' }}>
+      <TableCell sx={{ width: '100px !important' }}>
         <ControllerNumberInput
           name={`${object}.amount`}
           setValue={setValue}

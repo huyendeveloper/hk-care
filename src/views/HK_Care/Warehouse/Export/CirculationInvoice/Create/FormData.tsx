@@ -33,7 +33,7 @@ import { Cells } from 'components/Table/TableHeader';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { IExportWHRotation, IProductExportCancel, ITenant } from 'interface';
+import { IExportWHRotation, ITenant } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -80,8 +80,8 @@ const validationSchema = yup.object().shape({
 const getCells = (): Cells<IExportWHRotation> => [
   { id: 'code', label: 'STT' },
   { id: 'code', label: 'Tên sản phẩm' },
-  { id: 'code', label: 'Đơn vị' },
-  { id: 'code', label: 'Số lượng' },
+  { id: 'code', label: 'Đ.Vị' },
+  { id: 'code', label: 'SL' },
   { id: 'code', label: 'Giá vốn' },
   { id: 'code', label: 'Giá trị xuất' },
   { id: 'code', label: '' },

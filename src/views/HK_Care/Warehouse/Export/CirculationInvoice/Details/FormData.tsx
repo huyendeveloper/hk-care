@@ -46,8 +46,8 @@ interface IProps {
 const getCells = (): Cells<IExportWHRotation> => [
   { id: 'code', label: 'STT' },
   { id: 'code', label: 'Tên sản phẩm' },
-  { id: 'code', label: 'Đơn vị' },
-  { id: 'code', label: 'Số lượng' },
+  { id: 'code', label: 'Đ.Vị' },
+  { id: 'code', label: 'SL' },
   { id: 'code', label: 'Giá vốn' },
   { id: 'code', label: 'Giá trị xuất' },
 ];

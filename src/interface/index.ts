@@ -113,6 +113,7 @@ export interface IProductList {
   mesureLevelFisrtName: string;
   mesureLevelSecondName: string;
   mesureLevelThirdName: string;
+  quota: number;
 }
 
 export interface IProductReceiptWHDtos {
@@ -149,10 +150,10 @@ export interface IReceipt {
   mesureLevelSecondName: string;
   mesureLevelThirdName: string;
   quantity: number;
-  dateManufacture: Date;
+  dateManufacture?: Date | null;
+  expiryDate?: Date | null;
   productReceiptWHDtos?: IProductReceiptWHDtos[];
   discount?: number;
-  expiryDate: Date;
   amount: number;
   mesureNameLevelFirst?: string;
   pathFile?: string;
@@ -228,6 +229,7 @@ export interface ISalesOrder {
   disCount: number;
   description: string;
   orderDetailDtos: OrderDetailDtos[];
+  discountValue: number;
 }
 
 export interface OrderSales {
@@ -311,4 +313,30 @@ export interface IExportWHRotation {
   exportWHId: number;
   exportWHDetails: IProductExportCancel[];
   __tenant: string;
+}
+
+export interface IProductRequestImport {
+  name: string;
+  measureName: string;
+  budget: number;
+  addBudget: number;
+}
+
+export interface IRequestImport {
+  id: number;
+  code: string;
+  requestDate: Date;
+  description?: string;
+  productRequestImports?: IProductRequestImport[];
+}
+
+export interface IQuota {
+  id: number;
+  productName: string;
+  measureName: string;
+  groupProductName: string;
+  stockQuantity: number;
+  importPrice: number;
+  price: number;
+  quota: number;
 }

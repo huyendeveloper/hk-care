@@ -6,17 +6,29 @@ type Props =
       children: [ReactNode, ReactNode, ReactNode];
       disableHeader?: never;
       height?: string;
+      gridTemplateRows?: string;
     }
-  | { children: [ReactNode, ReactNode]; disableHeader: true; height?: string };
+  | {
+      children: [ReactNode, ReactNode];
+      disableHeader: true;
+      gridTemplateRows?: string;
+      height?: string;
+    };
 
 const FormPaperGrid = (props: Props & FormHTMLAttributes<HTMLFormElement>) => {
-  const { children, disableHeader, height = '100%', ...rest } = props;
+  const {
+    children,
+    disableHeader,
+    height = '100%',
+    gridTemplateRows = 'auto 1fr auto',
+    ...rest
+  } = props;
   return (
     <Paper
       component="form"
       sx={{
         display: 'grid',
-        gridTemplateRows: 'auto 1fr auto',
+        gridTemplateRows,
         rowGap: 1,
         p: 2.5,
         height,
