@@ -38,18 +38,17 @@ const validationSchema = yup.object().shape({});
 
 const getCells = (): Cells<IReceipt> => [
   { id: 'productId', label: 'STT' },
-  { id: 'productName', label: 'Tên sản phẩm' },
-  { id: 'mesure', label: 'Đơn vị' },
-  { id: 'mesure', label: 'Số lượng' },
+  { id: 'productName', label: 'Tên SP' },
+  { id: 'mesure', label: 'Đ.Vị' },
+  { id: 'mesure', label: 'SL' },
   { id: 'mesure', label: 'Giá nhập' },
   { id: 'mesure', label: 'Giá bán' },
-  { id: 'productGroup', label: 'Chiết khấu' },
-  { id: 'stockQuantity', label: 'Thành tiền' },
+  { id: 'productGroup', label: 'C.Khấu' },
+  { id: 'stockQuantity', label: 'T.T' },
   { id: 'importPrice', label: 'Số lô' },
-  { id: 'price', label: 'Số đăng ký' },
-  { id: 'price', label: 'Ngày sản xuất' },
-  { id: 'mesure', label: 'Hạn dùng' },
-  { id: 'mesure', label: '' },
+  { id: 'price', label: 'Số ĐK' },
+  { id: 'price', label: 'NSX' },
+  { id: 'mesure', label: 'HSD' },
 ];
 
 interface ImportReceipt {

@@ -81,6 +81,7 @@ const breadcrumbConfig = (tennant: string) => {
     { breadcrumb: 'Danh sách sản phẩm', path: '/hk_care/product/list' },
     // hk care warehouse
     { breadcrumb: 'Quản lý kho', path: '/hk_care/warehouse' },
+    { breadcrumb: 'Yêu cầu nhập kho', path: '/hk_care/warehouse/request' },
     { breadcrumb: 'Nhập kho', path: '/hk_care/warehouse/import' },
     {
       breadcrumb: 'Hóa đơn nhập kho',

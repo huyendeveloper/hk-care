@@ -106,31 +106,32 @@ const OrderInfo = ({ order }: IProps) => {
             <b>Tiền thừa trả khách</b>
             <div>
               {numberFormat(
-                (order?.orderDetailDtos
-                  ? order?.orderDetailDtos.reduce(
-                      // @ts-ignore
-                      (prev, cur) =>
-                        prev +
-                        (Number(
-                          (cur.quantity || 0) * cur.price - (cur.discount || 0)
-                        ) || 0),
-                      0
-                    )
-                  : 0) -
-                  ((order?.disCount ?? 0) / 100) *
-                    (order?.orderDetailDtos
-                      ? order?.orderDetailDtos.reduce(
-                          // @ts-ignore
-                          (prev, cur) =>
-                            prev +
-                            (Number(
-                              (cur.quantity || 0) * cur.price -
-                                (cur.discount || 0)
-                            ) || 0),
-                          0
-                        )
-                      : 0) -
-                  (order?.giveMoney || 0)
+                (order?.giveMoney || 0) -
+                  ((order?.orderDetailDtos
+                    ? order?.orderDetailDtos.reduce(
+                        // @ts-ignore
+                        (prev, cur) =>
+                          prev +
+                          (Number(
+                            (cur.quantity || 0) * cur.price -
+                              (cur.discount || 0)
+                          ) || 0),
+                        0
+                      )
+                    : 0) -
+                    ((order?.disCount ?? 0) / 100) *
+                      (order?.orderDetailDtos
+                        ? order?.orderDetailDtos.reduce(
+                            // @ts-ignore
+                            (prev, cur) =>
+                              prev +
+                              (Number(
+                                (cur.quantity || 0) * cur.price -
+                                  (cur.discount || 0)
+                              ) || 0),
+                            0
+                          )
+                        : 0))
               )}
             </div>
           </Stack>
@@ -159,7 +160,7 @@ const OrderInfo = ({ order }: IProps) => {
             </tr>
             <tr>
               <td>Ngày bán:</td>
-              <td>{moment(new Date()).format('DD/MM/YYYY HH:mm')}</td>
+              <td>{moment(order?.saleDate).format('DD/MM/YYYY HH:mm')}</td>
             </tr>
           </table>
           <hr />

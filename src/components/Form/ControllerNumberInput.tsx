@@ -15,6 +15,7 @@ interface Props<T> extends Omit<TextFieldProps, 'name'> {
   type?: string;
   control: Control<T>;
   defaultValue?: number;
+  errors?: string;
 }
 
 const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
@@ -29,6 +30,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
     type,
     control,
     inputProps,
+    errors,
   } = props;
 
   if (type === 'percent') {
@@ -69,29 +71,32 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
 
   return (
     <Controller
-      render={({ field: { ref, ...others }, fieldState: { error } }) => (
-        <NumberFormat
-          fullWidth
-          customInput={TextField}
-          value={value}
-          defaultValue={defaultValue}
-          onValueChange={({ value: v }) =>
-            // @ts-ignore
-            setValue(name, v ? Number(v) : null)
-          }
-          allowedDecimalSeparators={[',', '.']}
-          decimalScale={0}
-          isNumericString
-          thousandSeparator=","
-          allowNegative={false}
-          disabled={disabled}
-          error={Boolean(error)}
-          helperText={error?.message}
-          inputRef={ref}
-          variant={variant}
-          inputProps={inputProps}
-        />
-      )}
+      render={({ field: { ref, ...others }, fieldState: { error } }) => {
+        console.log('error', error);
+        return (
+          <NumberFormat
+            fullWidth
+            customInput={TextField}
+            value={value}
+            defaultValue={defaultValue}
+            onValueChange={({ value: v }) =>
+              // @ts-ignore
+              setValue(name, v ? Number(v) : null)
+            }
+            allowedDecimalSeparators={[',', '.']}
+            decimalScale={0}
+            isNumericString
+            thousandSeparator=","
+            allowNegative={false}
+            disabled={disabled}
+            error={Boolean(error) || Boolean(errors)}
+            helperText={error?.message || errors}
+            inputRef={ref}
+            variant={variant}
+            inputProps={inputProps}
+          />
+        );
+      }}
       name={name}
       control={control}
     />

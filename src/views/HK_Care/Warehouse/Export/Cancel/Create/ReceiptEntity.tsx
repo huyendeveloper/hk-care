@@ -16,22 +16,14 @@ const ReceiptEntity = ({ item, index, remove }: IProps) => {
     <TableRow hover tabIndex={-1} key={productId}>
       <TableCell>{index}</TableCell>
       <TableCell>{item.productName}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{item.measureName}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{numberFormat(item.amount)}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(item.importPrice)}
-      </TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(item.amount * item.importPrice)}
-      </TableCell>
-      <TableCell sx={{ width: '130px' }}>{item.lotNumber}</TableCell>
+      <TableCell>{item.measureName}</TableCell>
+      <TableCell>{numberFormat(item.amount)}</TableCell>
+      <TableCell>{numberFormat(item.importPrice)}</TableCell>
+      <TableCell>{numberFormat(item.amount * item.importPrice)}</TableCell>
+      <TableCell>{item.lotNumber}</TableCell>
 
-      <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(item.creationTime)}
-      </TableCell>
-      <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(item.expiryDate)}
-      </TableCell>
+      <TableCell>{DateFns.formatDate(item.creationTime)}</TableCell>
+      <TableCell>{DateFns.formatDate(item.expiryDate)}</TableCell>
 
       <TableCell align="left">
         <IconButton

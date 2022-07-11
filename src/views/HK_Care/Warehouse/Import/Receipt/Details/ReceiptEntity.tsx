@@ -19,26 +19,20 @@ const ReceiptEntity = ({ item, index, value }: IProps) => {
         {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
       </TableCell>
       <TableCell>{value.name}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{value.measure}</TableCell>
-      <TableCell sx={{ width: '130px' }}>{value.amount}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(value.importPrice)}
-      </TableCell>
-      <TableCell sx={{ width: '130px' }}>{numberFormat(value.price)}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {numberFormat(value?.discount || 0)}
-      </TableCell>
+      <TableCell>{value.measure}</TableCell>
+      <TableCell>{value.amount}</TableCell>
+      <TableCell>{numberFormat(value.importPrice)}</TableCell>
+      <TableCell>{numberFormat(value.price)}</TableCell>
+      <TableCell>{numberFormat(value?.discount || 0)}</TableCell>
       <TableCell>{numberFormat(value.totalMoney)}</TableCell>
 
-      <TableCell sx={{ width: '130px' }}>{value?.lotNumber || ''}</TableCell>
-      <TableCell sx={{ width: '130px' }}>
-        {value?.numberRegister || ''}
+      <TableCell>{value?.lotNumber || ''}</TableCell>
+      <TableCell>{value?.numberRegister || ''}</TableCell>
+      <TableCell>
+        {value.dateManufacture && DateFns.formatDate(value.dateManufacture)}
       </TableCell>
-      <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(value.dateManufacture)}
-      </TableCell>
-      <TableCell sx={{ width: '185px' }}>
-        {DateFns.formatDate(value.expiryDate)}
+      <TableCell>
+        {value.expiryDate && DateFns.formatDate(value.expiryDate)}
       </TableCell>
     </TableRow>
   );

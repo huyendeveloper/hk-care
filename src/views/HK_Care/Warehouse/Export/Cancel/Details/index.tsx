@@ -42,14 +42,14 @@ const validationSchema = yup.object().shape({});
 
 const getCells = (): Cells<IExportCancel> => [
   { id: 'code', label: 'STT' },
-  { id: 'code', label: 'Tên sản phẩm' },
-  { id: 'code', label: 'Đơn vị' },
-  { id: 'code', label: 'Số lượng' },
+  { id: 'code', label: 'Tên SP' },
+  { id: 'code', label: 'Đ.Vị' },
+  { id: 'code', label: 'SL' },
   { id: 'code', label: 'Giá vốn' },
   { id: 'code', label: 'Giá trị hủy' },
   { id: 'code', label: 'Số lô' },
   { id: 'creationTime', label: 'Ngày nhập' },
-  { id: 'code', label: 'Hạn sử dụng' },
+  { id: 'code', label: 'HSD' },
 ];
 
 const Details = () => {

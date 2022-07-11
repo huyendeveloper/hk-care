@@ -78,7 +78,7 @@ const Header = ({
         <Box
           sx={{
             paddingY: 1,
-            width: '250px',
+            width: '300px',
             maxWidth: '100%',
             position: 'relative',
           }}

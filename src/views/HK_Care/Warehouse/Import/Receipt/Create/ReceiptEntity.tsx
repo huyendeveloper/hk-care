@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, IconButton, TableCell, TableRow, TextField } from '@mui/material';
+import { Box, IconButton, TableCell, TableRow } from '@mui/material';
 import { ControllerDatePicker, ControllerTextField } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -93,23 +93,20 @@ const ReceiptEntity = ({
           {getValues(`${object}.name`)}
         </Box>
       </TableCell>
-      <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
-      >
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
           {getValues(`${object}.measure`)}
         </Box>
       </TableCell>
-      <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
-      >
+      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px', width: '80px' }}>
         <ControllerNumberInput
           name={`${object}.amount`}
           setValue={setValue}
           control={control}
           defaultValue={getValues(`${object}.amount`)}
+          disabled={id ? true : false}
         />
       </TableCell>
       <TableCell
@@ -130,6 +127,7 @@ const ReceiptEntity = ({
           value={getValues(`${object}.price`)}
           setValue={setValue}
           control={control}
+          errors={importPrice > price ? 'Giá bán không hợp lệ!' : ''}
         />
       </TableCell>
       <TableCell
@@ -147,53 +145,56 @@ const ReceiptEntity = ({
       </TableCell>
 
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '150px' }}
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '120px' }}
       >
-        <ControllerTextField name={`${object}.lotNumber`} control={control} />
+        <ControllerTextField
+          name={`${object}.lotNumber`}
+          control={control}
+          disabled={id ? true : false}
+        />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '150px' }}
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '120px' }}
       >
         <ControllerTextField
           name={`${object}.numberRegister`}
           control={control}
+          disabled={id ? true : false}
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '185px' }}
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '178px' }}
       >
         <ControllerDatePicker
           name={`${object}.dateManufacture`}
           control={control}
           errors={errors}
+          disabled={id ? true : false}
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '185px' }}
+        sx={{ verticalAlign: 'top', paddingY: '20px', width: '178px' }}
       >
         <ControllerDatePicker
           name={`${object}.expiryDate`}
           control={control}
           errors={errors}
-          // error={(expiryDate || '') === ''}
-          // helperText={
-          //   (expiryDate || '') === ''
-          //     ? 'Vui lòng nhập!'
-          //     : moment(expiryDate).isBefore(moment(dateManufacture))
-          //     ? 'Hạn dùng sau ngày sản xuất!'
-          //     : ''
-          // }
+          disabled={id ? true : false}
         />
       </TableCell>
 
       <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }} align="left">
-        <IconButton
-          onClick={() => {
-            remove(index);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        {id ? (
+          <></>
+        ) : (
+          <IconButton
+            onClick={() => {
+              remove(index);
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </TableCell>
     </TableRow>
   );

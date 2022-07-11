@@ -1,11 +1,7 @@
-import Box from '@mui/material/Box';
-import TableCell from '@mui/material/TableCell';
 import type { TableCellProps } from '@mui/material/TableCell';
+import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import { visuallyHidden } from '@mui/utils';
-import type { MouseEventCurrying } from 'types';
 import type { Dictionary, Order } from 'types/common';
 
 export interface Cell<T> {
@@ -24,43 +20,16 @@ interface Props<T> {
 }
 
 const TableHeader = <T extends Dictionary>(props: Props<T>) => {
-  const { cells, onSort, sortDirection, sortBy } = props;
-
-  const handleOnSort: MouseEventCurrying<HTMLSpanElement, keyof T> =
-    (field) => () => {
-      onSort(field);
-    };
+  const { cells } = props;
 
   return (
     <TableHead>
       <TableRow>
         {cells.map((cell, i) => {
-          const { id, label, align } = cell;
+          const { label, align } = cell;
           return (
             <TableCell key={i} align={align}>
-              {/* {label === 'Thao tác' ||
-              label === 'Hoạt động' ||
-              label === 'STT' ? ( */}
               <div style={{ fontSize: '1.125rem' }}>{label}</div>
-              {/* ) : (
-                <TableSortLabel
-                  active={sortBy === id}
-                  direction={
-                    sortBy === id && sortDirection ? sortDirection : undefined
-                  }
-                  onClick={handleOnSort(id)}
-                  sx={{ display: 'flex', justifyContent: 'start' }}
-                >
-                  <div style={{ fontSize: '1rem' }}>{label}</div>
-                  {sortBy === id ? (
-                    <Box component="span" sx={visuallyHidden}>
-                      {sortDirection === 'desc'
-                        ? 'sorted descending'
-                        : 'sorted ascending'}
-                    </Box>
-                  ) : null}
-                </TableSortLabel>
-              )} */}
             </TableCell>
           );
         })}

@@ -176,7 +176,7 @@ const Create = () => {
         {ids.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <TabPanel value={index.toString()} sx={{ height: '100vh' }}>
+              <TabPanel value={index.toString()}  >
                 <OrderProductForm
                   identification={item}
                   control={control}

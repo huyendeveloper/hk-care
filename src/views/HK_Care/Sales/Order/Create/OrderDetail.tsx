@@ -25,11 +25,11 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       )
     : 0;
   const discountValue = useWatch({ control, name: 'disCount' }) || 0;
-  const paid = useWatch({ control, name: 'moneyToPay' }) || 0;
-  const giveMoney = useWatch({ control, name: 'giveMoney' }) || 0;
+  const paid = useWatch({ control, name: 'giveMoney' }) || 0;
+  const moneyToPay = useWatch({ control, name: 'moneyToPay' }) || 0;
 
   useEffect(() => {
-    setValue('giveMoney', bill - (discountValue / 100) * bill);
+    setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bill, discountValue]);
 
@@ -59,7 +59,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
         <b>KHÁCH PHẢI TRẢ</b>
-        <div>{numberFormat(giveMoney)}</div>
+        <div>{numberFormat(moneyToPay)}</div>
       </Stack>
       <hr style={{ width: '100%' }} />
       <Stack flexDirection="row" justifyContent="space-between">
@@ -69,11 +69,11 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         <b>Tiền mặt</b>
         <div>
           <ControllerNumberInput
-            name="moneyToPay"
+            name="giveMoney"
             variant="standard"
             setValue={setValue}
             control={control}
-            value={getValues('moneyToPay')}
+            value={getValues('giveMoney')}
             inputProps={{ style: { textAlign: 'right' } }}
           />
         </div>
@@ -90,8 +90,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       <b>Ghi chú</b>
 
       <ControllerTextarea
-        maxRows={11}
-        minRows={11}
+        maxRows={5}
+        minRows={5}
         name="description"
         control={control}
       />

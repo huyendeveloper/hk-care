@@ -36,9 +36,7 @@ const ReceiptEntity = ({
       </TableCell>
       <TableCell>{getValues(`${object}.productName`)}</TableCell>
       <TableCell>{getValues(`${object}.measureName`)}</TableCell>
-      <TableCell sx={{ width: '150px !important' }}>
-        {numberFormat(getValues(`${object}.amount`))}
-      </TableCell>
+      <TableCell>{numberFormat(getValues(`${object}.amount`))}</TableCell>
       <TableCell>{numberFormat(getValues(`${object}.importPrice`))}</TableCell>
       <TableCell>
         {numberFormat(getValues(`${object}.importPrice`) * amount)}

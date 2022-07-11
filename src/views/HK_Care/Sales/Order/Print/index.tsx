@@ -4,6 +4,7 @@ import { LoadingScreen } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import { useNotification } from 'hooks';
 import { ISalesOrder } from 'interface';
+import moment from 'moment';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
@@ -12,6 +13,7 @@ import ReactToPrint from 'react-to-print';
 import { getSaleOrder } from 'redux/slices/salesOrder';
 import LocalStorage from 'utils/LocalStorage';
 import { numberFormat } from 'utils/numberFormat';
+import StarIcon from '@mui/icons-material/Star';
 // @ts-ignore
 import Print from './print';
 
@@ -116,24 +118,24 @@ const PrintOrder = () => {
                   {' '}
                   HÓA ĐƠN BÁN HÀNG
                 </h6>
-                (Ngày 30/02/2022)
+                (Ngày {moment(order?.saleDate).format('DD/MM/YYYY')})
               </Box>
               <Stack flexDirection="row" mb={2} justifyContent="space-between">
                 <div>
                   BH: <b>Dược sĩ Huyền</b>
                 </div>
                 <div>
-                  Mã HĐ: <b>07239</b>
+                  Mã HĐ: <b>{order?.code}</b>
                 </div>
               </Stack>
               <table style={{ marginBottom: '20px' }}>
                 <thead>
                   <tr>
                     <td>Sản phẩm</td>
-                    <td style={{ padding: '2px' }}>Đ.Vị</td>
+                    {/* <td style={{ padding: '2px' }}>Đ.Vị</td> */}
                     <td style={{ padding: '2px' }}>SL</td>
                     <td style={{ padding: '2px' }}>Đ.Giá</td>
-                    <td style={{ padding: '2px' }}>C.Khấu</td>
+                    {/* <td style={{ padding: '2px' }}>C.Khấu</td> */}
                     <td>T.Tiền</td>
                   </tr>
                 </thead>
@@ -143,17 +145,21 @@ const PrintOrder = () => {
                       <>
                         <tr>
                           <td>{item.productName}</td>
-                          <td style={{ padding: '2px' }}>{item.measureName}</td>
+                          {/* <td style={{ padding: '2px' }}>{item.measureName}</td> */}
                           <td style={{ padding: '2px', textAlign: 'center' }}>
                             {item.quantity}
                           </td>
                           <td style={{ padding: '2px' }}>
                             {numberFormat(item.price)}
                           </td>
-                          <td style={{ padding: '2px' }}>
+                          {/* <td style={{ padding: '2px' }}>
                             {numberFormat(item.discount)}
+                          </td> */}
+                          <td>
+                            {numberFormat(
+                              item.quantity * item.price - item.discount
+                            )}
                           </td>
-                          <td>{numberFormat(item.total)}</td>
                         </tr>
                         <tr>
                           <td colSpan={6}>
@@ -231,32 +237,32 @@ const PrintOrder = () => {
                   <div>Tiền thừa trả khách:</div>
                   <div>
                     {numberFormat(
-                      (order?.orderDetailDtos
-                        ? order?.orderDetailDtos.reduce(
-                            // @ts-ignore
-                            (prev, cur) =>
-                              prev +
-                              (Number(
-                                (cur.quantity || 0) * cur.price -
-                                  (cur.discount || 0)
-                              ) || 0),
-                            0
-                          )
-                        : 0) -
-                        ((order?.disCount ?? 0) / 100) *
-                          (order?.orderDetailDtos
-                            ? order?.orderDetailDtos.reduce(
-                                // @ts-ignore
-                                (prev, cur) =>
-                                  prev +
-                                  (Number(
-                                    (cur.quantity || 0) * cur.price -
-                                      (cur.discount || 0)
-                                  ) || 0),
-                                0
-                              )
-                            : 0) -
-                        (order?.giveMoney || 0)
+                      (order?.giveMoney || 0) -
+                        ((order?.orderDetailDtos
+                          ? order?.orderDetailDtos.reduce(
+                              // @ts-ignore
+                              (prev, cur) =>
+                                prev +
+                                (Number(
+                                  (cur.quantity || 0) * cur.price -
+                                    (cur.discount || 0)
+                                ) || 0),
+                              0
+                            )
+                          : 0) -
+                          ((order?.disCount ?? 0) / 100) *
+                            (order?.orderDetailDtos
+                              ? order?.orderDetailDtos.reduce(
+                                  // @ts-ignore
+                                  (prev, cur) =>
+                                    prev +
+                                    (Number(
+                                      (cur.quantity || 0) * cur.price -
+                                        (cur.discount || 0)
+                                    ) || 0),
+                                  0
+                                )
+                              : 0))
                     )}
                   </div>
                 </Stack>
@@ -270,11 +276,21 @@ const PrintOrder = () => {
                 mb={1}
               >
                 <b>Quý khách tiết kiệm được:</b>
-                <b>12.0000</b>
+                <b>{numberFormat(order?.discountValue || 0)}</b>
               </Stack>
               <hr
-                style={{ borderTop: '1px dashed black', marginBottom: '50px' }}
+                style={{ borderTop: '1px dashed black', marginBottom: '10px' }}
               />
+              <Stack flexDirection="row" mb={2} justifyContent='center' gap={1}>
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </Stack>
               <div>
                 Quý khách được đổi trả hàng khi hàng hóa nguyên vẹn, không hư
                 hỏng.
