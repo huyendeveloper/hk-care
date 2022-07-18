@@ -5,14 +5,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
@@ -21,7 +23,7 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -30,7 +32,9 @@ import { IProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  changeStatus, deleteProduct, getAllProduct
+  changeStatus,
+  deleteProduct,
+  getAllProduct,
 } from 'redux/slices/product';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
@@ -63,6 +67,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
@@ -77,6 +82,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
     setProductList(payload.productList);
@@ -115,10 +121,12 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const handleDelete = async () => {
     if (!currentID) return;
     handleCloseDeleteDialog();
+    setShowBackdrop(true);
     // @ts-ignore
     const { error } = await dispatch(deleteProduct(currentID));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -127,7 +135,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     });
 
     fetchData();
-    // setProductList(productList.filter((x) => x.id !== currentID));
+    setShowBackdrop(false);
   };
 
   const handleCloseDeleteDialog = () => {
@@ -171,39 +179,40 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
 
   const handleCloseFormDialog = (updated: boolean | undefined) => {
     setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
   };
 
   const handleBlock = async () => {
     if (!currentID) return;
     handleCloseBlockDialog();
+    setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
       changeStatus({ id: currentID, status: true })
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
       message: 'Vô hiệu hóa thành công!',
       severity: 'success',
     });
-
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleUnBlock = async () => {
     if (!currentID) return;
     handleCloseUnBlockDialog();
+    setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
       changeStatus({ id: currentID, status: false })
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -212,6 +221,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     });
 
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
@@ -222,7 +232,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const renderAction = (row: IProduct) => {
     return (
       <>
-        <LinkIconButton to={`/hk_group/product/list/${row.id}`}>
+        <LinkIconButton to={`${row.id}`}>
           <IconButton>
             <VisibilityIcon />
           </IconButton>
@@ -251,7 +261,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   };
 
   return (
-    <TableWrapper sx={{ height: 1 }} component={Paper}>
+    <TableWrapper sx={{ height: 1, minHeight: '60vh' }} component={Paper}>
       <TableSearchField
         title="Danh sách sản phẩm"
         placeHolder="Tìm kiếm sản phẩm"
@@ -343,6 +353,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         currentID={currentID}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        fetchData={fetchData}
       />
 
       <DeleteDialog
@@ -353,6 +364,14 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         open={openDeleteDialog}
         handleDelete={handleDelete}
       />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

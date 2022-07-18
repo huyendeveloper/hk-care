@@ -6,7 +6,7 @@ import type { Dictionary, Order } from 'types/common';
 
 export interface Cell<T> {
   id: keyof T;
-  label: string;
+  label: string | React.ReactElement;
   align?: TableCellProps['align'];
 }
 
@@ -28,7 +28,11 @@ const TableHeader = <T extends Dictionary>(props: Props<T>) => {
         {cells.map((cell, i) => {
           const { label, align } = cell;
           return (
-            <TableCell key={i} align={align}>
+            <TableCell
+              key={i}
+              align={align}
+              sx={label ? {} : { padding: '0px' }}
+            >
               <div style={{ fontSize: '1.125rem' }}>{label}</div>
             </TableCell>
           );

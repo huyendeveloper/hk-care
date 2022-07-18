@@ -14,7 +14,7 @@ import {
   FormGroup,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import EntitySelecter from 'components/Form/EntitySelecter';
@@ -27,7 +27,7 @@ import {
   IProductGroup,
   ISupplier,
   ITreatmentGroup,
-  IUsage,
+  IUsage
 } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,6 +48,7 @@ interface Props {
   currentID?: number | null;
   dataUpdate?: IProduct;
   supplierId?: number;
+  fetchData: () => void;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -87,9 +88,15 @@ const validationSchema = yup.object().shape({
   dateManufacture: yupDate,
 });
 
-const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
-  const setNotification = useNotification();
+const FormDialog = ({
+  open,
+  handleClose,
+  currentID,
+  supplierId,
+  fetchData,
+}: Props) => {
   const dispatch = useDispatch();
+  const setNotification = useNotification();
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
@@ -100,9 +107,9 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
   >([]);
   const [usageList, setUsageList] = useState<IUsage[]>([]);
   const [productDetail, setProductDetail] = useState(null);
-  const [taskQueue, setTaskQueue] = useState<number>(0);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [productsSupplier, setProductsSupplier] = useState<number[]>([]);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const {
     control,
@@ -116,13 +123,16 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const fetchData = async () => {
+  const fetchDataUpdate = async () => {
     if (currentID) {
+      setLoading(true);
       const { data } = await productService.get(currentID);
-      if (!data) return;
-      setTaskQueue((task) => task + 1);
+      if (!data) {
+        setLoading(false);
+        return;
+      }
       setProductDetail(data);
-      setTaskQueue((task) => task - 1);
+      setLoading(false);
     } else {
       if (supplierId) {
         setProductsSupplier([supplierId]);
@@ -197,7 +207,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
       routeOfUse: 'Theo chỉ định',
     });
     setImage(undefined);
-    fetchData();
+    fetchDataUpdate();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
@@ -277,6 +287,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
   };
 
   const onSubmit = async (payload: IProduct) => {
+    setShowBackdrop(true);
     if (payload.id) {
       const { error } = await dispatch(
         // @ts-ignore
@@ -284,6 +295,7 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
+        setShowBackdrop(false);
         return;
       }
       setNotification({
@@ -298,11 +310,13 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
+        setShowBackdrop(false);
         return;
       }
       setNotification({ message: 'Thêm thành công', severity: 'success' });
     }
-
+    setShowBackdrop(false);
+    fetchData();
     reset();
     handleClose(true);
   };
@@ -317,8 +331,10 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
         />
         <FormContent>
           <FormGroup>
-            {taskQueue > 0 ? (
-              <LoadingScreen />
+            {loading ? (
+              <Stack justifyContent="center" sx={{ minHeight: '50vh' }}>
+                <LoadingScreen />
+              </Stack>
             ) : (
               <Grid container spacing={2}>
                 <Grid item xs={12}>
@@ -613,7 +629,9 @@ const FormDialog = ({ open, handleClose, currentID, supplierId }: Props) => {
           >
             Hủy
           </Button>
-          <LoadingButton type="submit">Lưu</LoadingButton>
+          <LoadingButton loading={showBackdrop} type="submit">
+            Lưu
+          </LoadingButton>
         </FormFooter>
       </FormPaperGrid>
       <FormDialogSupplier

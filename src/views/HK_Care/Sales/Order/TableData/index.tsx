@@ -1,4 +1,3 @@
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
@@ -8,26 +7,24 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
-import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import { LinkIconButton, Scrollbar } from 'components/common';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { fil } from 'date-fns/locale';
 import { useNotification } from 'hooks';
 import { ISalesOrder } from 'interface';
 import moment from 'moment';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { getAllSaleOrders } from 'redux/slices/salesOrder';
-import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -68,10 +65,10 @@ const getCells = (): Cells<ISalesOrder> => [
 
 const TableData = () => {
   const dispatch = useDispatch();
+  const setNotification = useNotification();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [salesOrder, setSalesOrder] = useState<ISalesOrder[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const setNotification = useNotification();
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchData = async () => {
@@ -154,16 +151,7 @@ const TableData = () => {
         setStart={(val) => setFilters({ ...filters, startDate: val })}
         setEnd={(val) => setFilters({ ...filters, lastDate: val })}
         searchArea
-      >
-        <LinkButton
-          variant="outlined"
-          startIcon={<AddIcon />}
-          sx={{ fontSize: '1rem' }}
-          to="create"
-        >
-          Thêm hóa đơn
-        </LinkButton>
-      </TableSearchField>
+      />
 
       <TableContent total={salesOrder.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>

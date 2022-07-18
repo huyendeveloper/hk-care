@@ -18,6 +18,9 @@ const ProductListCreate = Loadable(lazy(() => import('views/HK_Care/Product/Prod
 const ProductDetails = Loadable(lazy(() => import('views/HK_Care/Product/ProductList/Details')));
 const RequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Request')));
 const CreateRequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Request/Create')));
+const InventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/InventoryRecord')));
+const CreateInventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/InventoryRecord/Create')));
+const Roles = Loadable(lazy(() => import('views/HK_Care/Roles')));
 
 const HKCareRoutes: RouteObject = {
   path: "hk_care",
@@ -102,6 +105,18 @@ const HKCareRoutes: RouteObject = {
     {
       path: "warehouse/request/create",
       children: [{ index: true, element: <CreateRequestImport /> }],
+    },
+    {
+      path: "warehouse/inventory_record",
+      children: [{ index: true, element: <InventoryRecord /> }],
+    },
+    {
+      path: "warehouse/inventory_record/create",
+      children: [{ index: true, element: <CreateInventoryRecord /> }],
+    },
+    {
+      path: "roles",
+      children: [{ index: true, element: <Roles /> }],
     },
   ],
 };

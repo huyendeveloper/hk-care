@@ -60,10 +60,11 @@ const FormDialog = ({
   disable,
   fetchData,
 }: Props) => {
-  const [disabled, setDisabled] = useState<boolean>(disable);
-  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const dispatch = useDispatch();
   const setNotification = useNotification();
+  const [disabled, setDisabled] = useState<boolean>(disable);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+
   const { control, handleSubmit, reset } = useForm<IMeasure>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),

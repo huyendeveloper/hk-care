@@ -117,17 +117,12 @@ svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall.MuiTableSortLabel-icon.MuiTableSort
 
 .print {
   font-size: 13px;
-  line-height: 22px; 
+  line-height: 22px;
 }
 
 .print table {
   border-collapse: separate;
   border-spacing: 0px;
-}
-
-.print thead td {
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
 }
 
 .print td {

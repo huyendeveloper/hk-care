@@ -138,11 +138,11 @@ const getSections = (): SectionItem[] => [
             path: '/hk_care/warehouse/request',
             roles: ['hkl2_1_2'],
           },
-          // {
-          //   title: 'Biên bản kiểm kê kho',
-          //   path: '/404',
-          //   roles: ['hkl2_1_2'],
-          // },
+          {
+            title: 'Biên bản kiểm kê kho',
+            path: '/hk_care/warehouse/inventory_record',
+            roles: ['hkl2_1_2'],
+          },
         ],
       },
       {
@@ -155,11 +155,11 @@ const getSections = (): SectionItem[] => [
             path: '/hk_care/sales/order/create',
             roles: ['hkl2_1_3'],
           },
-          // {
-          //   title: 'Danh sách khách hàng',
-          //   path: '/404',
-          //   roles: ['hkl2_1_3'],
-          // },
+          {
+            title: 'Danh sách hóa đơn',
+            path: '/hk_care/sales/order',
+            roles: ['hkl2_1_3'],
+          },
         ],
       },
       {
@@ -173,6 +173,11 @@ const getSections = (): SectionItem[] => [
           //   roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
           // },
         ],
+      },
+      {
+        title: 'Phân quyền người dùng',
+        path: '/hk_care/roles',
+        roles: ['hkl2_1_1'],
       },
       // {
       //   title: 'Báo cáo/Thống kê (Tại điểm bán)',

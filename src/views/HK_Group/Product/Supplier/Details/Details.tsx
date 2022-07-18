@@ -5,12 +5,15 @@ import {
   ControllerTextField,
   FormContent,
   FormGroup,
-  FormLabel
+  FormLabel,
 } from 'components/Form';
-import React from 'react';
 
-// @ts-ignore
-const Details = ({ control, files }) => {
+interface IProps {
+  control: any;
+  files: File[] | object[];
+}
+
+const Details = ({ control, files }: IProps) => {
   return (
     <FormContent>
       <FormGroup>

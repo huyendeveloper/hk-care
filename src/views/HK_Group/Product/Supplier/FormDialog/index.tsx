@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid } from '@mui/material';
-import { LoadingScreen } from 'components/common';
 import {
   ControllerMultiFile,
   ControllerTextarea,
@@ -11,17 +10,16 @@ import {
   FormGroup,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import { connectURL } from 'config';
 import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { createSupplier, updateSupplier } from 'redux/slices/supplier';
-import { RootState } from 'redux/store';
 import supplierService from 'services/supplier.service';
 import * as yup from 'yup';
 
@@ -30,7 +28,7 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   data?: ISupplier;
-  loading?: boolean;
+  fetchData?: () => void;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -69,12 +67,12 @@ const FormDialogSupplier = ({
   open,
   handleClose,
   currentID,
-  loading = false,
+  fetchData,
 }: Props) => {
-  const [files, setFiles] = useState<File[] | object[]>([]);
-  const setNotification = useNotification();
   const dispatch = useDispatch();
-  // const { loading } = useSelector((state: RootState) => state.supplier);
+  const setNotification = useNotification();
+  const [files, setFiles] = useState<File[] | object[]>([]);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const { control, handleSubmit, setValue, reset } = useForm<ISupplier>({
     mode: 'onChange',
@@ -82,7 +80,40 @@ const FormDialogSupplier = ({
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (supplier: ISupplier) => {
+  const handleUpdate = async (data: ISupplier) => {
+    const { error, payload } = await dispatch(
+      // @ts-ignore
+      updateSupplier({ ...data, files })
+    );
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Cập nhật thành công',
+      severity: 'success',
+    });
+  };
+
+  const handleAdd = async (data: ISupplier) => {
+    const { error, payload } = await dispatch(
+      // @ts-ignore
+      createSupplier({ ...data, files })
+    );
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({ message: 'Thêm thành công', severity: 'success' });
+  };
+
+  const onSubmit = async (data: ISupplier) => {
     if (files.length === 0) {
       setNotification({
         message: 'Chưa có giấy chứng nhận',
@@ -90,58 +121,53 @@ const FormDialogSupplier = ({
       });
       return;
     }
-
-    if (supplier.id) {
-      const { error, payload } = await dispatch(
-        // @ts-ignore
-        updateSupplier({ ...supplier, files })
-      );
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi!',
-        });
-        return;
-      }
-      setNotification({
-        message: 'Cập nhật thành công',
-        severity: 'success',
-      });
+    setShowBackdrop(true);
+    if (data.id) {
+      await handleUpdate(data);
     } else {
-      const { error, payload } = await dispatch(
-        // @ts-ignore
-        createSupplier({ ...supplier, files })
-      );
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi!',
-        });
-        return;
-      }
-      setNotification({ message: 'Thêm thành công', severity: 'success' });
+      await handleAdd(data);
     }
 
+    fetchData && fetchData();
     reset();
     setFiles([]);
     handleClose(true);
+    setShowBackdrop(false);
   };
 
-  const fetchData = async () => {
+  const fillFormData = async () => {
     setFiles([]);
     if (currentID) {
       const { data } = await supplierService.get(currentID);
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('address', data?.address || '');
-      setValue('nameContact', data?.nameContact || '');
-      setValue('telephoneNumber', data?.telephoneNumber || '');
-      setValue('mobileNumber', data?.mobileNumber || '');
-      setValue('description', data?.description || '');
-      setValue('fax', data?.fax || '');
-      setValue('taxCode', data?.taxCode || '');
-      setValue('active', data?.active);
-      if (data?.bussinessLicense) {
+      const {
+        name,
+        address,
+        nameContact,
+        telephoneNumber,
+        mobileNumber,
+        description,
+        fax,
+        taxCode,
+        active,
+        bussinessLicense,
+      } = data;
+
+      reset({
+        id: currentID,
+        name,
+        address,
+        nameContact,
+        telephoneNumber,
+        mobileNumber,
+        description,
+        fax,
+        taxCode,
+        active,
+      });
+
+      if (bussinessLicense) {
         const fileList: object[] = [];
-        data.bussinessLicense.forEach((item: string) => {
+        bussinessLicense.forEach((item: string) => {
           fileList.push({ name: `${connectURL}/${item}` });
         });
         setFiles(fileList);
@@ -150,8 +176,8 @@ const FormDialogSupplier = ({
   };
 
   useEffect(() => {
-    reset();
-    fetchData();
+    reset({});
+    fillFormData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 
@@ -272,7 +298,7 @@ const FormDialogSupplier = ({
           <Button variant="outlined" onClick={() => handleClose()}>
             Hủy
           </Button>
-          <LoadingButton loading={loading} type="submit">
+          <LoadingButton loading={showBackdrop} type="submit">
             Lưu
           </LoadingButton>
         </FormFooter>

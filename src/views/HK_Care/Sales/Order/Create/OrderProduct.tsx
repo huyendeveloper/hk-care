@@ -105,26 +105,25 @@ const OrderProduct = ({
 
   return (
     <TableRow hover tabIndex={-1} key={product.productId}>
-      <TableCell sx={{ width: '50px !important' }}>
-        {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}
-      </TableCell>
       <TableCell>
-        <IconButton onClick={handleRemove}>
+        {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}{' '}
+        <IconButton onClick={handleRemove} sx={{ p: 0 }}>
           <CloseIcon />
         </IconButton>
-        {product.productName}
       </TableCell>
-      <TableCell sx={{ width: '130px !important' }}>
+      <TableCell>{product.productName}</TableCell>
+      <TableCell sx={{ width: '120px !important' }}>
         <EntitySelecter
           name={`createOrderDetailDtos.${index}.measureId`}
           control={control}
           options={measures}
           renderLabel={(field) => field.name}
           placeholder=""
+          disableClearable
           noOptionsText="Không có đơn vị nào có thể chọn"
         />
       </TableCell>
-      <TableCell sx={{ width: '130px !important' }}>
+      <TableCell sx={{ width: '90px !important' }}>
         <ControllerNumberInput
           name={`createOrderDetailDtos.${index}.quantity`}
           setValue={setValue}
@@ -132,10 +131,8 @@ const OrderProduct = ({
           control={control}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px !important' }}>
-        {numberFormat(price)}
-      </TableCell>
-      <TableCell sx={{ width: '130px !important' }}>
+      <TableCell>{numberFormat(price)}</TableCell>
+      <TableCell sx={{ width: '120px !important' }}>
         <ControllerNumberInput
           name={`createOrderDetailDtos.${index}.discount`}
           setValue={setValue}
@@ -143,22 +140,40 @@ const OrderProduct = ({
           control={control}
         />
       </TableCell>
-      <TableCell sx={{ width: '130px !important' }}>
-        {numberFormat(product.billPerProduct)}
-      </TableCell>
+      <TableCell>{numberFormat(product.billPerProduct)}</TableCell>
 
       <TableCell>
         <TableContainer>
           <Table>
-            <TableHeader
+            {/* <TableHeader
               cells={cells}
               onSort={handleOnSort}
               sortDirection={''}
               sortBy={''}
-            />
+            /> */}
             <TableBody>
               <TableRow>
-                <TableCell sx={{ width: '100px !important' }}>
+                <TableCell sx={{ padding: '5px 8px', fontWeight: 'bold' }}>
+                  Sáng
+                </TableCell>
+                <TableCell sx={{ padding: '5px 8px', fontWeight: 'bold' }}>
+                  Trưa
+                </TableCell>
+                <TableCell sx={{ padding: '5px 8px', fontWeight: 'bold' }}>
+                  Tối
+                </TableCell>
+                <TableCell sx={{ padding: '5px 8px', fontWeight: 'bold' }}>
+                  Ghi chú
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    width: '70px !important',
+                    padding: '0 8px',
+                  }}
+                >
                   <ControllerTextField
                     name={`createOrderDetailDtos.${index}.mor`}
                     variant="standard"
@@ -168,7 +183,13 @@ const OrderProduct = ({
                     )}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '100px !important' }}>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    width: '70px !important',
+                    padding: '0 8px',
+                  }}
+                >
                   <ControllerTextField
                     name={`createOrderDetailDtos.${index}.noon`}
                     variant="standard"
@@ -178,7 +199,13 @@ const OrderProduct = ({
                     )}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '100px !important' }}>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    width: '70px !important',
+                    padding: '0 8px',
+                  }}
+                >
                   <ControllerTextField
                     name={`createOrderDetailDtos.${index}.night`}
                     variant="standard"
@@ -188,7 +215,13 @@ const OrderProduct = ({
                     )}
                   />
                 </TableCell>
-                <TableCell sx={{ width: '200px !important' }}>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    width: '200px !important',
+                    padding: '0 8px',
+                  }}
+                >
                   <ControllerTextField
                     name={`createOrderDetailDtos.${index}.description`}
                     variant="standard"
