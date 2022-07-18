@@ -440,8 +440,6 @@ const FormData = ({ defaultValue }: IProps) => {
                   <Grid item xs={12} p={2}>
                     <TotalBill
                       control={control}
-                      setValue={setValue}
-                      getValues={getValues}
                     />
                   </Grid>
                 </Grid>

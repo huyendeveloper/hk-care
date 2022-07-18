@@ -60,11 +60,11 @@ const Details = () => {
     []
   );
   const [exportCancel, setImportReceipt] = useState<IExportCancel>();
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const [files, setFiles] = useState<File[] | object[]>([
-    { name: '23465233827' },
-  ]);
+  const [files, setFiles] = useState<File[] | object[]>([]);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const cells = useMemo(() => getCells(), []);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -81,15 +81,14 @@ const Details = () => {
     }));
   };
 
-  const cells = useMemo(() => getCells(), []);
-
-  const { control, setValue, handleSubmit } = useForm<IExportCancel>({
+  const { control, handleSubmit } = useForm<IExportCancel>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
   const fetchData = async () => {
+    setLoading(true);
     // @ts-ignore
     const { payload, error } = await dispatch(getGetDetail(id));
 
@@ -97,6 +96,7 @@ const Details = () => {
       setNotification({
         error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
     setImportReceipt(payload.exportCancel);
@@ -109,6 +109,7 @@ const Details = () => {
       });
     setFiles(fileList);
     setReceiptProduct(payload.exportCancel.exportWHDetails);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -126,7 +127,7 @@ const Details = () => {
   };
 
   return (
-    <PageWrapperFullwidth title="Thông tin hóa đơn">
+    <PageWrapperFullwidth title="Xuất hủy">
       <FormPaperGrid height="fit-content" onSubmit={handleSubmit(onSubmit)}>
         <FormHeader title="Thông tin sản phẩm" />
         <FormContent>
@@ -134,7 +135,7 @@ const Details = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={8} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent total={1} noDataText=" " loading={false}>
+                  <TableContent total={1} noDataText=" " loading={loading}>
                     <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -163,27 +164,23 @@ const Details = () => {
                         </Table>
                       </Scrollbar>
                     </TableContainer>
+                    <Grid container alignItems="center">
+                      <Grid item xs={12}>
+                        <TablePagination
+                          pageIndex={filters.pageIndex}
+                          totalPages={receiptProduct.length}
+                          onChangePage={handleChangePage}
+                          onChangeRowsPerPage={handleChangeRowsPerPage}
+                          rowsPerPage={filters.pageSize}
+                          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                        />
+                      </Grid>
+                      <Grid item lg={8} xs={0}></Grid>
+                      <Grid item lg={4} xs={12} p={2}>
+                        <TotalBill exportCancel={exportCancel} />
+                      </Grid>
+                    </Grid>
                   </TableContent>
-                  <Grid container alignItems="center">
-                    <Grid item xs={12}>
-                      <TablePagination
-                        pageIndex={filters.pageIndex}
-                        totalPages={receiptProduct.length}
-                        onChangePage={handleChangePage}
-                        onChangeRowsPerPage={handleChangeRowsPerPage}
-                        rowsPerPage={filters.pageSize}
-                        rowsPerPageOptions={[10, 20, 30, 40, 50]}
-                      />
-                    </Grid>
-                    <Grid item lg={8} xs={0}></Grid>
-                    <Grid item lg={4} xs={12} p={2}>
-                      <TotalBill
-                        control={control}
-                        setValue={setValue}
-                        exportCancel={exportCancel}
-                      />
-                    </Grid>
-                  </Grid>
                 </TableWrapper>
               </Grid>
 

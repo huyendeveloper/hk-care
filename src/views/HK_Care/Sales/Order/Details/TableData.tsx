@@ -1,4 +1,5 @@
 import {
+  Box,
   Paper,
   Stack,
   Table,
@@ -14,8 +15,6 @@ import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { ISalesOrder, OrderDetailDtos } from 'interface';
 import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -144,18 +143,78 @@ const TableData = ({ orderDetailDtos }: IProps) => {
                       <TableCell>
                         <TableContainer>
                           <Table>
-                            <TableHeader
-                              cells={cellsChild}
-                              onSort={handleOnSort}
-                              sortDirection={''}
-                              sortBy={''}
-                            />
                             <TableBody>
                               <TableRow>
-                                <TableCell>{mor}</TableCell>
-                                <TableCell>{noon}</TableCell>
-                                <TableCell>{night}</TableCell>
-                                <TableCell>{description}</TableCell>
+                                <TableCell
+                                  sx={{
+                                    padding: '5px 8px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Sáng
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    padding: '5px 8px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Trưa
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    padding: '5px 8px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Tối
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    padding: '5px 8px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Ghi chú
+                                </TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell
+                                  sx={{
+                                    borderBottom: 'none',
+                                    width: '70px !important',
+                                    padding: '0 8px',
+                                  }}
+                                >
+                                  <Box sx={{ minHeight: '22px' }}>{mor}</Box>
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    borderBottom: 'none',
+                                    width: '70px !important',
+                                    padding: '0 8px',
+                                  }}
+                                >
+                                  {noon}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    borderBottom: 'none',
+                                    width: '70px !important',
+                                    padding: '0 8px',
+                                  }}
+                                >
+                                  {night}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    borderBottom: 'none',
+                                    width: '70px !important',
+                                    padding: '0 8px',
+                                  }}
+                                >
+                                  {description}
+                                </TableCell>
                               </TableRow>
                             </TableBody>
                           </Table>

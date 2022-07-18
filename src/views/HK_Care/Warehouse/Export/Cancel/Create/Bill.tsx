@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -10,11 +10,14 @@ interface IProps {
 const TotalBill = ({ control, index }: IProps) => {
   const results = useWatch({ control, name: 'exportWHDetails' });
 
-  const item = results[index];
+  const item = useMemo(() => results[index], [index, results]);
 
-  const bill =
-    (Number(item?.amount) || 0) * (Number(item?.importPrice) || 0) -
-    (Number(item?.discount) || 0);
+  const bill = useMemo(
+    () =>
+      (Number(item?.amount) || 0) * (Number(item?.importPrice) || 0) -
+      (Number(item?.discount) || 0),
+    [item?.amount, item?.discount, item?.importPrice]
+  );
 
   return <>{numberFormat(bill < 0 ? 0 : bill)}</>;
 };

@@ -66,11 +66,10 @@ const Details = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
   const [receiptProduct, setReceiptProduct] = useState<IReceipt[]>([]);
   const [importReceipt, setImportReceipt] = useState<ImportReceipt>();
-  const [files, setFiles] = useState<File[] | object[]>([
-    { name: '23465233827' },
-  ]);
+  const [files, setFiles] = useState<File[] | object[]>([]);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     pageSize: 1000,
@@ -78,7 +77,7 @@ const Details = () => {
 
   const cells = useMemo(() => getCells(), []);
 
-  const { control, setValue, handleSubmit } = useForm<IReceipt>({
+  const { control, handleSubmit, reset } = useForm<IReceipt>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -92,9 +91,11 @@ const Details = () => {
       setNotification({
         error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
     setImportReceipt(payload.importReceipt);
+    reset({ ...payload.importReceipt });
     const fileList: object[] = [];
     files &&
       fileList.push({
@@ -104,9 +105,11 @@ const Details = () => {
       });
     setFiles(fileList);
     setReceiptProduct(payload.importReceipt.listProductReceiptWH);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -129,7 +132,7 @@ const Details = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent total={1} noDataText=" " loading={false}>
+                  <TableContent total={1} noDataText=" " loading={loading}>
                     <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -159,11 +162,7 @@ const Details = () => {
               <Grid container alignItems="center">
                 <Grid item lg={9} xs={0}></Grid>
                 <Grid item lg={3} xs={12} p={2}>
-                  <TotalBill
-                    control={control}
-                    setValue={setValue}
-                    importReceipt={importReceipt}
-                  />
+                  <TotalBill importReceipt={importReceipt} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -176,7 +175,6 @@ const Details = () => {
                     minRows={11}
                     name="description"
                     control={control}
-                    value={importReceipt?.description}
                     disabled
                   />
                 </Grid>

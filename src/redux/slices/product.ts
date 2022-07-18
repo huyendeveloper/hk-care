@@ -3,11 +3,9 @@ import { IProduct } from 'interface';
 import productService from 'services/product.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllProduct = createAsyncThunk(
   'product/getAll',
@@ -83,17 +81,7 @@ const productSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllProduct.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllProduct.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllProduct.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default productSlice.reducer;

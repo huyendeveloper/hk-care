@@ -81,7 +81,6 @@ const getCells = (): Cells<ISearchProduct> => [
 ];
 
 const OrderProductForm = ({
-  identification,
   control,
   handleSubmit,
   getValues,
@@ -89,15 +88,17 @@ const OrderProductForm = ({
   handleDelete,
 }: IProps) => {
   const { id } = useParams();
-  const cells = useMemo(() => getCells(), []);
-  const setNotification = useNotification();
   const navigate = useNavigate();
-  const { productSales } = useSelector((state: RootState) => state.salesOrder);
   const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const { productSales } = useSelector((state: RootState) => state.salesOrder);
+  const [loading, setLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
     pageSize: 1000,
   });
+
+  const cells = useMemo(() => getCells(), []);
 
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
@@ -108,7 +109,6 @@ const OrderProductForm = ({
 
   const { fields, append, remove } = useFieldArray<IForm>({
     control,
-    // @ts-ignore
     name: `createOrderDetailDtos`,
   });
 
@@ -134,6 +134,7 @@ const OrderProductForm = ({
       setNotification({ error: 'Bạn chưa chọn sản phẩm nào!' });
       return;
     }
+    setLoading(true);
     if (id) {
       const { error } = await dispatch(
         // @ts-ignore
@@ -141,12 +142,14 @@ const OrderProductForm = ({
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
+        setLoading(false);
         return;
       }
       setNotification({
         message: 'Cập nhật thành công',
         severity: 'success',
       });
+      setLoading(false);
       window.open(`/hk_care/sales/order/${id}/print`);
       return navigate(`/hk_care/sales/order`);
     } else {
@@ -156,6 +159,7 @@ const OrderProductForm = ({
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
+        setLoading(false);
         return;
       }
       setNotification({
@@ -165,6 +169,7 @@ const OrderProductForm = ({
       if (payload.id) {
         window.open(`/hk_care/sales/order/${payload.id}/print`);
       }
+      setLoading(false);
       handleDelete();
     }
   };
@@ -226,6 +231,7 @@ const OrderProductForm = ({
               {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
               <LoadingButton
                 type="submit"
+                loading={loading}
                 sx={id ? {} : { fontSize: '28px', width: '100%' }}
               >
                 {id ? 'Lưu' : 'Thanh toán'}

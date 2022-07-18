@@ -4,9 +4,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, IconButton, TableCell, TableRow } from '@mui/material';
 import { LinkIconButton } from 'components/common';
 import { IProductExportCancel } from 'interface';
-import moment from 'moment';
 import { useState } from 'react';
 import { FilterParams } from 'types';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
@@ -75,9 +75,7 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
                 {(filters.pageIndex - 1) * filters.pageSize + index + 1}
               </TableCell>
               <TableCell>{code}</TableCell>
-              <TableCell>
-                {moment(creationTime).format('DD/MM/YYYY HH:mm')}
-              </TableCell>
+              <TableCell>{formatDateTime(creationTime)}</TableCell>
               <TableCell>{numberFormat(cancellationPrice)}</TableCell>
               <TableCell>{renderAction(item)}</TableCell>
             </TableRow>

@@ -53,29 +53,29 @@ class ImportReceiptService {
   }
 
   update(payload: OrderSales) {
-    return axiosClient.put(
-      `${baseURL}/BillOfSale/UpdateBillOfSale`,
-      payload
-    );
+    return axiosClient.put(`${baseURL}/BillOfSale/UpdateBillOfSale`, payload);
   }
 
   getAll({
     pageIndex,
     pageSize,
-    sortBy,
     searchText,
     startDate,
     lastDate,
   }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/receiptwarehouse/SearchAll?Keyword=${searchText}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}&startDate=${
-        startDate ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00' : ''
-      }&lastDate=${
-        lastDate ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59' : ''
-      }`
-    );
+    return axiosClient.get(`${baseURL}/receiptwarehouse/SearchAll`, {
+      params: {
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+        Keyword: searchText,
+        startDate: startDate
+          ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00'
+          : '',
+        lastDate: lastDate
+          ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59'
+          : '',
+      },
+    });
   }
 
   get(id: number) {

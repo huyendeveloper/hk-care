@@ -5,10 +5,9 @@ import {
   TextareaAutosize,
   Typography,
 } from '@mui/material';
-import { ControllerTextarea } from 'components/Form';
 import { TableWrapper } from 'components/Table';
 import { ISalesOrder } from 'interface';
-import moment from 'moment';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
@@ -160,7 +159,7 @@ const OrderInfo = ({ order }: IProps) => {
             </tr>
             <tr>
               <td>Ngày bán:</td>
-              <td>{moment(order?.saleDate).format('DD/MM/YYYY HH:mm')}</td>
+              <td>{formatDateTime(order?.saleDate)}</td>
             </tr>
           </table>
           <hr />

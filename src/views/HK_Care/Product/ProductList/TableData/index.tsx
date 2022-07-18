@@ -2,6 +2,8 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -33,9 +35,9 @@ import QuotaUpdate from './QuotaUpdate';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
-  { id: 'productName', label: 'Tên sản phẩm' },
+  { id: 'productName', label: 'Tên SP' },
   { id: 'mesure', label: 'Đơn vị' },
-  { id: 'productGroup', label: 'Nhóm sản phẩm' },
+  { id: 'productGroup', label: 'Nhóm SP' },
   { id: 'stockQuantity', label: 'Hàng tồn' },
   { id: 'importPrice', label: 'Giá nhập' },
   { id: 'price', label: 'Giá bán' },
@@ -57,7 +59,7 @@ const TableData = ({ active = 1 }: IProps) => {
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -67,6 +69,7 @@ const TableData = ({ active = 1 }: IProps) => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
     setProductList(payload.productList);
@@ -77,7 +80,6 @@ const TableData = ({ active = 1 }: IProps) => {
   useEffect(() => {
     setLoading(true);
     fetchData();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
@@ -121,12 +123,13 @@ const TableData = ({ active = 1 }: IProps) => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-
     handleCloseDeleteDialog();
+    setShowBackdrop(true);
     // @ts-ignore
     const { error } = await dispatch(deleteProductList(currentID));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -134,13 +137,8 @@ const TableData = ({ active = 1 }: IProps) => {
       severity: 'success',
     });
 
-    // setProductList(productList.filter((x) => x.productId !== currentID));
     fetchData();
-  };
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
-    fetchData();
+    setShowBackdrop(false);
   };
 
   const renderAction = (row: IProductList) => {
@@ -173,7 +171,7 @@ const TableData = ({ active = 1 }: IProps) => {
           <LinkButton
             variant="outlined"
             startIcon={<AddIcon />}
-            to="/hk_care/product/list/create"
+            to="create"
             sx={{ fontSize: '1rem' }}
           >
             Đăng ký sản phẩm
@@ -246,6 +244,13 @@ const TableData = ({ active = 1 }: IProps) => {
         handleDelete={handleDelete}
         spanContent=" ra khỏi danh sách bán"
       />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

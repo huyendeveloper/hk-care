@@ -6,7 +6,7 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Typography,
+  Typography
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -17,13 +17,13 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import {
   TableContent,
   TableHeader,
   TablePagination,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -78,12 +78,11 @@ const Details = ({ defaultValue }: IProps) => {
 
   const cells = useMemo(() => getCells(), []);
 
-  const { control, setValue, handleSubmit, getValues } =
-    useForm<IExportWHRotation>({
-      mode: 'onChange',
-      resolver: yupResolver(validationSchema),
-      defaultValues: defaultValue || validationSchema.getDefault(),
-    });
+  const { control, handleSubmit, getValues } = useForm<IExportWHRotation>({
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+    defaultValues: defaultValue || validationSchema.getDefault(),
+  });
 
   const fetchTenants = async () => {
     try {
@@ -143,7 +142,6 @@ const Details = ({ defaultValue }: IProps) => {
                                 item={item}
                                 key={index}
                                 index={index}
-                                setValue={setValue}
                                 getValues={getValues}
                                 arrayName="exportWHDetails"
                                 control={control}
@@ -167,11 +165,7 @@ const Details = ({ defaultValue }: IProps) => {
                     </Grid>
                     <Grid item lg={8} xs={0}></Grid>
                     <Grid item lg={4} xs={12} p={2}>
-                      <TotalBill
-                        control={control}
-                        setValue={setValue}
-                        getValues={getValues}
-                      />
+                      <TotalBill control={control} />
                     </Grid>
                   </Grid>
                 </TableWrapper>

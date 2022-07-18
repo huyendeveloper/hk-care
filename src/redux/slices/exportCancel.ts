@@ -3,11 +3,9 @@ import { IExportCancel } from 'interface';
 import exportCancelService from 'services/exportCancel.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllProduct = createAsyncThunk(
   'exportCancel/getAllProduct',
@@ -34,8 +32,7 @@ export const createExportWH = createAsyncThunk(
   'exportCancel/create',
   async (payload: IExportCancel, { rejectWithValue }) => {
     try {
-      const { data } = await exportCancelService.create(payload);
-      // return { id: data.id };
+      await exportCancelService.create(payload);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -100,17 +97,7 @@ const exportCancelSlice = createSlice({
   name: 'exportCancel',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    // builder.addCase(getAllExportCancel.pending, (state) => {
-    //   state.loading = true;
-    // });
-    // builder.addCase(getAllExportCancel.fulfilled, (state) => {
-    //   state.loading = false;
-    // });
-    // builder.addCase(getAllExportCancel.rejected, (state) => {
-    //   state.loading = false;
-    // });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default exportCancelSlice.reducer;

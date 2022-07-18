@@ -2,9 +2,9 @@ import axiosClient from 'api';
 import axios from 'axios';
 import { baseURL } from 'config';
 import { IProduct } from 'interface';
+import moment from 'moment';
 import { FilterParams } from 'types';
 import LocalStorage from 'utils/LocalStorage';
-import moment from 'moment';
 
 const getFormData = (payload: IProduct, file: any) => {
   const params = new FormData();
@@ -64,11 +64,15 @@ class ProductService {
     searchText,
     supplierId,
   }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/product/SearchAll?Keyword=${searchText}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}&supplierId=${supplierId}`
-    );
+    return axiosClient.get(`${baseURL}/product/SearchAll`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+        supplierId,
+      },
+    });
   }
 
   get(id: number) {
@@ -114,13 +118,19 @@ class ProductService {
   }
 
   changeStatus(id: number | null, status: boolean) {
-    return axiosClient.patch(
-      `${baseURL}/product/ChangeStatus/${id}?status=${status}`
-    );
+    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, {
+      params: {
+        status,
+      },
+    });
   }
 
   getFile(filePath: string) {
-    return axiosClient.get(`${baseURL}/file/url-file?filePath=${filePath}`);
+    return axiosClient.get(`${baseURL}/file/url-file`, {
+      params: {
+        filePath,
+      },
+    });
   }
 }
 

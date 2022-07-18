@@ -16,7 +16,6 @@ import {
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { connectURL } from 'config';
-import { useNotification } from 'hooks';
 import {
   IMeasure,
   IProduct,
@@ -27,9 +26,7 @@ import {
 } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { updateProduct } from 'redux/slices/product';
 import measureService from 'services/measure.service';
 import productGroupService from 'services/productGroup.service';
 import productListService from 'services/productList.service';
@@ -38,19 +35,10 @@ import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
 
-const validationSchema = yup.object().shape({
-  name: yup
-    .string()
-    .required('Vui lòng nhập tên sản phẩm.')
-    .strict(true)
-    .default(''),
-  description: yup.string().strict(true).default(''),
-});
+const validationSchema = yup.object().shape({});
 
 const DetailsForm = () => {
-  const { id: crudId } = useParams();
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
+  const { id } = useParams();
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -60,7 +48,7 @@ const DetailsForm = () => {
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [productDetail, setProductDetail] = useState(null);
-  const [taskQueue, setTaskQueue] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const {
     control,
@@ -142,14 +130,16 @@ const DetailsForm = () => {
   }, [productDetail, reset]);
 
   const fetchData = async () => {
-    setTaskQueue((task) => task + 1);
-    if (!crudId) return;
+    if (!id) return;
 
-    const { data } = await productListService.get(Number(crudId));
+    const { data } = await productListService.get(Number(id));
 
-    if (!data) return;
+    if (!data) {
+      setLoading(false);
+      return;
+    }
     setProductDetail(data);
-    setTaskQueue((task) => task - 1);
+    setLoading(false);
   };
 
   const fetchProductGroupList = () => {
@@ -203,6 +193,7 @@ const DetailsForm = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     fetchProductGroupList();
     fetchTreatmentGroupList();
@@ -210,24 +201,11 @@ const DetailsForm = () => {
     fetchMeasureList();
     fetchSupplierList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [crudId]);
+  }, [id]);
 
-  const onSubmit = async (payload: IProduct) => {
-    const { error } = await dispatch(
-      // @ts-ignore
-      updateProduct({ ...payload, image })
-    );
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      return;
-    }
-    setNotification({
-      message: 'Cập nhật thành công',
-      severity: 'success',
-    });
-  };
+  const onSubmit = async (payload: IProduct) => {};
 
-  if (taskQueue > 0) {
+  if (loading) {
     return <LoadingScreen />;
   }
 

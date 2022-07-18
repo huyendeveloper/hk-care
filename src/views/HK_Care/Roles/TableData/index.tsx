@@ -1,11 +1,4 @@
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from '@mui/material';
+import { Paper, Table, TableBody, TableContainer } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { TableContent, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
@@ -94,7 +87,6 @@ const TableData = () => {
 
               <TableBody>
                 {roles.map((item, index) => {
-                  const {} = item;
                   return (
                     <Role
                       role={item}

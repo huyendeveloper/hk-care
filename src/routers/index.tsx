@@ -4,7 +4,6 @@ import DashboardLayout from "layouts/Dashboard";
 import MainLayout from "layouts/Main";
 import { lazy } from "react";
 import { Navigate, RouteObject, useRoutes } from "react-router-dom";
-import { CreateSalesOrder, PrintSalesOrder } from "views/HK_Care/Sales";
 import HKCare from './HKCare';
 import HKGroup from "./HKGroup";
 import HKTrading from "./HKTrading";
@@ -14,6 +13,8 @@ import UserRoutes from "./User";
 const Login = Loadable(lazy(() => import("views/Login")));
 const NotFound = Loadable(lazy(() => import("views/NotFound")));
 const Home = Loadable(lazy(() => import("views/Home")));
+const CreateSalesOrder = Loadable(lazy(() => import('views/HK_Care/Sales/Order/Create')));
+const PrintSalesOrder = Loadable(lazy(() => import('views/HK_Care/Sales/Order/Print')));
 
 const routes: RouteObject[] = [
   {

@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material';
 import { ControllerTextarea } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -17,13 +17,17 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     name: 'createOrderDetailDtos',
   });
 
-  const bill = createOrderDetailDtos
-    ? createOrderDetailDtos.reduce(
-        // @ts-ignore
-        (prev, cur) => prev + (Number(cur?.billPerProduct) || 0),
-        0
-      )
-    : 0;
+  const bill = useMemo(
+    () =>
+      createOrderDetailDtos
+        ? createOrderDetailDtos.reduce(
+            // @ts-ignore
+            (prev, cur) => prev + (Number(cur?.billPerProduct) || 0),
+            0
+          )
+        : 0,
+    [createOrderDetailDtos]
+  );
   const discountValue = useWatch({ control, name: 'disCount' }) || 0;
   const paid = useWatch({ control, name: 'giveMoney' }) || 0;
   const moneyToPay = useWatch({ control, name: 'moneyToPay' }) || 0;

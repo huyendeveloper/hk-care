@@ -15,7 +15,6 @@ const CreateForm = () => {
     useState<IExportWHRotation | null>(null);
 
   const fetchDataUpdate = async () => {
-    // @ts-ignore
     const { payload, error } = await dispatch(
       // @ts-ignore
       getDetailExportWHRotation({ id: exportWHId, childId: id })

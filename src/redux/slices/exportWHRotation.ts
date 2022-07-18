@@ -3,11 +3,9 @@ import { IExportWHRotation } from 'interface';
 import exportWHRotationService from 'services/exportWHRotation.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllProduct = createAsyncThunk(
   'exportWHRotation/getAllProduct',
@@ -34,8 +32,7 @@ export const createExportWH = createAsyncThunk(
   'exportWHRotation/create',
   async (payload: IExportWHRotation, { rejectWithValue }) => {
     try {
-      const { data } = await exportWHRotationService.create(payload);
-      // return { id: data.id };
+      await exportWHRotationService.create(payload);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -80,7 +77,7 @@ export const getDetailExportWHRotation = createAsyncThunk(
   'exportWHRotation/getDetail',
   async (
     { id, childId }: { id: number; childId: number },
-    { rejectWithValue },
+    { rejectWithValue }
   ) => {
     try {
       const { data } = await exportWHRotationService.getDetail(id, childId);
@@ -103,17 +100,7 @@ const exportWHRotationSlice = createSlice({
   name: 'exportWHRotation',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    // builder.addCase(getAllExportCancel.pending, (state) => {
-    //   state.loading = true;
-    // });
-    // builder.addCase(getAllExportCancel.fulfilled, (state) => {
-    //   state.loading = false;
-    // });
-    // builder.addCase(getAllExportCancel.rejected, (state) => {
-    //   state.loading = false;
-    // });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default exportWHRotationSlice.reducer;

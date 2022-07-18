@@ -15,7 +15,7 @@ interface Props extends BoxProps {
   searchText: string;
   title?: string;
   headerTitle?: string;
-  searchArea?: boolean;
+  haveFromTo?: boolean;
   start?: Date | null;
   end?: Date | null;
   setStart?: (date: Date | null) => void;
@@ -30,7 +30,7 @@ const TableSearchField = (props: Props) => {
     onSearch,
     children,
     headerTitle,
-    searchArea,
+    haveFromTo,
     onDragStart,
     start,
     end,
@@ -63,7 +63,7 @@ const TableSearchField = (props: Props) => {
           </Stack>
         </Box>
       </SearchField>
-      {searchArea && (
+      {haveFromTo && (
         <Stack
           flexDirection="row"
           gap={1}

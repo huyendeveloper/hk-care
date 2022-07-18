@@ -14,7 +14,6 @@ interface IProps {
   index: number;
   remove: any;
   errors: any;
-  register: any;
   setValue: any;
   getValues: any;
   arrayName: string;
@@ -26,16 +25,14 @@ const ReceiptEntity = ({
   index,
   remove,
   errors,
-  register,
   setValue,
   getValues,
   arrayName,
   control,
 }: IProps) => {
+  const { id } = useParams();
   const { productId } = item;
   const object = `${arrayName}.${index}`;
-
-  const { id } = useParams();
 
   const importPrice = useWatch({
     control,
@@ -51,6 +48,7 @@ const ReceiptEntity = ({
     control,
     name: `${object}.dateManufacture`,
   });
+
   const expiryDate = useWatch({
     control,
     name: `${object}.expiryDate`,
@@ -79,7 +77,7 @@ const ReceiptEntity = ({
 
   return (
     <TableRow hover tabIndex={-1} key={productId}>
-      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>
+      <TableCell sx={{ paddingY: '20px' }}>
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
@@ -106,7 +104,7 @@ const ReceiptEntity = ({
           setValue={setValue}
           control={control}
           defaultValue={getValues(`${object}.amount`)}
-          disabled={id ? true : false}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -150,7 +148,7 @@ const ReceiptEntity = ({
         <ControllerTextField
           name={`${object}.lotNumber`}
           control={control}
-          disabled={id ? true : false}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -159,7 +157,7 @@ const ReceiptEntity = ({
         <ControllerTextField
           name={`${object}.numberRegister`}
           control={control}
-          disabled={id ? true : false}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -169,7 +167,7 @@ const ReceiptEntity = ({
           name={`${object}.dateManufacture`}
           control={control}
           errors={errors}
-          disabled={id ? true : false}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -179,7 +177,7 @@ const ReceiptEntity = ({
           name={`${object}.expiryDate`}
           control={control}
           errors={errors}
-          disabled={id ? true : false}
+          disabled={Boolean(id)}
         />
       </TableCell>
 

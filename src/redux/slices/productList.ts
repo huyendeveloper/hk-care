@@ -3,11 +3,9 @@ import { IProductList } from 'interface';
 import productListService from 'services/productList.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllProduct = createAsyncThunk(
   'productList/getAllProduct',
@@ -54,29 +52,6 @@ export const getAllProductList = createAsyncThunk(
     }
   }
 );
-
-// export const getAllProductRegisted = createAsyncThunk(
-//   'productList/getAllProductRegisted',
-//   async (filters: FilterParams, { rejectWithValue }) => {
-//     try {
-//       const { data } = await productListService.getAllProductRegisted(filters);
-
-//       if (data.items) {
-//         const productList = data.items;
-//         const totalCount = data.totalCount;
-
-//         return {
-//           productList,
-//           totalCount,
-//         };
-//       }
-
-//       return rejectWithValue('Get data fail');
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
 
 export const registProductList = createAsyncThunk(
   'productList/regist',
@@ -131,17 +106,7 @@ const productListSlice = createSlice({
   name: 'productList',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllProduct.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllProduct.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllProduct.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default productListSlice.reducer;

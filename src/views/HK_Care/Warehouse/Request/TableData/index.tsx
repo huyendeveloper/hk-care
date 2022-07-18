@@ -1,28 +1,28 @@
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-    IconButton,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableRow
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
 import {
-    TableContent,
-    TableHeader,
-    TablePagination,
-    TableSearchField,
-    TableWrapper
+  TableContent,
+  TableHeader,
+  TablePagination,
+  TableSearchField,
+  TableWrapper,
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { IRequestImport } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
+import formatDateTime from 'utils/dateTimeFormat';
 
 const getCells = (): Cells<IRequestImport> => [
   {
@@ -130,7 +130,7 @@ const TableData = () => {
         setEnd={(val) =>
           setFilters({ ...filters, pageIndex: 1, lastDate: val })
         }
-        searchArea
+        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -162,9 +162,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>
-                        {moment(requestDate).format('DD/MM/YYYY HH:mm')}
-                      </TableCell>
+                      <TableCell>{formatDateTime(requestDate)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>
                   );
