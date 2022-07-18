@@ -1,19 +1,11 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isPending,
-  isFulfilled,
-  isRejected,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ISupplier } from 'interface';
 import supplierService from 'services/supplier.service';
 import { FilterParams } from 'types';
 
-interface IInitialState {
-  loading: boolean;
-}
+interface IInitialState {}
 
-const initialState: IInitialState = { loading: false };
+const initialState: IInitialState = {};
 
 export const getAllSupplier = createAsyncThunk(
   'supplier/getAll',
@@ -28,6 +20,26 @@ export const getAllSupplier = createAsyncThunk(
         return {
           supplierList,
           totalCount,
+        };
+      }
+
+      return rejectWithValue('Get data fail');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getSupplier = createAsyncThunk(
+  'supplier/get',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const { data } = await supplierService.get(id);
+      if (data) {
+        const supplier = data;
+
+        return {
+          supplier,
         };
       }
 
@@ -89,17 +101,7 @@ const supplierSlice = createSlice({
   name: 'supplier',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getAllSupplier.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllSupplier.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(getAllSupplier.rejected, (state) => {
-      state.loading = false;
-    });
-  },
+  extraReducers: (builder) => {},
 });
 
 export default supplierSlice.reducer;

@@ -3,7 +3,7 @@ import { Button, Paper } from '@mui/material';
 import { TableSearchField, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { ITenant, IUser } from 'interface';
+import { IUser } from 'interface';
 import { useState } from 'react';
 import { FilterParams } from 'types';
 

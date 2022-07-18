@@ -13,7 +13,7 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { connectURL } from 'config';
@@ -25,7 +25,7 @@ import {
   IProductGroup,
   ISupplier,
   ITreatmentGroup,
-  IUsage,
+  IUsage
 } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -39,7 +39,6 @@ import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
-import FormDialog from '../FormDialog';
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
   return this.test(`test-trim`, errorMessage, function (value) {
@@ -79,11 +78,10 @@ const validationSchema = yup.object().shape({
 });
 
 const DetailsForm = () => {
-  const { id: crudId } = useParams();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const setNotification = useNotification();
   const [productDetail, setProductDetail] = useState(null);
-  const [taskQueue, setTaskQueue] = useState<number>(0);
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -93,6 +91,8 @@ const DetailsForm = () => {
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const {
     control,
@@ -176,13 +176,16 @@ const DetailsForm = () => {
   }, [productDetail, reset]);
 
   const fetchData = async () => {
-    setTaskQueue((task) => task + 1);
-    if (!crudId) return;
+    setLoading(true);
+    if (!id) return;
 
-    const { data } = await productService.get(Number(crudId));
-    if (!data) return;
+    const { data } = await productService.get(Number(id));
+    if (!data) {
+      setLoading(false);
+      return;
+    }
     setProductDetail(data);
-    setTaskQueue((task) => task - 1);
+    setLoading(false);
   };
 
   const fetchProductGroupList = () => {
@@ -243,15 +246,17 @@ const DetailsForm = () => {
     fetchMeasureList();
     fetchSupplierList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [crudId]);
+  }, [id]);
 
   const onSubmit = async (payload: IProduct) => {
+    setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
       updateProduct({ ...payload, image })
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -260,9 +265,10 @@ const DetailsForm = () => {
     });
 
     setDisabled(true);
+    setShowBackdrop(false);
   };
 
-  if (taskQueue > 0) {
+  if (loading) {
     return <LoadingScreen />;
   }
 
@@ -434,7 +440,7 @@ const DetailsForm = () => {
                 <ControllerNumberInput
                   name="importPrice"
                   // @ts-ignore
-                  value={productDetail?.importPrice}
+                  defaultValue={productDetail?.importPrice}
                   setValue={setValue}
                   disabled={disabled}
                   control={control}
@@ -445,7 +451,7 @@ const DetailsForm = () => {
                 <ControllerNumberInput
                   name="price"
                   // @ts-ignore
-                  value={productDetail?.price}
+                  defaultValue={productDetail?.price}
                   setValue={setValue}
                   disabled={disabled}
                   control={control}
@@ -527,7 +533,11 @@ const DetailsForm = () => {
             Quay lại danh sách sản phẩm
           </LinkButton>
 
-          {!disabled && <LoadingButton type="submit">Lưu</LoadingButton>}
+          {!disabled && (
+            <LoadingButton loading={showBackdrop} type="submit">
+              Lưu
+            </LoadingButton>
+          )}
 
           {disabled && (
             <Button variant="contained" onClick={() => setDisabled(false)}>

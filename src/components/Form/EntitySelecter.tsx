@@ -28,6 +28,7 @@ interface Props<T, O extends FieldValues[]>
   noOptionsText?: string;
   handleChangeInput?: (value: string) => void;
   loading?: boolean;
+  disableClearable?: boolean;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -48,6 +49,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     getOptionDisabled,
     handleChangeInput,
     loading = false,
+    disableClearable = false,
     ...rest
   } = props;
   const labels = options.reduce((acc: Record<number, Label>, option) => {
@@ -72,6 +74,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
+          disableClearable={disableClearable}
           renderInput={(params) => {
             // @ts-ignore
             // params.inputProps.value = params.inputProps.value | defaultLabel;

@@ -185,6 +185,13 @@ const FormDialog = ({
                     name="name"
                     control={control}
                     disabled={disabled}
+                    helperText={
+                      <>
+                        HK [ĐỊA CHỈ ĐIỂM BÁN]
+                        <br />
+                        VD: HK 39 Núi Trúc
+                      </>
+                    }
                   />
                 </Grid>
               </Grid>

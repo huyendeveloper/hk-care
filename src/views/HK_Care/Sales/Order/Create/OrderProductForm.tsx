@@ -73,7 +73,7 @@ const getCells = (): Cells<ISearchProduct> => [
   { id: 'productId', label: 'STT' },
   { id: 'productName', label: 'Tên sản phẩm' },
   { id: 'mesureNameLevelFirst', label: 'Đơn vị' },
-  { id: 'quantity', label: 'Số lượng' },
+  { id: 'quantity', label: 'SL' },
   { id: 'price', label: 'Đơn giá' },
   { id: 'discount', label: 'Chiết khấu' },
   { id: 'stockQuantity', label: 'Thành tiền' },
@@ -180,9 +180,14 @@ const OrderProductForm = ({
       <FormContent>
         <Grid container sx={{ height: 1 }}>
           <Grid item xs={12} md={9}>
-            <TableWrapper sx={{ height: 1 }} component={Paper}>
+            <TableWrapper
+              sx={{ height: 'calc(100vh - 98px)' }}
+              component={Paper}
+            >
               <TableContent total={1} loading={false}>
-                <TableContainer sx={{ p: 1.5, maxHeight: '30vh' }}>
+                <TableContainer
+                  sx={{ p: 1.5, maxHeight: 'calc(100vh - 98px)' }}
+                >
                   <Scrollbar>
                     <Table sx={{ minWidth: 'max-content' }} size="small">
                       <TableHeader

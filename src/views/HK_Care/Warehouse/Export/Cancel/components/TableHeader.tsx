@@ -10,7 +10,7 @@ import type { Dictionary, Order } from 'types/common';
 
 export interface Cell<T> {
   id: keyof T;
-  label: string;
+  label: string | React.ReactElement;
   align?: TableCellProps['align'];
 }
 

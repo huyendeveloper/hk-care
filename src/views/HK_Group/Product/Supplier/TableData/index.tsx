@@ -5,7 +5,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -29,13 +31,12 @@ import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   changeStatus,
   deleteSupplier,
   getAllSupplier,
 } from 'redux/slices/supplier';
-import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialogSupplier from '../FormDialog';
@@ -51,16 +52,17 @@ const getCells = (): Cells<ISupplier> => [
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const { loading } = useSelector((state: RootState) => state.supplier);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const dispatch = useDispatch();
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
@@ -71,14 +73,17 @@ const TableData = () => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
     setSupplierList(payload.supplierList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -140,14 +145,12 @@ const TableData = () => {
     setOpenUnBlockDialog(false);
   };
 
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
+  const handleCloseFormDialog = () => {
     setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
   };
 
   const handleBlock = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseBlockDialog();
     const { error } = await dispatch(
@@ -156,6 +159,7 @@ const TableData = () => {
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -164,9 +168,11 @@ const TableData = () => {
     });
 
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleUnBlock = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseUnBlockDialog();
     const { error } = await dispatch(
@@ -175,6 +181,7 @@ const TableData = () => {
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -183,6 +190,7 @@ const TableData = () => {
     });
 
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
@@ -195,12 +203,14 @@ const TableData = () => {
   };
 
   const handleDelete = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
     // @ts-ignore
     const { error } = await dispatch(deleteSupplier(currentID));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -208,7 +218,8 @@ const TableData = () => {
       severity: 'success',
     });
 
-    setSupplierList(supplierList.filter((x) => x.id !== currentID));
+    fetchData();
+    setShowBackdrop(false);
   };
 
   const renderAction = (row: ISupplier) => {
@@ -288,7 +299,6 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{name}</TableCell>
-                      {/* @ts-ignore */}
                       <Tooltip title={address} placement="bottom">
                         <TableCell
                           sx={{
@@ -355,6 +365,7 @@ const TableData = () => {
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
+        loading={showBackdrop}
       />
 
       <FormDialogSupplier
@@ -362,7 +373,16 @@ const TableData = () => {
         data={supplierList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        fetchData={fetchData}
       />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

@@ -1,62 +1,57 @@
+export interface ITenant {
+  id: string;
+  name: string;
+  address: string;
+  hotline: string;
+  status: boolean;
+  nameContact?: string;
+  description?: string;
+  phone?: string;
+}
+
 export interface ILogin {
   username: string;
   password: string;
-  __tenant: string | null;
-  tenant: string | null;
-}
-
-export interface ILoginResponse {
-  access_Token: string;
-  userId: string;
-}
-
-export interface IUser {
-  token: string;
-  name: string;
-  phone: string;
-  email: string;
-  role: string;
+  __tenant: string;
   tenant: string;
-  status: boolean;
-  id: number;
 }
 
 export interface IProductGroup {
-  name: string;
-  description?: string;
   id: number;
-}
-
-export interface IUsage {
   name: string;
-  description?: string;
-  id: number;
+  description: string;
 }
 
 export interface ITreatmentGroup {
-  name: string;
-  description?: string;
   id: number;
+  name: string;
+  description: string;
+}
+
+export interface IUsage {
+  id: number;
+  name: string;
+  description: string;
 }
 
 export interface IMeasure {
-  name: string;
-  description?: string;
   id: number;
+  name: string;
+  description: string;
 }
 
 export interface ISupplier {
-  name: string;
-  address?: string;
-  nameContact?: string;
-  telephoneNumber: string;
-  mobileNumber?: string;
-  fax?: string;
-  taxCode?: string;
-  bussinessLicense: any;
-  description?: string;
-  active?: number;
   id: number;
+  name: string;
+  address: string;
+  nameContact: string;
+  telephoneNumber: string;
+  mobileNumber: string;
+  fax: string;
+  taxCode: string;
+  bussinessLicense: any;
+  description: string;
+  active: 1 | 2;
   files?: File[] | object[];
 }
 
@@ -167,17 +162,6 @@ export interface IReceipt {
   paid?: number;
   __tenant?: string;
   outOfDate: Date;
-}
-
-export interface ITenant {
-  id: string;
-  name: string;
-  address: string;
-  hotline: string;
-  status: boolean;
-  nameContact?: string;
-  description?: string;
-  phone?: string;
 }
 
 export interface IReferencePricesMock {
@@ -339,4 +323,44 @@ export interface IQuota {
   importPrice: number;
   price: number;
   quota: number;
+}
+
+export interface IInventoryRecordProduct {
+  id: number;
+  productName: string;
+  measureName: string;
+  stockQuantityApp: number;
+  realStockQuantity: number;
+  importPrice: number;
+  price: number;
+}
+
+export interface IInventoryRecord {
+  id: number;
+  code: string;
+  date: Date;
+  staff: string;
+  totalRevenueDiff: number;
+  description?: string;
+  inventoryRecordProducts?: IInventoryRecordProduct[];
+}
+
+export interface IUser {
+  token: string;
+  name: string;
+  phone: string;
+  email: string;
+  role: string;
+  tenant: string;
+  status: boolean;
+  id: number;
+}
+
+export interface IRole {
+  id: number;
+  roleName: string;
+  qlsp: boolean;
+  qlkh: boolean;
+  qlbh: boolean;
+  qlvh: boolean;
 }

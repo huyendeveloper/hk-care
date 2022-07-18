@@ -94,6 +94,8 @@ const CreateForm = () => {
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
+  const [loadingExpiredProduct, setLoadingExpiredProduct] =
+    useState<boolean>(false);
 
   const { loading: loadingProduct } = useSelector(
     (state: RootState) => state.productList
@@ -104,6 +106,8 @@ const CreateForm = () => {
     from: null,
     to: null,
   });
+
+  const cells = useMemo(() => getCells(), []);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -119,8 +123,6 @@ const CreateForm = () => {
       pageSize: rowsPerPage,
     }));
   };
-
-  const cells = useMemo(() => getCells(), []);
 
   const { control, setValue, getValues, handleSubmit, reset } =
     useForm<IExportCancel>({
@@ -182,7 +184,7 @@ const CreateForm = () => {
   }, [detailAdd]);
 
   const fetchExpiredProduct = async () => {
-    setLoadingAdd(true);
+    setLoadingExpiredProduct(true);
     try {
       const { data } = await exportCancelService.addToListExportCancel({
         productId: null,
@@ -191,7 +193,7 @@ const CreateForm = () => {
       });
       if (data.length === 0) {
         setNotification({ error: 'Không có sản phẩm nào!' });
-        setLoadingAdd(false);
+        setLoadingExpiredProduct(false);
         return;
       }
       data.forEach((item: IProductExportCancel) => {
@@ -209,9 +211,8 @@ const CreateForm = () => {
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
       setNotification({ error: 'Lỗi!' });
-      setLoadingAdd(false);
     }
-    setLoadingAdd(false);
+    setLoadingExpiredProduct(false);
   };
 
   useEffect(() => {
@@ -343,7 +344,7 @@ const CreateForm = () => {
           <Grid item xs={12} md={5}>
             <FormLabel title="Thời gian sử dụng còn" name="name" />
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Stack flexDirection="row" alignItems="center" gap="10px">
                   <FormLabel title="Từ:" name="name" />
                   <Selecter
@@ -359,7 +360,7 @@ const CreateForm = () => {
                   />
                 </Stack>
               </Grid>
-              <Grid item xs={4} sx={{ gap: '10px' }}>
+              <Grid item xs={6} sx={{ gap: '10px' }}>
                 <Stack flexDirection="row" alignItems="center" gap="10px">
                   <FormLabel title="Đến:" name="name" />
                   <Selecter
@@ -405,6 +406,7 @@ const CreateForm = () => {
                   loadingPosition="start"
                   startIcon={<></>}
                   sx={{ height: 1, width: '100px' }}
+                  disabled={loadingExpiredProduct}
                 >
                   Thêm
                 </LoadingButton>
@@ -420,7 +422,11 @@ const CreateForm = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent total={1} noDataText=" " loading={false}>
+                  <TableContent
+                    total={1}
+                    noDataText=" "
+                    loading={loadingExpiredProduct}
+                  >
                     <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">

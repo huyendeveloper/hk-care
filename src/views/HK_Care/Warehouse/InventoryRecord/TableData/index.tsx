@@ -1,10 +1,9 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Backdrop,
-  Button,
   CircularProgress,
   IconButton,
   Paper,
@@ -14,8 +13,8 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
+import { LinkButton } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
-import DeleteDialog from 'components/Dialog/DeleteDialog';
 import TableContent from 'components/Table/TableContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import TablePagination from 'components/Table/TablePagination';
@@ -23,24 +22,36 @@ import TableSearchField from 'components/Table/TableSearchField';
 import TableWrapper from 'components/Table/TableWrapper';
 import { defaultFilters } from 'constants/defaultFilters';
 import useNotification from 'hooks/useNotification';
-import { IMeasure } from 'interface';
+import { IInventoryRecord } from 'interface';
+import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { deleteMeasure, getAllMeasure } from 'redux/slices/measure';
 import { ClickEventCurrying, FilterParams } from 'types';
-import FormDialog from '../FormDialog';
+import { numberFormat } from 'utils/numberFormat';
 
-const getCells = (): Cells<IMeasure> => [
+const getCells = (): Cells<IInventoryRecord> => [
   {
     id: 'id',
     label: 'STT',
   },
   {
-    id: 'name',
-    label: 'Tên đơn vị đo lường',
+    id: 'code',
+    label: 'Mã biên bản kiểm kê',
   },
   {
-    id: 'description',
+    id: 'date',
+    label: 'Ngày kiểm kê',
+  },
+  {
+    id: 'staff',
+    label: 'Nhân viên kiểm',
+  },
+  {
+    id: 'totalRevenueDiff',
+    label: 'Tổng lệch doanh thu',
+  },
+  {
+    id: 'date',
     label: 'Thao tác',
   },
 ];
@@ -52,7 +63,9 @@ const TableData = () => {
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [measureList, setMeasureList] = useState<IMeasure[]>([]);
+  const [inventoryRecord, setInventoryRecord] = useState<IInventoryRecord[]>(
+    []
+  );
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
@@ -61,16 +74,83 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
-    // @ts-ignore
-    const { payload, error } = await dispatch(getAllMeasure(filters));
+    const payload = {
+      inventoryRecord: [
+        {
+          id: 1,
+          code: '13537-445',
+          date: new Date('8/16/2021'),
+          staff: 'Terzo',
+          totalRevenueDiff: 87872,
+        },
+        {
+          id: 2,
+          code: '36987-2460',
+          date: new Date('4/15/2022'),
+          staff: 'Davioud',
+          totalRevenueDiff: 76375,
+        },
+        {
+          id: 3,
+          code: '33992-1307',
+          date: new Date('5/5/2022'),
+          staff: 'Graber',
+          totalRevenueDiff: 18260,
+        },
+        {
+          id: 4,
+          code: '51345-115',
+          date: new Date('11/8/2021'),
+          staff: 'Duffyn',
+          totalRevenueDiff: 82972,
+        },
+        {
+          id: 5,
+          code: '22431-640',
+          date: new Date('9/21/2021'),
+          staff: 'Menichino',
+          totalRevenueDiff: 55772,
+        },
+        {
+          id: 6,
+          code: '0093-7350',
+          date: new Date('12/27/2021'),
+          staff: 'Adams',
+          totalRevenueDiff: 35887,
+        },
+        {
+          id: 7,
+          code: '52810-214',
+          date: new Date('7/21/2021'),
+          staff: 'Woodeson',
+          totalRevenueDiff: 83272,
+        },
+        {
+          id: 8,
+          code: '50523-489',
+          date: new Date('11/17/2021'),
+          staff: 'Abrahmer',
+          totalRevenueDiff: 36194,
+        },
+        {
+          id: 9,
+          code: '59779-404',
+          date: new Date('10/15/2021'),
+          staff: "O'Hartnedy",
+          totalRevenueDiff: 11672,
+        },
+        {
+          id: 10,
+          code: '59640-154',
+          date: new Date('3/16/2022'),
+          staff: 'Costa',
+          totalRevenueDiff: 58563,
+        },
+      ],
+      totalCount: 35,
+    };
 
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      setLoading(false);
-      return;
-    }
-
-    setMeasureList(payload.measureList);
+    setInventoryRecord(payload.inventoryRecord);
     setTotalRows(payload.totalCount);
     setLoading(false);
   };
@@ -129,25 +209,6 @@ const TableData = () => {
     setOpenFormDialog(false);
   };
 
-  const handleDelete = async () => {
-    if (!currentID) return;
-    handleCloseDeleteDialog();
-    setShowBackdrop(true);
-    // @ts-ignore
-    const { error } = await dispatch(deleteMeasure(currentID));
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      setShowBackdrop(false);
-      return;
-    }
-    setNotification({
-      message: 'Xóa thành công!',
-      severity: 'success',
-    });
-    fetchData();
-    setShowBackdrop(false);
-  };
-
   const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
     setOpenFormDialog(true);
@@ -160,7 +221,7 @@ const TableData = () => {
     setOpenFormDialog(true);
   };
 
-  const renderAction = (row: IMeasure) => {
+  const renderAction = (row: IInventoryRecord) => {
     return (
       <>
         <IconButton onClick={handleOpenViewDialog(row.id)}>
@@ -170,9 +231,8 @@ const TableData = () => {
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
         </IconButton>
-
-        <IconButton onClick={handleOpenDeleteDialog(row.id)}>
-          <DeleteIcon />
+        <IconButton>
+          <DownloadIcon />
         </IconButton>
       </>
     );
@@ -181,22 +241,31 @@ const TableData = () => {
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
       <TableSearchField
-        title="Danh sách đơn vị đo lường"
-        placeHolder="Tìm kiếm đơn vị đo lường"
+        title="Danh sách bản kiểm kê kho"
+        placeHolder="Tìm kiếm bản kiểm kho"
         onSearch={handleSearch}
         searchText={filters.searchText}
+        start={filters.startDate}
+        end={filters.lastDate}
+        setStart={(val) =>
+          setFilters({ ...filters, pageIndex: 1, startDate: val })
+        }
+        setEnd={(val) =>
+          setFilters({ ...filters, pageIndex: 1, lastDate: val })
+        }
+        searchArea
       >
-        <Button
+        <LinkButton
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleOpenCreateDialog}
           sx={{ fontSize: '1rem' }}
+          to="create"
         >
-          Thêm mới đơn vị đo lường
-        </Button>
+          Thêm bản kiểm kho
+        </LinkButton>
       </TableSearchField>
 
-      <TableContent total={measureList.length} loading={loading}>
+      <TableContent total={inventoryRecord.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -208,17 +277,20 @@ const TableData = () => {
               />
 
               <TableBody>
-                {measureList.map((item, index) => {
-                  const { id, name } = item;
+                {inventoryRecord.map((item, index) => {
+                  const { id, code, date, staff, totalRevenueDiff } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
-                      <TableCell sx={{ width: '44%' }}>
+                      <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell sx={{ width: '44%' }}>{name}</TableCell>
-                      <TableCell sx={{ width: '12%' }} align="left">
-                        {renderAction(item)}
+                      <TableCell>{code}</TableCell>
+                      <TableCell>
+                        {moment(date).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
+                      <TableCell>{staff}</TableCell>
+                      <TableCell>{numberFormat(totalRevenueDiff)}</TableCell>
+                      <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -236,25 +308,6 @@ const TableData = () => {
           rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
-
-      <DeleteDialog
-        id={currentID}
-        tableName="đơn vị đo lường"
-        name={measureList.find((x) => x.id === currentID)?.name}
-        onClose={handleCloseDeleteDialog}
-        open={openDeleteDialog}
-        handleDelete={handleDelete}
-        loading={showBackdrop}
-      />
-
-      <FormDialog
-        currentID={currentID}
-        data={measureList.find((x) => x.id === currentID)}
-        open={openFormDialog}
-        handleClose={handleCloseFormDialog}
-        disable={disableView}
-        fetchData={fetchData}
-      />
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}

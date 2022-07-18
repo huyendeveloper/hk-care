@@ -131,12 +131,22 @@ const PrintOrder = () => {
               <table style={{ marginBottom: '20px' }}>
                 <thead>
                   <tr>
+                    <td colSpan={5} style={{ padding: '0' }}>
+                      <hr style={{ borderTop: '1px solid black', margin: 0 }} />
+                    </td>
+                  </tr>
+                  <tr>
                     <td>Sản phẩm</td>
                     {/* <td style={{ padding: '2px' }}>Đ.Vị</td> */}
                     <td style={{ padding: '2px' }}>SL</td>
                     <td style={{ padding: '2px' }}>Đ.Giá</td>
-                    {/* <td style={{ padding: '2px' }}>C.Khấu</td> */}
+                    <td style={{ padding: '2px' }}>C.Khấu</td>
                     <td>T.Tiền</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={5} style={{ padding: '0' }}>
+                      <hr style={{ borderTop: '1px solid black', margin: 0 }} />
+                    </td>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,9 +162,9 @@ const PrintOrder = () => {
                           <td style={{ padding: '2px' }}>
                             {numberFormat(item.price)}
                           </td>
-                          {/* <td style={{ padding: '2px' }}>
+                          <td style={{ padding: '2px' }}>
                             {numberFormat(item.discount)}
-                          </td> */}
+                          </td>
                           <td>
                             {numberFormat(
                               item.quantity * item.price - item.discount
@@ -168,7 +178,7 @@ const PrintOrder = () => {
                               {item.noon || '......'}, Tối:{' '}
                               {item.night || '......'}, Ghi chú:{' '}
                               {item.description ||
-                                '............................................................................'}
+                                '........................................................'}
                               )
                             </em>
                           </td>
@@ -281,7 +291,7 @@ const PrintOrder = () => {
               <hr
                 style={{ borderTop: '1px dashed black', marginBottom: '10px' }}
               />
-              <Stack flexDirection="row" mb={2} justifyContent='center' gap={1}>
+              <Stack flexDirection="row" mb={2} justifyContent="center" gap={1}>
                 <StarIcon />
                 <StarIcon />
                 <StarIcon />
