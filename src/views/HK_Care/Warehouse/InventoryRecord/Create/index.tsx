@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { LoadingButton } from '@mui/lab';
@@ -12,7 +13,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -24,7 +25,7 @@ import {
   FormHeader,
   FormLabel,
   FormPaperGrid,
-  Selecter,
+  Selecter
 } from 'components/Form';
 import { TableContent, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
@@ -33,14 +34,12 @@ import { useNotification } from 'hooks';
 import { IInventoryRecord, IInventoryRecordProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getAllProduct } from 'redux/slices/exportCancel';
-import { RootState } from 'redux/store';
 import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 import * as yup from 'yup';
-import CloseIcon from '@mui/icons-material/Close';
 import MapDialog from './MapDialog';
 
 interface IProductListName {
@@ -100,9 +99,7 @@ const Create = () => {
     IInventoryRecordProduct[]
   >([]);
   const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
-  const { loading: loadingProduct } = useSelector(
-    (state: RootState) => state.productList
-  );
+
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     productId: null,
     productGroupId: null,
@@ -222,7 +219,7 @@ const Create = () => {
                     setDetailAdd({ ...detailAdd, productId: value })
                   }
                   defaultValue=""
-                  loading={loadingProduct}
+                  loading={false}
                 />
               </Grid>
               <Grid item xs={12} md={5}>
@@ -237,7 +234,7 @@ const Create = () => {
                     setDetailAdd({ ...detailAdd, productId: value })
                   }
                   defaultValue=""
-                  loading={loadingProduct}
+                  loading={false}
                 />
               </Grid>
               <Grid item xs={12} md={2}>

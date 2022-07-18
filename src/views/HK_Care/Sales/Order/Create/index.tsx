@@ -48,9 +48,9 @@ interface IForm {
 
 const Create = () => {
   const { id } = useParams();
-  const setNotification = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const setNotification = useNotification();
   const [tab, setTab] = useState<string>('0');
   const [ids, setIds] = useState<number[]>([1]);
   const { orderSales } = useSelector((state: RootState) => state.salesOrder);
@@ -176,7 +176,7 @@ const Create = () => {
         {ids.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <TabPanel value={index.toString()}  >
+              <TabPanel value={index.toString()}>
                 <OrderProductForm
                   identification={item}
                   control={control}

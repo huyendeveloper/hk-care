@@ -13,8 +13,10 @@ const CreateForm = () => {
   const setNotification = useNotification();
   const [exportWHRotation, setExportWHRotation] =
     useState<IExportWHRotation | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchDataUpdate = async () => {
+    setLoading(true);
     // @ts-ignore
     const { payload, error } = await dispatch(
       // @ts-ignore
@@ -23,10 +25,12 @@ const CreateForm = () => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
     setExportWHRotation(payload.exportWHRotation);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const CreateForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!exportWHRotation && id) {
+  if (loading && id) {
     return <LoadingScreen />;
   }
 

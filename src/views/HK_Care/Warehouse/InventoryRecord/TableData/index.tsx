@@ -11,7 +11,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkButton } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
@@ -23,10 +23,10 @@ import TableWrapper from 'components/Table/TableWrapper';
 import { defaultFilters } from 'constants/defaultFilters';
 import useNotification from 'hooks/useNotification';
 import { IInventoryRecord } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ClickEventCurrying, FilterParams } from 'types';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 const getCells = (): Cells<IInventoryRecord> => [
@@ -253,7 +253,7 @@ const TableData = () => {
         setEnd={(val) =>
           setFilters({ ...filters, pageIndex: 1, lastDate: val })
         }
-        searchArea
+        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -285,9 +285,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>
-                        {moment(date).format('DD/MM/YYYY HH:mm')}
-                      </TableCell>
+                      <TableCell>{formatDateTime(date)}</TableCell>
                       <TableCell>{staff}</TableCell>
                       <TableCell>{numberFormat(totalRevenueDiff)}</TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>

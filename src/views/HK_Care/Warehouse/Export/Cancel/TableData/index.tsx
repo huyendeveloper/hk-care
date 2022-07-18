@@ -22,12 +22,11 @@ import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IExportCancel } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getAllExportCancel } from 'redux/slices/exportCancel';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 const getCells = (): Cells<IExportCancel> => [
@@ -54,10 +53,10 @@ const getCells = (): Cells<IExportCancel> => [
 ];
 
 const TableData = () => {
-  const setNotification = useNotification();
   const dispatch = useDispatch();
-  const [exportCancel, setImportReceipt] = useState<IExportCancel[]>([]);
+  const setNotification = useNotification();
 
+  const [exportCancel, setExportCancel] = useState<IExportCancel[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
@@ -69,10 +68,11 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllExportCancel(filters));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
-    setImportReceipt(payload.exportWHList);
+    setExportCancel(payload.exportWHList);
     setTotalRows(payload.totalCount);
     setLoading(false);
   };
@@ -140,7 +140,7 @@ const TableData = () => {
         end={filters.lastDate}
         setStart={(val) => setFilters({ ...filters, startDate: val })}
         setEnd={(val) => setFilters({ ...filters, lastDate: val })}
-        searchArea
+        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -172,9 +172,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>
-                        {moment(creationTime).format('DD/MM/YYYY HH:mm')}
-                      </TableCell>
+                      <TableCell>{formatDateTime(creationTime)}</TableCell>
                       <TableCell>{numberFormat(totalFee)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>

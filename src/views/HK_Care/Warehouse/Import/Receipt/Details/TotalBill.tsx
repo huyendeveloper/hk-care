@@ -12,16 +12,14 @@ interface ImportReceipt {
 }
 
 interface IProps {
-  control: any;
-  setValue: any;
   importReceipt: ImportReceipt | undefined;
 }
 
-const TotalBill = ({ control, setValue, importReceipt }: IProps) => {
+const TotalBill = ({ importReceipt }: IProps) => {
   return (
     <>
       {importReceipt && (
-        <table style={{float:'right'}}>
+        <table style={{ float: 'right' }}>
           <tbody>
             <tr>
               <td>Tổng tiền:</td>

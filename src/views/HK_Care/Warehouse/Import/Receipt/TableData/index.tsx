@@ -20,16 +20,13 @@ import {
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { previousDay } from 'date-fns';
 import { useNotification } from 'hooks';
 import { IImportReceipt } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getAllImportReceipt } from 'redux/slices/importReceipt';
-import { getAllUsage } from 'redux/slices/usage';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 const getCells = (): Cells<IImportReceipt> => [
@@ -60,13 +57,13 @@ const getCells = (): Cells<IImportReceipt> => [
 ];
 
 const TableData = () => {
-  const setNotification = useNotification();
   const dispatch = useDispatch();
-  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
+  const setNotification = useNotification();
 
-  const [totalRows, setTotalRows] = useState<number>(0);
-  // const { loading } = useSelector((state: RootState) => state.usage);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [totalRows, setTotalRows] = useState<number>(0);
+  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -77,26 +74,17 @@ const TableData = () => {
       setNotification({
         error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
 
-    // setImportReceipt([
-    //   { id: 1, creationTime: new Date('9/29/2021'), moneyToPay: 78, debts: 86 },
-    //   { id: 2, creationTime: new Date('6/16/2021'), moneyToPay: 26, debts: 3 },
-    //   { id: 3, creationTime: new Date('11/26/2021'), moneyToPay: 61, debts: 28 },
-    //   { id: 4, creationTime: new Date('3/9/2022'), moneyToPay: 63, debts: 32 },
-    //   { id: 5, creationTime: new Date('12/9/2021'), moneyToPay: 80, debts: 60 },
-    //   { id: 6, creationTime: new Date('11/1/2021'), moneyToPay: 98, debts: 80 },
-    //   { id: 7, creationTime: new Date('12/6/2021'), moneyToPay: 66, debts: 26 },
-    //   { id: 8, creationTime: new Date('8/4/2021'), moneyToPay: 81, debts: 1 },
-    //   { id: 9, creationTime: new Date('2/12/2022'), moneyToPay: 99, debts: 3 },
-    //   { id: 10, creationTime: new Date('6/13/2021'), moneyToPay: 17, debts: 96 },
-    // ]);
     setImportReceipt(payload.importReceiptList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -162,7 +150,7 @@ const TableData = () => {
         setEnd={(val) =>
           setFilters({ ...filters, pageIndex: 1, lastDate: val })
         }
-        searchArea
+        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -174,7 +162,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={importReceipt.length} loading={false}>
+      <TableContent total={importReceipt.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -194,9 +182,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>
-                        {moment(creationTime).format('DD/MM/YYYY HH:mm')}
-                      </TableCell>
+                      <TableCell>{formatDateTime(creationTime)}</TableCell>
                       <TableCell>{numberFormat(moneyToPay)}</TableCell>
                       <TableCell>{numberFormat(debts)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>

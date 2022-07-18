@@ -25,7 +25,6 @@ const ReceiptEntity = ({ item, index, value }: IProps) => {
       <TableCell>{numberFormat(value.price)}</TableCell>
       <TableCell>{numberFormat(value?.discount || 0)}</TableCell>
       <TableCell>{numberFormat(value.totalMoney)}</TableCell>
-
       <TableCell>{value?.lotNumber || ''}</TableCell>
       <TableCell>{value?.numberRegister || ''}</TableCell>
       <TableCell>

@@ -1,15 +1,13 @@
-import { Paper } from '@mui/material';
 import { LoadingScreen } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
-import { TableWrapper } from 'components/Table';
 import { useNotification } from 'hooks';
 import { ISalesOrder } from 'interface';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getSaleOrder } from 'redux/slices/salesOrder';
-import TableData from './TableData';
 import OrderInfo from './OrderInfo';
+import TableData from './TableData';
 
 const Details = () => {
   const { id } = useParams();

@@ -20,8 +20,6 @@ import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { IProductList } from 'interface';
 import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
 
 const getCells = (): Cells<IProductList> => [
@@ -31,18 +29,12 @@ const getCells = (): Cells<IProductList> => [
 ];
 
 interface IProps {
-  handleUnregist: (item: IProductList) => void;
   handleCancelRegist: (id: number) => void;
   registerList: IProductList[];
 }
 
-const ProductListTableData = ({
-  handleUnregist,
-  registerList,
-  handleCancelRegist,
-}: IProps) => {
+const ProductListTableData = ({ registerList, handleCancelRegist }: IProps) => {
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const { loading } = useSelector((state: RootState) => state.productList);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -102,7 +94,7 @@ const ProductListTableData = ({
             )
             .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10).length
         }
-        loading={loading}
+        loading={false}
       >
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>

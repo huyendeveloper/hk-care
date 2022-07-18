@@ -1,5 +1,4 @@
 import { TableCell, TableRow } from '@mui/material';
-import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
@@ -7,7 +6,6 @@ import { numberFormat } from 'utils/numberFormat';
 interface IProps {
   item: any;
   index: number;
-  setValue: any;
   getValues: any;
   arrayName: string;
   control: any;
@@ -16,7 +14,6 @@ interface IProps {
 const ReceiptEntity = ({
   item,
   index,
-  setValue,
   getValues,
   arrayName,
   control,

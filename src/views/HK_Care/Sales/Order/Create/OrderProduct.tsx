@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import {
   IconButton,
   Table,
@@ -8,13 +9,10 @@ import {
 } from '@mui/material';
 import { ControllerTextField, EntitySelecter } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { TableHeader } from 'components/Table';
-import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
-import CloseIcon from '@mui/icons-material/Close';
 
 interface IProps {
   index: number;
@@ -24,32 +22,6 @@ interface IProps {
   handleRemove: () => void;
 }
 
-interface Data {
-  mor: string;
-  noon: string;
-  night: string;
-  description: string;
-}
-
-const getCells = (): Cells<Data> => [
-  {
-    id: 'mor',
-    label: 'Sáng',
-  },
-  {
-    id: 'noon',
-    label: 'Trưa',
-  },
-  {
-    id: 'night',
-    label: 'Tối',
-  },
-  {
-    id: 'description',
-    label: 'Ghi chú',
-  },
-];
-
 const OrderProduct = ({
   index,
   control,
@@ -57,27 +29,25 @@ const OrderProduct = ({
   getValues,
   handleRemove,
 }: IProps) => {
+  const object = `createOrderDetailDtos.${index}`;
   const product = useWatch({
     control,
-    name: `createOrderDetailDtos.${index}`,
+    name: `${object}`,
   });
 
-  const cells = useMemo(() => getCells(), []);
-
-  // @ts-ignore
   const measures = useWatch({
     control,
-    name: `createOrderDetailDtos.${index}.measureListDtos`,
+    name: `${object}.measureListDtos`,
   });
 
   const measureId = useWatch({
     control,
-    name: `createOrderDetailDtos.${index}.measureId`,
+    name: `${object}.measureId`,
   });
 
   const price = useWatch({
     control,
-    name: `createOrderDetailDtos.${index}.price`,
+    name: `${object}.price`,
   });
 
   useEffect(() => {
@@ -92,16 +62,14 @@ const OrderProduct = ({
         measures[0]?.price
       : 0;
 
-    setValue(`createOrderDetailDtos.${index}.price`, price);
+    setValue(`${object}.price`, price);
 
     setValue(
-      `createOrderDetailDtos.${index}.billPerProduct`,
+      `${object}.billPerProduct`,
       (product.quantity || 0) * price - (product.discount || 0)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.quantity, measureId, product.discount]);
-
-  const handleOnSort = (field: string) => {};
 
   return (
     <TableRow hover tabIndex={-1} key={product.productId}>
@@ -114,7 +82,7 @@ const OrderProduct = ({
       <TableCell>{product.productName}</TableCell>
       <TableCell sx={{ width: '120px !important' }}>
         <EntitySelecter
-          name={`createOrderDetailDtos.${index}.measureId`}
+          name={`${object}.measureId`}
           control={control}
           options={measures}
           renderLabel={(field) => field.name}
@@ -125,18 +93,18 @@ const OrderProduct = ({
       </TableCell>
       <TableCell sx={{ width: '90px !important' }}>
         <ControllerNumberInput
-          name={`createOrderDetailDtos.${index}.quantity`}
+          name={`${object}.quantity`}
           setValue={setValue}
-          value={getValues(`createOrderDetailDtos.${index}.quantity`)}
+          value={getValues(`${object}.quantity`)}
           control={control}
         />
       </TableCell>
       <TableCell>{numberFormat(price)}</TableCell>
       <TableCell sx={{ width: '120px !important' }}>
         <ControllerNumberInput
-          name={`createOrderDetailDtos.${index}.discount`}
+          name={`${object}.discount`}
           setValue={setValue}
-          value={getValues(`createOrderDetailDtos.${index}.discount`)}
+          value={getValues(`${object}.discount`)}
           control={control}
         />
       </TableCell>
@@ -145,12 +113,6 @@ const OrderProduct = ({
       <TableCell>
         <TableContainer>
           <Table>
-            {/* <TableHeader
-              cells={cells}
-              onSort={handleOnSort}
-              sortDirection={''}
-              sortBy={''}
-            /> */}
             <TableBody>
               <TableRow>
                 <TableCell sx={{ padding: '5px 8px', fontWeight: 'bold' }}>
@@ -175,12 +137,10 @@ const OrderProduct = ({
                   }}
                 >
                   <ControllerTextField
-                    name={`createOrderDetailDtos.${index}.mor`}
+                    name={`${object}.mor`}
                     variant="standard"
                     control={control}
-                    defaultValue={getValues(
-                      `createOrderDetailDtos.${index}.mor`
-                    )}
+                    defaultValue={getValues(`${object}.mor`)}
                   />
                 </TableCell>
                 <TableCell
@@ -191,12 +151,10 @@ const OrderProduct = ({
                   }}
                 >
                   <ControllerTextField
-                    name={`createOrderDetailDtos.${index}.noon`}
+                    name={`${object}.noon`}
                     variant="standard"
                     control={control}
-                    defaultValue={getValues(
-                      `createOrderDetailDtos.${index}.noon`
-                    )}
+                    defaultValue={getValues(`${object}.noon`)}
                   />
                 </TableCell>
                 <TableCell
@@ -207,12 +165,10 @@ const OrderProduct = ({
                   }}
                 >
                   <ControllerTextField
-                    name={`createOrderDetailDtos.${index}.night`}
+                    name={`${object}.night`}
                     variant="standard"
                     control={control}
-                    defaultValue={getValues(
-                      `createOrderDetailDtos.${index}.night`
-                    )}
+                    defaultValue={getValues(`${object}.night`)}
                   />
                 </TableCell>
                 <TableCell
@@ -223,12 +179,10 @@ const OrderProduct = ({
                   }}
                 >
                   <ControllerTextField
-                    name={`createOrderDetailDtos.${index}.description`}
+                    name={`${object}.description`}
                     variant="standard"
                     control={control}
-                    defaultValue={getValues(
-                      `createOrderDetailDtos.${index}.description`
-                    )}
+                    defaultValue={getValues(`${object}.description`)}
                   />
                 </TableCell>
               </TableRow>

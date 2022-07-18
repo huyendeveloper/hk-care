@@ -22,7 +22,7 @@ const ReceiptEntity = ({ item, index, value }: IProps) => {
       <TableCell>{value.measureName}</TableCell>
       <TableCell>{value.amount}</TableCell>
       <TableCell>{numberFormat(value.importPrice)}</TableCell>
-      <TableCell>{numberFormat(value.importPrice)}</TableCell>
+      <TableCell>{numberFormat(value.importPrice * value.amount)}</TableCell>
       <TableCell>{value.lotNumber}</TableCell>
 
       <TableCell>{DateFns.formatDate(value.creationTime)}</TableCell>

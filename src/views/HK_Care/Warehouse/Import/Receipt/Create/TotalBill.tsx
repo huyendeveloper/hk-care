@@ -1,5 +1,5 @@
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import React from 'react';
+import { useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -18,20 +18,25 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
   const discountValue = useWatch({ control, name: 'discountValue' }) || 0;
   const paid = useWatch({ control, name: 'paid' }) || 0;
 
-  const bill = productReceiptWHDtos
-    ? productReceiptWHDtos.reduce(
-        // @ts-ignore
-        (prev, cur) =>
-          prev +
-          (Number(cur?.amount) || 0) * (Number(cur?.importPrice) || 0) -
-          (Number(cur?.discount) || 0),
-        0
-      )
-    : 0;
+  const bill = useMemo(() => {
+    return productReceiptWHDtos
+      ? productReceiptWHDtos.reduce(
+          // @ts-ignore
+          (prev, cur) =>
+            prev +
+            (Number(cur?.amount) || 0) * (Number(cur?.importPrice) || 0) -
+            (Number(cur?.discount) || 0),
+          0
+        )
+      : 0;
+  }, [productReceiptWHDtos]);
 
-  const moneyToPay = bill + bill * (vat / 100) - bill * (discountValue / 100);
+  const moneyToPay = useMemo(
+    () => bill + bill * (vat / 100) - bill * (discountValue / 100),
+    [bill, discountValue, vat]
+  );
 
-  const debts = moneyToPay - paid;
+  const debts = useMemo(() => moneyToPay - paid, [moneyToPay, paid]);
 
   return (
     <table style={{ float: 'right' }}>

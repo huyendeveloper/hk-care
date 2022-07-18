@@ -6,7 +6,7 @@ import {
   Paper,
   Table,
   TableBody,
-  TableContainer,
+  TableContainer
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -17,29 +17,26 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
-  Selecter,
+  FormPaperGrid
 } from 'components/Form';
 import ChooseOption from 'components/Form/ChooseOption';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
-import { yupDate } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { IProductReceiptWHDtos, IReceipt } from 'interface';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   createImportReceipt,
   getImportReceipt,
-  updateImportReceipt,
+  updateImportReceipt
 } from 'redux/slices/importReceipt';
 import { getAllProduct } from 'redux/slices/productList';
-import { RootState } from 'redux/store';
 import importReceiptService from 'services/importReceipt.service';
 import { FilterParams } from 'types';
 import DateFns from 'utils/DateFns';
@@ -111,10 +108,13 @@ const getCells = (): Cells<IReceipt> => [
 const CreateForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const setNotification = useNotification();
   const navigate = useNavigate();
+  const setNotification = useNotification();
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingButton, setLoadingButton] = useState<boolean>(false);
+  const [loadingProductList, setLoadingProductList] = useState<boolean>(true);
   const [productList, setProductList] = useState<IReceipt[]>([]);
-  const { loading } = useSelector((state: RootState) => state.productList);
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [pathFile, setPathFile] = useState<string>('');
   const [productChoosed, setProductChoosed] = useState<number | null>(null);
@@ -123,11 +123,11 @@ const CreateForm = () => {
     pageSize: 1000,
   });
 
-  const today = new Date();
+  const cells = useMemo(() => getCells(), []);
+
+  const today = useMemo(() => new Date(), []);
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
-
-  const cells = useMemo(() => getCells(), []);
 
   const getPathFile = async () => {
     const { data } = await importReceiptService.getPathFileReceipt(files[0]);
@@ -160,7 +160,6 @@ const CreateForm = () => {
     setValue,
     getValues,
     handleSubmit,
-    register,
     reset,
     formState: { errors },
   } = useForm<IReceipt>({
@@ -181,6 +180,7 @@ const CreateForm = () => {
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
@@ -209,23 +209,31 @@ const CreateForm = () => {
       paid,
       productReceiptWHDtos: listProductReceiptWH,
     });
+    setLoading(false);
   };
 
   const fetchData = async () => {
     if (id) {
       fetchDataUpdate();
+    } else {
+      setLoading(false);
     }
+
     // @ts-ignore
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoadingProductList(false);
       return;
     }
     setProductList(payload.productList);
+    setLoadingProductList(false);
   };
 
   useEffect(() => {
+    setLoading(true);
+    setLoadingProductList(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -280,6 +288,7 @@ const CreateForm = () => {
         }
       ),
     };
+    setLoadingButton(true);
     if (id) {
       const { error, payload } = await dispatch(
         // @ts-ignore
@@ -287,12 +296,14 @@ const CreateForm = () => {
       );
       if (error) {
         setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
+        setLoadingButton(false);
         return;
       }
       setNotification({
         message: 'Cập nhật thành công',
         severity: 'success',
       });
+      setLoadingButton(false);
       return navigate(`/hk_care/warehouse/import/receipt`);
     }
     const { error, payload } = await dispatch(
@@ -301,12 +312,14 @@ const CreateForm = () => {
     );
     if (error) {
       setNotification({ error: payload.response.data.join(' ') || 'Lỗi!' });
+      setLoadingButton(false);
       return;
     }
     setNotification({
       message: 'Thêm thành công',
       severity: 'success',
     });
+    setLoadingButton(false);
     return navigate(`/hk_care/warehouse/import/receipt`);
   };
 
@@ -348,13 +361,13 @@ const CreateForm = () => {
                   renderValue="productId"
                   placeholder=""
                   onChangeSelect={onChangeSelect}
-                  loading={loading}
+                  loading={loadingProductList}
                   value={productChoosed}
                 />
               </Grid>
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
-                  <TableContent total={1} noDataText=" " loading={false}>
+                  <TableContent total={1} noDataText=" " loading={loading}>
                     <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -373,7 +386,6 @@ const CreateForm = () => {
                                 index={index}
                                 remove={remove}
                                 errors={errors}
-                                register={register}
                                 setValue={setValue}
                                 getValues={getValues}
                                 arrayName="productReceiptWHDtos"
@@ -430,7 +442,9 @@ const CreateForm = () => {
         <FormFooter>
           <LinkButton to="/hk_care/warehouse/import/receipt">Hủy</LinkButton>
 
-          <LoadingButton type="submit">{id ? 'Lưu' : 'Nhập kho'}</LoadingButton>
+          <LoadingButton loading={loadingButton} type="submit">
+            {id ? 'Lưu' : 'Nhập kho'}
+          </LoadingButton>
         </FormFooter>
       </FormPaperGrid>
     </PageWrapperFullwidth>

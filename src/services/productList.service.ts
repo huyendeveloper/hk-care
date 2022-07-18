@@ -4,33 +4,25 @@ import { FilterParams } from 'types';
 
 class ProductService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/ProductList/SearchRegisterProduct?Keyword=${searchText}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
-    // return axiosClient.post(`${baseURL}/ProductList/SearchRegisterProduct`, {
-    //   maxResultCount: pageSize,
-    //   skipCount: (pageIndex - 1) * pageSize,
-    //   sorting: '',
-    //   keyword: 'searchText',
-    //   descending: false,
-    // });
+    return axiosClient.get(`${baseURL}/ProductList/SearchRegisterProduct`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllProduct({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/ProductList/SearchAll?Keyword=${searchText}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
-    // return axiosClient.post(`${baseURL}/ProductList/SearchAll`, {
-    //   maxResultCount: pageSize,
-    //   skipCount: (pageIndex - 1) * pageSize,
-    //   sorting: '',
-    //   keyword: 'searchText',
-    //   descending: false,
-    // });
+    return axiosClient.get(`${baseURL}/ProductList/SearchAll`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllProductRegisted({
@@ -39,28 +31,22 @@ class ProductService {
     sortBy,
     searchText,
   }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/ProductList/SearchRegisterProductList?Keyword=${searchText}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
-
-    // return axiosClient.post(
-    //   `${baseURL}/ProductList/SearchRegisterProductList`,
-    //   {
-    //     maxResultCount: pageSize,
-    //     skipCount: (pageIndex - 1) * pageSize,
-    //     sorting: '',
-    //     keyword: 'searchText',
-    //     descending: false,
-    //   }
-    // );
+    return axiosClient.get(`${baseURL}/ProductList/SearchRegisterProductList`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   get(id: number) {
-    return axiosClient.get(
-      `${baseURL}/ProductList/GetProductListDetail?productId=${id}`
-    );
+    return axiosClient.get(`${baseURL}/ProductList/GetProductListDetail`, {
+      params: {
+        productId: id,
+      },
+    });
   }
 
   create(payload: { listProductId: number[] }) {
@@ -71,25 +57,36 @@ class ProductService {
   }
 
   update(payload: { price: number; productId: number }) {
-    return axiosClient.put(
-      `${baseURL}/ProductList/UpdatePrice?productId=${payload.productId}&price=${payload.price}`
-    );
+    return axiosClient.put(`${baseURL}/ProductList/UpdatePrice`, {
+      params: {
+        productId: payload.productId,
+        price: payload.price,
+      },
+    });
   }
 
   delete(id: number | null) {
-    return axiosClient.post(
-      `${baseURL}/ProductList/UnRegisterProduct?productId=${id}`
-    );
+    return axiosClient.post(`${baseURL}/ProductList/UnRegisterProduct`, {
+      params: {
+        productId: id,
+      },
+    });
   }
 
   changeStatus(id: number | null, status: boolean) {
-    return axiosClient.patch(
-      `${baseURL}/product/ChangeStatus/${id}?status=${status}`
-    );
+    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, {
+      params: {
+        status,
+      },
+    });
   }
 
   getFile(filePath: string) {
-    return axiosClient.get(`${baseURL}/file/url-file?filePath=${filePath}`);
+    return axiosClient.get(`${baseURL}/file/url-file`, {
+      params: {
+        filePath,
+      },
+    });
   }
 }
 

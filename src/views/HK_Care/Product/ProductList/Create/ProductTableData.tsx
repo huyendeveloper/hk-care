@@ -20,9 +20,8 @@ import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getAllProductList } from 'redux/slices/productList';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
 
 const getCells = (): Cells<IProductList> => [
@@ -34,22 +33,16 @@ const getCells = (): Cells<IProductList> => [
 interface IProps {
   handleRegist: (item: IProductList) => void;
   registerList: IProductList[];
-  handleCancelRegist: (id: number) => void;
   rerender: number;
 }
 
-const ProductTableData = ({
-  handleRegist,
-  registerList,
-  handleCancelRegist,
-  rerender,
-}: IProps) => {
+const ProductTableData = ({ handleRegist, registerList, rerender }: IProps) => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
 
   const [productList, setProductList] = useState<IProductList[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.product);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
   });
@@ -64,13 +57,16 @@ const ProductTableData = ({
       setNotification({
         error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
     setProductList(payload.productList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, rerender]);

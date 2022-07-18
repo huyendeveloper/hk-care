@@ -2,12 +2,10 @@ import { IExportCancel } from 'interface';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
-  control: any;
-  setValue: any;
   exportCancel: IExportCancel | undefined;
 }
 
-const TotalBill = ({ control, setValue, exportCancel }: IProps) => {
+const TotalBill = ({ exportCancel }: IProps) => {
   return (
     <>
       {exportCancel && (

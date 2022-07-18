@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import {
@@ -15,17 +15,17 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { ISalesOrder } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getAllSaleOrders } from 'redux/slices/salesOrder';
 import { FilterParams } from 'types';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 const getCells = (): Cells<ISalesOrder> => [
@@ -88,7 +88,9 @@ const TableData = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const cells = useMemo(() => getCells(), []);
@@ -150,7 +152,7 @@ const TableData = () => {
         end={filters.lastDate}
         setStart={(val) => setFilters({ ...filters, startDate: val })}
         setEnd={(val) => setFilters({ ...filters, lastDate: val })}
-        searchArea
+        haveFromTo
       />
 
       <TableContent total={salesOrder.length} loading={loading}>
@@ -167,7 +169,6 @@ const TableData = () => {
               <TableBody>
                 {salesOrder.map((item, index) => {
                   const {
-                    id,
                     saleDate,
                     customerName,
                     orderType,
@@ -181,9 +182,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>
-                        {moment(saleDate).format('DD/MM/YYYY HH:mm')}
-                      </TableCell>
+                      <TableCell>{formatDateTime(saleDate)}</TableCell>
                       <TableCell>{customerName}</TableCell>
                       <TableCell>{orderType}</TableCell>
                       <TableCell>{userName}</TableCell>

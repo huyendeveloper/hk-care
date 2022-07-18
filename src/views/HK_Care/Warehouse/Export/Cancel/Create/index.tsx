@@ -27,7 +27,7 @@ import { useNotification } from 'hooks';
 import { IExportCancel, IProductExportCancel } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   createExportWH,
@@ -35,7 +35,6 @@ import {
   getGetDetail,
   updateExportCancel,
 } from 'redux/slices/exportCancel';
-import { RootState } from 'redux/store';
 import exportCancelService from 'services/exportCancel.service';
 import { FilterParams } from 'types';
 import * as yup from 'yup';
@@ -96,11 +95,9 @@ const CreateForm = () => {
   const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [loadingExpiredProduct, setLoadingExpiredProduct] =
     useState<boolean>(false);
-
-  const { loading: loadingProduct } = useSelector(
-    (state: RootState) => state.productList
-  );
-
+  const [loadingFetchData, setLoadingFetchData] = useState<boolean>(false);
+  const [loadingFetchProducts, setLoadingFetchProducts] =
+    useState<boolean>(false);
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     productId: null,
     from: null,
@@ -124,12 +121,11 @@ const CreateForm = () => {
     }));
   };
 
-  const { control, setValue, getValues, handleSubmit, reset } =
-    useForm<IExportCancel>({
-      mode: 'onChange',
-      resolver: yupResolver(validationSchema),
-      defaultValues: validationSchema.getDefault(),
-    });
+  const { control, setValue, handleSubmit, reset } = useForm<IExportCancel>({
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+    defaultValues: validationSchema.getDefault(),
+  });
 
   const exportWHDetails = useWatch({
     control,
@@ -142,12 +138,14 @@ const CreateForm = () => {
   });
 
   const fetchDataUpdate = async () => {
+    setLoadingFetchData(true);
     // @ts-ignore
     const { payload, error } = await dispatch(getGetDetail(id));
     if (error) {
       setNotification({
         error: 'Lỗi!',
       });
+      setLoadingFetchData(false);
       return;
     }
     const { totalFee, code, description, rotationPoint, exportWHDetails } =
@@ -160,21 +158,25 @@ const CreateForm = () => {
       rotationPoint,
       exportWHDetails,
     });
+    setLoadingFetchData(false);
   };
 
   const fetchData = async () => {
     if (id) {
       fetchDataUpdate();
     }
+    setLoadingFetchProducts(true);
     // @ts-ignore
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoadingFetchProducts(false);
       return;
     }
 
     setProductList(payload.productList);
+    setLoadingFetchProducts(false);
   };
 
   useEffect(() => {
@@ -217,7 +219,9 @@ const CreateForm = () => {
 
   useEffect(() => {
     fetchData();
-    fetchExpiredProduct();
+    if (!id) {
+      fetchExpiredProduct();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -241,12 +245,14 @@ const CreateForm = () => {
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
+        setLoading(false);
         return;
       }
       setNotification({
         message: 'Cập nhật thành công',
         severity: 'success',
       });
+      setLoading(false);
       return navigate(`/hk_care/warehouse/export/cancel`);
     }
     const { error } = await dispatch(
@@ -255,6 +261,7 @@ const CreateForm = () => {
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
     setNotification({
@@ -396,7 +403,7 @@ const CreateForm = () => {
                     setDetailAdd({ ...detailAdd, productId: value })
                   }
                   defaultValue=""
-                  loading={loadingProduct}
+                  loading={loadingFetchProducts}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -425,7 +432,7 @@ const CreateForm = () => {
                   <TableContent
                     total={1}
                     noDataText=" "
-                    loading={loadingExpiredProduct}
+                    loading={loadingExpiredProduct || loadingFetchData}
                   >
                     <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
                       <Scrollbar>
@@ -477,11 +484,7 @@ const CreateForm = () => {
                 </Grid>
                 <Grid item lg={9} xs={0}></Grid>
                 <Grid item lg={3} xs={12} p={2}>
-                  <TotalBill
-                    control={control}
-                    setValue={setValue}
-                    getValues={getValues}
-                  />
+                  <TotalBill control={control} />
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
