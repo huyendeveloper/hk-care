@@ -12,7 +12,7 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import {
   TableContent,
@@ -40,14 +40,15 @@ const getCells = (): Cells<ITenant> => [
 
 const TableData = () => {
   const setNotification = useNotification();
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [currentID, setCurrentID] = useState<string | null>(null);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
+  const [currentID, setCurrentID] = useState<string | null>(null);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -61,6 +62,7 @@ const TableData = () => {
 
     // if (error) {
     // setNotification({ error: 'Lỗi!' });
+    // setLoading(false);
     //   return;
     // }
     // setTenantList(payload.tenantList);
@@ -143,6 +145,7 @@ const TableData = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -179,18 +182,20 @@ const TableData = () => {
   const handleDelete = async () => {
     if (!currentID) return;
     handleCloseDeleteDialog();
+    setShowBackdrop(true);
     // @ts-ignore
     const { error } = await dispatch(deleteUsage(currentID));
     if (error) {
       setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
       message: 'Xóa thành công!',
       severity: 'success',
     });
-
-    setTenantList(tenantList.filter((x) => x.id !== currentID));
+    fetchData();
+    setShowBackdrop(false);
   };
 
   const handleOpenDeleteDialog = (id: string) => () => {
@@ -212,14 +217,12 @@ const TableData = () => {
 
   const handleOpenCreateDialog = () => {
     setCurrentID(null);
+    setDisableView(false);
     setOpenFormDialog(true);
   };
 
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
+  const handleCloseFormDialog = () => {
     setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
   };
 
   const renderAction = (row: ITenant) => {
@@ -307,7 +310,6 @@ const TableData = () => {
 
       <FormDialog
         currentID={currentID}
-        data={tenantList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
         disable={disableView}

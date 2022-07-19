@@ -1,5 +1,5 @@
-import { Stack } from '@mui/material';
-import { ControllerTextarea } from 'components/Form';
+import { Box, Stack } from '@mui/material';
+import { ControllerTextarea, EntitySelecter } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
@@ -32,6 +32,14 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
   const paid = useWatch({ control, name: 'giveMoney' }) || 0;
   const moneyToPay = useWatch({ control, name: 'moneyToPay' }) || 0;
 
+  const selectOrderTypeOptions = useMemo(
+    () => [
+      { id: 1, name: 'Khách bán lẻ' },
+      { id: 2, name: 'Bán theo kê đơn bác sĩ' },
+    ],
+    []
+  );
+
   useEffect(() => {
     setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,7 +49,17 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     <Stack p={2} gap={2}>
       <Stack flexDirection="row" justifyContent="space-between">
         <div>Loại hóa đơn</div>
-        <div>Khách bán lẻ</div>
+        <Box sx={{ width: '60%' }}>
+          <EntitySelecter
+            name="orderType"
+            control={control}
+            options={selectOrderTypeOptions}
+            renderLabel={(field) => field.name}
+            renderValue="id"
+            placeholder=""
+            disableClearable
+          />
+        </Box>
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
         <div>Tổng tiền: ({createOrderDetailDtos?.length || 0} sản phẩm)</div>
@@ -67,10 +85,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       </Stack>
       <hr style={{ width: '100%' }} />
       <Stack flexDirection="row" justifyContent="space-between">
-        <b>Tiền khách đưa</b>
-      </Stack>
-      <Stack flexDirection="row" justifyContent="space-between">
-        <b>Tiền mặt</b>
+        <b>Tiền khách đưa</b>{' '}
         <div>
           <ControllerNumberInput
             name="giveMoney"
@@ -81,6 +96,9 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             inputProps={{ style: { textAlign: 'right' } }}
           />
         </div>
+      </Stack>
+      <Stack flexDirection="row" justifyContent="space-between">
+        <div>Tiền mặt</div>
       </Stack>
       <hr style={{ width: '100%' }} />
       <Stack flexDirection="row" justifyContent="space-between">

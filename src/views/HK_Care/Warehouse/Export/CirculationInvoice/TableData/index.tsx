@@ -44,10 +44,10 @@ const getCells = (): Cells<IExportWHRotation> => [
 const TableData = () => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const [circulationInvoice, setCirculationInvoice] = useState<object>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [circulationInvoice, setCirculationInvoice] = useState<object>([]);
 
   const cells = useMemo(() => getCells(), []);
 

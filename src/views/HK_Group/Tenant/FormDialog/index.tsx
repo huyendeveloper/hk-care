@@ -19,14 +19,13 @@ import { ITenant } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import importReceiptService from 'services/importReceipt.service';
 import * as yup from 'yup';
 
 interface Props {
   open: boolean;
   handleClose: (updated?: boolean) => void;
   currentID?: string | null;
-  data?: ITenant;
-  loading?: boolean;
   disable: boolean;
 }
 
@@ -63,16 +62,11 @@ const validationSchema = yup.object().shape({
   status: yup.boolean().default(true),
 });
 
-const FormDialog = ({
-  open,
-  handleClose,
-  currentID,
-  disable,
-  loading = false,
-}: Props) => {
+const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
+  const [pathFile, setPathFile] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
 
   const { control, handleSubmit, setValue, reset } = useForm<ITenant>({
@@ -86,6 +80,48 @@ const FormDialog = ({
   }, [disable, open]);
 
   const status = useWatch({ control, name: 'status' });
+
+  const uploadFile = async () => {
+    // @ts-ignore
+    let filePaths = [];
+    files.forEach(async (item) => {
+      if (
+        // @ts-ignore
+        item.type &&
+        // @ts-ignore
+        (item.type === 'application/pdf' ||
+          // @ts-ignore
+          item.type.substr(0, 5) === 'image')
+      ) {
+        const { data } = await importReceiptService.getPathFileReceipt(item);
+        filePaths.push({ name: data });
+        // @ts-ignore
+        setPathFile([...pathFile, { name: data }]);
+        // setFiles([...files, { name: data }]); // @ts-ignore
+      } else {
+        // @ts-ignore
+        setPathFile([...pathFile, { name: item.name }]); // @ts-ignore
+        // setFiles([...files, { name: item.name }]); // @ts-ignore
+      }
+    }); // @ts-ignore
+  };
+
+  useEffect(() => {
+    const fileToUpload = files.filter(
+      (item) =>
+        // @ts-ignore
+        item.type &&
+        // @ts-ignore
+        (item.type === 'application/pdf' ||
+          // @ts-ignore
+          item.type.substr(0, 5) === 'image')
+    );
+
+    if (fileToUpload.length > 0) {
+      uploadFile();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files]);
 
   const fetchData = async () => {
     setFiles([]);
@@ -274,15 +310,14 @@ const FormDialog = ({
                       name="bussinessLicense"
                     />
                   </Grid>
+                  <Grid item xs={12}>
+                    <ControllerMultiFile
+                      files={files}
+                      setFiles={setFiles}
+                      viewOnly={disabled}
+                    />
+                  </Grid>
                 </Box>
-
-                <Grid item xs={12}>
-                  <ControllerMultiFile
-                    files={files}
-                    setFiles={setFiles}
-                    viewOnly={disabled}
-                  />
-                </Grid>
               </Grid>
               <Grid item xs={12} md={6}></Grid>
               <Grid item xs={12} md={6}>
@@ -312,7 +347,7 @@ const FormDialog = ({
           <Button variant="outlined" onClick={() => handleClose()}>
             {disabled ? 'Đóng' : 'Hủy'}
           </Button>
-          {disabled && (
+          {disabled && currentID && (
             <Button onClick={() => setDisabled(false)}>
               Chỉnh sửa thông tin
             </Button>

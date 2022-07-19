@@ -19,6 +19,7 @@ import OrderProductForm from './OrderProductForm';
 
 const validationSchema = yup.object().shape({
   disCount: yup.number().default(0),
+  orderType: yup.number().default(1),
 });
 
 interface IForm {
@@ -68,6 +69,7 @@ const Create = () => {
     setValue('disCount', orderSale?.disCount || 0);
     setValue('giveMoney', orderSale?.giveMoney || 0);
     setValue('description', orderSale?.description || '');
+    setValue('orderType', orderSale?.orderType || 1);
     setValue('moneyToPay', orderSale?.moneyToPay || 0);
     setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
   };
@@ -118,7 +120,7 @@ const Create = () => {
       });
       return;
     }
-    const { disCount, orderDetailDtos, description, giveMoney } =
+    const { disCount, orderDetailDtos, description, giveMoney, orderType } =
       payload.saleOrder;
 
     reset({
@@ -126,6 +128,7 @@ const Create = () => {
       createOrderDetailDtos: orderDetailDtos,
       moneyToPay: giveMoney,
       description,
+      orderType,
     });
   };
 
@@ -156,6 +159,7 @@ const Create = () => {
     setValue('moneyToPay', orderSale?.moneyToPay || 0);
     setValue('giveMoney', orderSale?.giveMoney || 0);
     setValue('description', orderSale?.description || '');
+    setValue('orderType', orderSale?.orderType || 1);
     setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
   };
 
