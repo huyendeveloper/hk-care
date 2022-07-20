@@ -72,7 +72,6 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
   return (
     <Controller
       render={({ field: { ref, ...others }, fieldState: { error } }) => {
-        console.log('error', error);
         return (
           <NumberFormat
             fullWidth

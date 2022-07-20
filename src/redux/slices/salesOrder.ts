@@ -10,6 +10,7 @@ interface OrderSales {
   description: string;
   orderId?: number;
   moneyToPay: number;
+  orderType: number;
   createOrderDetailDtos: {
     productId: number;
     productName: string;
@@ -40,6 +41,7 @@ const initialState: IInitialState = {
       id: 1,
       disCount: 0,
       giveMoney: 0,
+      orderType: 1,
       description: '',
       createOrderDetailDtos: [],
       moneyToPay: 0,

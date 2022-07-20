@@ -1,12 +1,12 @@
 import { PageWrapper } from 'components/common';
 import TableData from './TableData';
 
-const Tenant = () => {
+const SalesReport = () => {
   return (
-    <PageWrapper title="Thông tin điểm bán">
+    <PageWrapper title="Báo cáo doanh thu nhà thuốc">
       <TableData />
     </PageWrapper>
   );
 };
 
-export default Tenant;
+export default SalesReport;

@@ -14,7 +14,7 @@ interface SectionItem {
   info?: () => JSX.Element | null;
   icon?: ReactNode;
   path?: string;
-  roles?: Role[];
+  roles?: Role[]; 
 }
 
 const getSections = (): SectionItem[] => [
@@ -179,29 +179,29 @@ const getSections = (): SectionItem[] => [
         path: '/hk_care/roles',
         roles: ['hkl2_1_1'],
       },
-      // {
-      //   title: 'Báo cáo/Thống kê (Tại điểm bán)',
-      //   path: '/404',
-      //   roles: ['hkl2_1'],
-      //   children: [
-      //     {
-      //       title: 'Báo cáo doanh thu nhà thuốc',
-      //       path: '/404',
-      //       roles: ['hkl2_1'],
-      //     },
-      //   ],
-      // },
+      {
+        title: 'Báo cáo/Thống kê',
+        path: '/404',
+        roles: ['hkl2_1'],
+        children: [
+          {
+            title: 'Báo cáo doanh thu nhà thuốc',
+            path: '/hk_care/sales_statistical/sales_report',
+            roles: ['hkl2_1'],
+          },
+        ],
+      },
     ],
   },
   {
     title: 'HK_Trading',
     roles: ['hkl4'],
     children: [
-      // {
-      //   title: 'Tổng hợp yêu cầu nhập',
-      //   path: '/404',
-      //   roles: ['hkl4'],
-      // },
+      {
+        title: 'Tổng hợp yêu cầu nhập',
+        path: '/hk_trading/request',
+        roles: ['hkl4'],
+      },
       // {
       //   title: 'Kế hoạch nhập kho',
       //   path: '/404',

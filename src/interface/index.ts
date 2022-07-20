@@ -309,8 +309,10 @@ export interface IProductRequestImport {
 export interface IRequestImport {
   id: number;
   code: string;
-  requestDate: Date;
+  requestDate?: Date;
   description?: string;
+  tenant?: string;
+  quantity?: number;
   productRequestImports?: IProductRequestImport[];
 }
 
@@ -363,4 +365,17 @@ export interface IRole {
   qlkh: boolean;
   qlbh: boolean;
   qlvh: boolean;
+}
+
+export interface IStaff {
+  id: number;
+  name: string;
+}
+
+export interface ISalesReport {
+  id: number;
+  code: string;
+  staffName: string;
+  saleDate: Date;
+  orderValue: number;
 }

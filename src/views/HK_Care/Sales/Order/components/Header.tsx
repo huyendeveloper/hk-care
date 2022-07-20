@@ -4,7 +4,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { TabList } from '@mui/lab';
 import { IconButton, Stack, Tab } from '@mui/material';
 import { Box } from '@mui/system';
-import { LinkIconButton } from 'components/common';
+import { LinkIconButton, Scrollbar } from 'components/common';
 import SearchField from 'components/Table/SearchField';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -74,7 +74,7 @@ const Header = ({
       justifyContent="space-between"
       sx={{ backgroundColor: '#3f9f36', paddingX: 4 }}
     >
-      <Stack flexDirection="row" flexWrap="wrap">
+      <Stack flexDirection="row" flexWrap="wrap" alignItems="center">
         <Box
           sx={{
             paddingY: 1,
@@ -124,7 +124,11 @@ const Header = ({
                         width: '100px',
                         height: '70px',
                       }}
-                      src={`${connectURL}/${item.productImage}`}
+                      src={
+                        item.productImage === ''
+                          ? '/static/default.jpg'
+                          : `${connectURL}/${item.productImage}`
+                      }
                       alt=""
                     />
                     <Box pl={2}>{item.productName}</Box>
@@ -162,7 +166,7 @@ const Header = ({
           )}
         </Box>
 
-        <TabList onChange={handleChange}>
+        <TabList onChange={handleChange} className="sale__tab">
           {ids.map((item, index) => (
             <Tab
               key={index}
@@ -199,7 +203,6 @@ const Header = ({
             />
           ))}
         </TabList>
-
         {ids.length < 9 && !id && (
           <Stack flexDirection="row" alignItems="center">
             <IconButton onClick={handleAddTab}>
