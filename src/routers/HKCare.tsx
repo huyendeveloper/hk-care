@@ -22,6 +22,8 @@ const InventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/Inve
 const CreateInventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/InventoryRecord/Create')));
 const Roles = Loadable(lazy(() => import('views/HK_Care/Roles')));
 const SalesReport = Loadable(lazy(() => import('views/HK_Care/SalesStatistical/SalesReport')));
+const OperateStaff = Loadable(lazy(() => import('views/HK_Care/Operate/Staff')));
+const CreateOperateStaff = Loadable(lazy(() => import('views/HK_Care/Operate/Staff/Create')));
 
 const HKCareRoutes: RouteObject = {
   path: 'hk_care',
@@ -122,6 +124,22 @@ const HKCareRoutes: RouteObject = {
     {
       path: 'sales_statistical/sales_report',
       children: [{ index: true, element: <SalesReport /> }],
+    },
+    {
+      path: 'operate/staff',
+      children: [{ index: true, element: <OperateStaff /> }],
+    },
+    {
+      path: 'operate/staff/create',
+      children: [{ index: true, element: <CreateOperateStaff /> }],
+    },
+    {
+      path: 'operate/staff/:id/update',
+      children: [{ index: true, element: <CreateOperateStaff /> }],
+    },
+    {
+      path: 'operate/staff/:id',
+      children: [{ index: true, element: <CreateOperateStaff /> }],
     },
   ],
 };
