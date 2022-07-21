@@ -348,10 +348,10 @@ export interface IInventoryRecord {
 }
 
 export interface IUser {
-  token: string;
+  token?: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   role: string;
   tenant: string;
   status: boolean;
