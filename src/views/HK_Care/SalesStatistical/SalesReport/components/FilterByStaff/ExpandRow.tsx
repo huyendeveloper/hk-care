@@ -22,7 +22,7 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
         key={groupName}
         onClick={() => setExpand(!expand)}
       >
-        <TableCell colSpan={5} sx={{ padding: '16px' }}>
+        <TableCell colSpan={4} sx={{ padding: '16px' }}>
           {groupName}
         </TableCell>
         <TableCell
@@ -37,14 +37,13 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: ISalesReport, index) => {
-          const { id, code, staffName, saleDate, orderValue } = item;
+          const { id, code, saleDate, orderValue } = item;
           return (
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell>
                 {(filters.pageIndex - 1) * filters.pageSize + index + 1}
               </TableCell>
               <TableCell>{code}</TableCell>
-              <TableCell>{staffName}</TableCell>
               <TableCell>{formatDateTime(saleDate)}</TableCell>
               <TableCell>{numberFormat(orderValue)}</TableCell>
               <TableCell></TableCell>

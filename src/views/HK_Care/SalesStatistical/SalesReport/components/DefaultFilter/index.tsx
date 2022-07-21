@@ -1,4 +1,4 @@
-import { TableBody, TableCell, TableRow } from '@mui/material';
+import { Grid, Stack, TableBody, TableCell, TableRow } from '@mui/material';
 import { TableHeader } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -137,6 +137,29 @@ const DefaultFilter = () => {
           );
         })}
       </TableBody>
+      <tr>
+        <td colSpan={5}></td>
+        <td>
+          <Stack flexDirection="row" justifyContent="space-between">
+            <div>Tổng doanh thu</div>
+            <div>
+              {numberFormat(
+                Object.keys(salesReport).reduce((previous, key) => {
+                  return (
+                    previous +
+                    // @ts-ignore
+                    salesReport[key].reduce(
+                      // @ts-ignore
+                      (pre, cur) => pre + cur.orderValue,
+                      0
+                    )
+                  );
+                }, 0)
+              )}
+            </div>
+          </Stack>
+        </td>
+      </tr>
     </>
   );
 };

@@ -1,11 +1,11 @@
-import { TableBody, TableCell, TableRow } from '@mui/material';
+import { Stack, TableBody, TableCell, TableRow } from '@mui/material';
 import { TableHeader } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { IImportReceipt, ISalesReport } from 'interface';
-import { useEffect, useMemo, useState } from 'react';
+import { IImportReceipt, IRequestImport, ISalesReport } from 'interface';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { FilterParams } from 'types/common';
-import formatDateTime from 'utils/dateTimeFormat';
+import formatDateTime, { formatDate } from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import ExpandRow from './ExpandRow';
 
@@ -33,10 +33,10 @@ const getCells = (): Cells<IImportReceipt> => [
 ];
 
 const FilterByStaff = () => {
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [salesReport, setSalesReport] = useState<object>([]);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -133,8 +133,31 @@ const FilterByStaff = () => {
           );
         })}
       </TableBody>
+      <tr>
+        <td colSpan={4}></td>
+        <td>
+          <Stack flexDirection="row" justifyContent="space-between">
+            <div>Tổng doanh thu</div>
+            <div>
+              {numberFormat(
+                Object.keys(salesReport).reduce((previous, key) => {
+                  return (
+                    previous +
+                    // @ts-ignore
+                    salesReport[key].reduce(
+                      // @ts-ignore
+                      (pre, cur) => pre + cur.orderValue,
+                      0
+                    )
+                  );
+                }, 0)
+              )}
+            </div>
+          </Stack>
+        </td>
+      </tr>
     </>
   );
 };
 
-export default FilterByStaff;
+export default React.memo(FilterByStaff);

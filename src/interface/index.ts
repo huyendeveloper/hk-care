@@ -370,6 +370,14 @@ export interface IRole {
 export interface IStaff {
   id: number;
   name: string;
+  roleId?: string;
+  roleName?: string;
+  phone?: string;
+  active?: boolean;
+  identityCard?: string;
+  email?: string;
+  username?: string;
+  password?: string;
 }
 
 export interface ISalesReport {

@@ -14,7 +14,7 @@ interface SectionItem {
   info?: () => JSX.Element | null;
   icon?: ReactNode;
   path?: string;
-  roles?: Role[]; 
+  roles?: Role[];
 }
 
 const getSections = (): SectionItem[] => [
@@ -167,11 +167,11 @@ const getSections = (): SectionItem[] => [
         path: '/404',
         roles: ['hkl2_1_4', 'hkl2_1_1', 'hkl2_1'],
         children: [
-          // {
-          //   title: 'Danh sách nhân viên',
-          //   path: '/404',
-          //   roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
-          // },
+          {
+            title: 'Danh sách nhân viên',
+            path: '/hk_care/operate/staff',
+            roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
+          },
         ],
       },
       {

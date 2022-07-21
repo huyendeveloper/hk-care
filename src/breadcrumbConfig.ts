@@ -117,6 +117,16 @@ const breadcrumbConfig = (tennant: string) => {
       breadcrumb: 'Báo cáo doanh thu tại nhà thuốc',
       path: '/hk_care/sales_statistical/sales_report',
     },
+    {
+      exact: true,
+      breadcrumb: 'Quản lý vận hành',
+      path: '/hk_care/operate',
+    },
+    {
+      exact: true,
+      breadcrumb: 'Danh sách nhân viên',
+      path: '/hk_care/operate/staff',
+    },
     // hk care sales
     { breadcrumb: 'Quản lý bán hàng', path: '/hk_care/sales' },
     { breadcrumb: 'Hóa đơn bán hàng', path: '/hk_care/sales/order' },
