@@ -10,6 +10,7 @@ const Supplier = Loadable(lazy(() => import('views/HK_Group/Product/Supplier')))
 const SupplierDetails = Loadable(lazy(() => import('views/HK_Group/Product/Supplier/Details')));
 const Tenant = Loadable(lazy(() => import("views/HK_Group/Tenant")));
 const Users = Loadable(lazy(() => import("views/HK_Group/Users")));
+const CreateUsers = Loadable(lazy(() => import("views/HK_Group/Users/Create")));
 const ProductList = Loadable(lazy(() => import('views/HK_Group/Product/ProductList')));
 const ProductDetails = Loadable(lazy(() => import('views/HK_Group/Product/ProductList/Details')));
 const ReferencePrices = Loadable(lazy(() => import('views/HK_Group/Product/ReferencePrices')));
@@ -61,6 +62,18 @@ const HKGroupRoutes: RouteObject = {
     {
       path: "users",
       children: [{ index: true, element: <Users /> }],
+    },
+    {
+      path: "users/create",
+      children: [{ index: true, element: <CreateUsers /> }],
+    },
+    {
+      path: "users/:id/update",
+      children: [{ index: true, element: <CreateUsers /> }],
+    },
+    {
+      path: "users/:id",
+      children: [{ index: true, element: <CreateUsers /> }],
     },
   ],
 };
