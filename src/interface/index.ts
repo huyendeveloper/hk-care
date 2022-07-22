@@ -309,8 +309,10 @@ export interface IProductRequestImport {
 export interface IRequestImport {
   id: number;
   code: string;
-  requestDate: Date;
+  requestDate?: Date;
   description?: string;
+  tenant?: string;
+  quantity?: number;
   productRequestImports?: IProductRequestImport[];
 }
 
@@ -346,10 +348,10 @@ export interface IInventoryRecord {
 }
 
 export interface IUser {
-  token: string;
+  token?: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   role: string;
   tenant: string;
   status: boolean;
@@ -363,4 +365,25 @@ export interface IRole {
   qlkh: boolean;
   qlbh: boolean;
   qlvh: boolean;
+}
+
+export interface IStaff {
+  id: number;
+  name: string;
+  roleId?: string;
+  roleName?: string;
+  phone?: string;
+  active?: boolean;
+  identityCard?: string;
+  email?: string;
+  username?: string;
+  password?: string;
+}
+
+export interface ISalesReport {
+  id: number;
+  code: string;
+  staffName: string;
+  saleDate: Date;
+  orderValue: number;
 }

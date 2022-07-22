@@ -107,6 +107,26 @@ const breadcrumbConfig = (tennant: string) => {
       breadcrumb: 'Cập nhật hóa đơn xuất hủy',
       path: '/hk_care/warehouse/export/cancel/:id/update',
     },
+    {
+      exact: true,
+      breadcrumb: 'Báo cáo/Thống kê',
+      path: '/hk_care/sales_statistical',
+    },
+    {
+      exact: true,
+      breadcrumb: 'Báo cáo doanh thu tại nhà thuốc',
+      path: '/hk_care/sales_statistical/sales_report',
+    },
+    {
+      exact: true,
+      breadcrumb: 'Quản lý vận hành',
+      path: '/hk_care/operate',
+    },
+    {
+      exact: true,
+      breadcrumb: 'Danh sách nhân viên',
+      path: '/hk_care/operate/staff',
+    },
     // hk care sales
     { breadcrumb: 'Quản lý bán hàng', path: '/hk_care/sales' },
     { breadcrumb: 'Hóa đơn bán hàng', path: '/hk_care/sales/order' },
@@ -114,6 +134,10 @@ const breadcrumbConfig = (tennant: string) => {
     {
       breadcrumb: 'HK Trading',
       path: '/hk_trading',
+    },
+    {
+      breadcrumb: 'Tổng hợp yêu cầu nhập',
+      path: '/hk_trading/request',
     },
   ];
 };

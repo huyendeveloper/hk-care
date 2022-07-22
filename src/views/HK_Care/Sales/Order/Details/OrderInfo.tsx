@@ -168,6 +168,7 @@ const OrderInfo = ({ order }: IProps) => {
             minRows={11}
             style={{ width: '100%' }}
             value={order?.description || ''}
+            disabled
           />
         </TableWrapper>
       </Grid>

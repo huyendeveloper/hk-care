@@ -1,11 +1,11 @@
 import PrintIcon from '@mui/icons-material/Print';
+import StarIcon from '@mui/icons-material/Star';
 import { Box, IconButton, Stack } from '@mui/material';
 import { LoadingScreen } from 'components/common';
-import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import { useNotification } from 'hooks';
 import { ISalesOrder } from 'interface';
 import moment from 'moment';
-import React, { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -13,7 +13,6 @@ import ReactToPrint from 'react-to-print';
 import { getSaleOrder } from 'redux/slices/salesOrder';
 import LocalStorage from 'utils/LocalStorage';
 import { numberFormat } from 'utils/numberFormat';
-import StarIcon from '@mui/icons-material/Star';
 // @ts-ignore
 import Print from './print';
 
@@ -48,6 +47,7 @@ const PrintOrder = () => {
     if (id) {
       fetchDataUpdate();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -190,8 +190,16 @@ const PrintOrder = () => {
 
               <hr style={{ borderTop: '1px dashed black' }} />
               <div
-                style={{ width: '5.3cm', marginLeft: 'auto', padding: '10px' }}
+                style={{ width: '6cm', marginLeft: 'auto', padding: '10px' }}
               >
+                <Stack
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  flexWrap="wrap"
+                >
+                  <div>Chiết khấu(%):</div>
+                  <div>{numberFormat(order?.disCount || 0)}</div>
+                </Stack>
                 <Stack
                   flexDirection="row"
                   justifyContent="space-between"

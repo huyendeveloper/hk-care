@@ -167,11 +167,11 @@ const getSections = (): SectionItem[] => [
         path: '/404',
         roles: ['hkl2_1_4', 'hkl2_1_1', 'hkl2_1'],
         children: [
-          // {
-          //   title: 'Danh sách nhân viên',
-          //   path: '/404',
-          //   roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
-          // },
+          {
+            title: 'Danh sách nhân viên',
+            path: '/hk_care/operate/staff',
+            roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
+          },
         ],
       },
       {
@@ -179,29 +179,29 @@ const getSections = (): SectionItem[] => [
         path: '/hk_care/roles',
         roles: ['hkl2_1_1'],
       },
-      // {
-      //   title: 'Báo cáo/Thống kê (Tại điểm bán)',
-      //   path: '/404',
-      //   roles: ['hkl2_1'],
-      //   children: [
-      //     {
-      //       title: 'Báo cáo doanh thu nhà thuốc',
-      //       path: '/404',
-      //       roles: ['hkl2_1'],
-      //     },
-      //   ],
-      // },
+      {
+        title: 'Báo cáo/Thống kê',
+        path: '/404',
+        roles: ['hkl2_1'],
+        children: [
+          {
+            title: 'Báo cáo doanh thu nhà thuốc',
+            path: '/hk_care/sales_statistical/sales_report',
+            roles: ['hkl2_1'],
+          },
+        ],
+      },
     ],
   },
   {
     title: 'HK_Trading',
     roles: ['hkl4'],
     children: [
-      // {
-      //   title: 'Tổng hợp yêu cầu nhập',
-      //   path: '/404',
-      //   roles: ['hkl4'],
-      // },
+      {
+        title: 'Tổng hợp yêu cầu nhập',
+        path: '/hk_trading/request',
+        roles: ['hkl4'],
+      },
       // {
       //   title: 'Kế hoạch nhập kho',
       //   path: '/404',

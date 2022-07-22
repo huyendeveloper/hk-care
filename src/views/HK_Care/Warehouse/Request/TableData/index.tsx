@@ -53,16 +53,16 @@ const TableData = () => {
   const fetchData = async () => {
     const payload = {
       requestImport: [
-        { id: 1, code: 'Ahmed', requestDate: new Date('10/03/2022') },
-        { id: 2, code: 'Erika', requestDate: new Date('03/11/2021') },
-        { id: 3, code: 'Casie', requestDate: new Date('30/03/2022') },
-        { id: 4, code: 'Derril', requestDate: new Date('21/02/2022') },
-        { id: 5, code: 'Jobyna', requestDate: new Date('02/06/2022') },
-        { id: 6, code: 'Corbett', requestDate: new Date('30/09/2021') },
-        { id: 7, code: 'Ivor', requestDate: new Date('23/01/2022') },
-        { id: 8, code: 'Robbi', requestDate: new Date('02/07/2022') },
-        { id: 9, code: 'Elinor', requestDate: new Date('19/10/2021') },
-        { id: 10, code: 'Mathian', requestDate: new Date('29/10/2021') },
+        { id: 1, code: 'Ahmed', requestDate: new Date('2022/12/15') },
+        { id: 2, code: 'Erika', requestDate: new Date('2022/12/15') },
+        { id: 3, code: 'Casie', requestDate: new Date('2022/12/15') },
+        { id: 4, code: 'Derril', requestDate: new Date('2022/12/15') },
+        { id: 5, code: 'Jobyna', requestDate: new Date('2022/12/15') },
+        { id: 6, code: 'Corbett', requestDate: new Date('2022/12/15') },
+        { id: 7, code: 'Ivor', requestDate: new Date('2022/12/15') },
+        { id: 8, code: 'Robbi', requestDate: new Date('2022/12/15') },
+        { id: 9, code: 'Elinor', requestDate: new Date('2022/12/15') },
+        { id: 10, code: 'Mathian', requestDate: new Date('2022/12/15') },
       ],
       totalCount: 35,
     };

@@ -3,7 +3,7 @@ import TableData from './components/tableData';
 
 const Tenant = () => {
   return (
-    <PageWrapper title="Điểm bán">
+    <PageWrapper title="Thông tin điểm bán">
       <TableData />
     </PageWrapper>
   );

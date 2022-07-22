@@ -115,8 +115,8 @@ const CreateForm = () => {
   const [loadingButton, setLoadingButton] = useState<boolean>(false);
   const [loadingProductList, setLoadingProductList] = useState<boolean>(true);
   const [productList, setProductList] = useState<IReceipt[]>([]);
-  const [files, setFiles] = useState<File[] | object[]>([]);
   const [pathFile, setPathFile] = useState<string>('');
+  const [files, setFiles] = useState<File[] | object[]>([]);
   const [productChoosed, setProductChoosed] = useState<number | null>(null);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,

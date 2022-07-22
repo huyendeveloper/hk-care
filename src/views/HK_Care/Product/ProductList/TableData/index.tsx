@@ -213,7 +213,7 @@ const TableData = ({ active = 1 }: IProps) => {
                       <TableCell>{stockQuantity}</TableCell>
                       <TableCell>{numberFormat(importPrice)}</TableCell>
                       <TableCell>{numberFormat(price)}</TableCell>
-                      <TableCell width="120px">
+                      <TableCell sx={{ width: '120px' }}>
                         <QuotaUpdate quota={quota} />
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>

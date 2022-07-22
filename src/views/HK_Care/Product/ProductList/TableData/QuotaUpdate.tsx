@@ -42,6 +42,7 @@ const QuotaUpdate = ({ quota }: IProps) => {
           name="quota"
           setValue={setValue}
           defaultValue={getValues(`quota`)}
+          inputProps={{ style: { width: '52px' } }}
           control={control}
         />
         {editing && (

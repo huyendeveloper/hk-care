@@ -3,7 +3,7 @@ import TableData from './TableData';
 
 const Users = () => {
   return (
-    <PageWrapper title="Người dùng">
+    <PageWrapper title="Tổng hợp yêu cầu nhập">
       <TableData />
     </PageWrapper>
   );
