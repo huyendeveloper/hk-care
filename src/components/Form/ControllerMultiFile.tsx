@@ -2,6 +2,7 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Stack } from '@mui/material';
 import { useNotification } from 'hooks';
+import { connectURL } from 'config';
 import React from 'react';
 
 interface IProps {
@@ -77,7 +78,7 @@ const ControllerMultiFile = ({
             {/* @ts-ignore */}
             {item?.name
               ? // @ts-ignore
-                item.name
+              item.name
               : 'Không có chứng nhận'}
             <input
               type="file"
@@ -103,7 +104,7 @@ const ControllerMultiFile = ({
               {item?.name && !item.type && (
                 // @ts-ignore
                 // eslint-disable-next-line react/jsx-no-target-blank
-                <a href={item?.name} target={'_blank'}>
+                <a href={item?.name.includes(connectURL) ? item?.name : connectURL + "/" + item?.name} target={'_blank'}>
                   <Stack
                     height={1}
                     bgcolor="#00AB55"

@@ -1,32 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid } from '@mui/material';
-import {
-  ControllerMultiFile,
-  ControllerTextarea,
-  ControllerTextField,
-  FormContent,
-  FormFooter,
-  FormGroup,
-  FormHeader,
-  FormLabel,
-  FormPaperGrid,
-} from 'components/Form';
+import { ControllerMultiFile, ControllerTextarea, ControllerTextField, FormContent, FormFooter, FormGroup, FormHeader, FormLabel, FormPaperGrid, } from 'components/Form';
 import ControllerSwitch from 'components/Form/ControllerSwitch';
 import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
-import { ITenant } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import importReceiptService from 'services/importReceipt.service';
+import service from '../service';
 import * as yup from 'yup';
+import { AttachmentsFile, SalePointDto } from '../dto/salePointDto';
 
 interface Props {
   open: boolean;
   handleClose: (updated?: boolean) => void;
   currentID?: string | null;
+  data?: SalePointDto;
+  loading?: boolean;
   disable: boolean;
+}
+
+interface fileUrl {
+  url: string;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -47,6 +42,7 @@ const validationSchema = yup.object().shape({
     // @ts-ignore
     .trimCustom('Vui lòng nhập tên điểm bán.')
     .max(150, 'Tên điểm bán không quá 150 ký tự.')
+    .matches(/^HK\s+.*$/, 'Điểm bán không đúng định dạng.')
     .strict(true)
     .default(''),
   hotline: yup
@@ -62,14 +58,17 @@ const validationSchema = yup.object().shape({
   status: yup.boolean().default(true),
 });
 
-const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
-  const dispatch = useDispatch();
+const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }: Props) => {
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
-  const [pathFile, setPathFile] = useState<string[]>([]);
+  //const [pathFile, setPathFile] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
 
-  const { control, handleSubmit, setValue, reset } = useForm<ITenant>({
+  useEffect(() => {
+    console.log(files);
+  }, [files]);
+
+  const { control, handleSubmit, setValue, reset } = useForm<SalePointDto>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -81,124 +80,114 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
 
   const status = useWatch({ control, name: 'status' });
 
-  const uploadFile = async () => {
-    // @ts-ignore
-    let filePaths = [];
-    files.forEach(async (item) => {
-      if (
-        // @ts-ignore
-        item.type &&
-        // @ts-ignore
-        (item.type === 'application/pdf' ||
-          // @ts-ignore
-          item.type.substr(0, 5) === 'image')
-      ) {
-        const { data } = await importReceiptService.getPathFileReceipt(item);
-        filePaths.push({ name: data });
-        // @ts-ignore
-        setPathFile([...pathFile, { name: data }]);
-        // setFiles([...files, { name: data }]); // @ts-ignore
-      } else {
-        // @ts-ignore
-        setPathFile([...pathFile, { name: item.name }]); // @ts-ignore
-        // setFiles([...files, { name: item.name }]); // @ts-ignore
-      }
-    }); // @ts-ignore
-  };
+  // const uploadFile = async () => {
+  //   // @ts-ignore
+  //   let filePaths = [];
+  //   files.forEach(async (item) => {
+  //     if (
+  //       // @ts-ignore
+  //       item.type &&
+  //       // @ts-ignore
+  //       (item.type === 'application/pdf' ||
+  //         // @ts-ignore
+  //         item.type.substr(0, 5) === 'image')
+  //     ) {
+  //       //const { data } = await importReceiptService.getPathFileReceipt(item);
+  //       filePaths.push({ name: data });
+  //       // @ts-ignore
+  //       setPathFile([...pathFile, { name: data }]);
+  //       // setFiles([...files, { name: data }]); // @ts-ignore
+  //     } else {
+  //       // @ts-ignore
+  //       setPathFile([...pathFile, { name: item.name }]); // @ts-ignore
+  //       // setFiles([...files, { name: item.name }]); // @ts-ignore
+  //     }
+  //   }); // @ts-ignore
+  // };
 
-  useEffect(() => {
-    const fileToUpload = files.filter(
-      (item) =>
-        // @ts-ignore
-        item.type &&
-        // @ts-ignore
-        (item.type === 'application/pdf' ||
-          // @ts-ignore
-          item.type.substr(0, 5) === 'image')
-    );
+  // useEffect(() => {
+  //   const fileToUpload = files.filter(
+  //     (item) =>
+  //       // @ts-ignore
+  //       item.type &&
+  //       // @ts-ignore
+  //       (item.type === 'application/pdf' ||
+  //         // @ts-ignore
+  //         item.type.substr(0, 5) === 'image')
+  //   );
 
-    if (fileToUpload.length > 0) {
-      uploadFile();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]);
+  //   if (fileToUpload.length > 0) {
+  //     uploadFile();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [files]);
 
   const fetchData = async () => {
     setFiles([]);
-    if (currentID) {
-      // const { data } = await supplierService.get(currentID);
-      // setValue('id', currentID);
-      // setValue('name', data?.name || '');
-      // setValue('address', data?.address || '');
-      // setValue('nameContact', data?.nameContact || '');
-      // setValue('telephoneNumber', data?.telephoneNumber || '');
-      // setValue('mobileNumber', data?.mobileNumber || '');
-      // setValue('description', data?.description || '');
-      // setValue('fax', data?.fax || '');
-      // setValue('taxCode', data?.taxCode || '');
-      // setValue('active', data?.active);
-      // if (data?.bussinessLicense) {
-      //   const fileList: object[] = [];
-      //   data.bussinessLicense.forEach((item: string) => {
-      //     fileList.push({ name: `${connectURL}/${item}` });
-      //   });
-      //   setFiles(fileList);
-      // }
-      reset({
-        id: '1',
-        name: 'Salvidor',
-        address: 'Joselin',
-        hotline: '355-395-4971',
-        status: false,
-      });
-    }
+    // get Data
+    const data = async () => await service.detail(currentID);
+    data().then(rel => {
+      reset(rel);
+      // eslint-disable-next-line no-labels
+      var fileName = rel.attachments.map((m) => { return { name: m.url } });
+      if (fileName.length) {
+        setFiles(fileName);
+      }
+      else {
+        setFiles([]);
+      }
+      console.log("rel", rel);
+
+
+    }).catch(error => {
+    });
   };
 
   useEffect(() => {
-    reset({ status: true });
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (currentID) { reset({ status: true }); fetchData(); }
+    else { reset({ status: true }); setFiles([]); }
   }, [currentID, open]);
 
-  const onSubmit = async (tenant: ITenant) => {
-    // if (files.length === 0) {
-    //   setNotification({
-    //     message: 'Chưa có giấy chứng nhận',
-    //     severity: 'warning',
-    //   });
-    //   return;
-    // }
-    // if (tenant.id) {
-    //   const { error, payload } = await dispatch(
-    //     // @ts-ignore
-    //     updateSupplier({ ...tenant, files })
-    //   );
-    //   if (error) {
-    //     setNotification({
-    //       error: payload.response.data || 'Lỗi!',
-    //     });
-    //     return;
-    //   }
-    //   setNotification({
-    //     message: 'Cập nhật thành công',
-    //     severity: 'success',
-    //   });
-    // } else {
-    //   const { error, payload } = await dispatch(
-    //     // @ts-ignore
-    //     createSupplier({ ...tenant, files })
-    //   );
-    //   if (error) {
-    //     setNotification({
-    //       error: payload.response.data || 'Lỗi!',
-    //     });
-    //     return;
-    //   }
-    //   setNotification({ message: 'Thêm thành công', severity: 'success' });
-    // }
-    // reset({});
-    // setFiles([]);
-    // handleClose(true);
+  const onSubmit = async (tenant: SalePointDto) => {
+    loading = true;
+    var filesConvert: AttachmentsFile[] = [];
+    files.forEach((m: File | object | any) => {
+
+      if (m instanceof File && m !== null && m !== undefined) {
+        filesConvert = [...filesConvert, { url: "", file: m }]
+      }
+      else if (typeof m === 'object' && m !== null && m !== undefined) {
+        filesConvert = [...filesConvert, { url: m.name as string, file: undefined }]
+      }
+    });
+
+    tenant.attachments = filesConvert;
+    if (currentID) {
+      const data = await service.update(currentID, tenant);
+      if (data.status >= 500) {
+        setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
+      }
+      else if (data.status !== 200) {
+        setNotification({ message: data.data, severity: 'error' });
+      }
+      else {
+        setNotification({ message: data.data, severity: 'success' });
+        handleClose();
+      }
+    }
+    else {
+      const data = await service.create(tenant);
+      if (data.status >= 500) {
+        setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
+      }
+      else if (data.status !== 200) {
+        setNotification({ message: data.data, severity: 'error' });
+      }
+      else {
+        setNotification({ message: data.data, severity: 'success' });
+        handleClose();
+      }
+    }
   };
 
   return (
@@ -209,6 +198,7 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
             currentID ? 'Chỉnh sửa thông tin điểm bán' : 'Thêm mới điểm bán'
           }
         />
+
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
@@ -231,6 +221,7 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
                   />
                 </Grid>
               </Grid>
+
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel title="Người liên hệ" name="nameContact" />
@@ -243,6 +234,7 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
                   />
                 </Grid>
               </Grid>
+
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel title="Hotline" required name="hotline" />
@@ -302,6 +294,26 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
                   />
                 </Grid>
               </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 'auto' }}>
+                  <Grid item xs={12}>
+                    <FormLabel
+                      title="Trạng thái hoạt động"
+                      name="bussinessLicense"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerSwitch
+                      name="status"
+                      label={status ? 'Hoạt động' : 'Không hoạt động'}
+                      control={control}
+                      disabled={disabled}
+                    />
+                  </Grid>
+                </Box>
+              </Grid>
+
               <Grid item xs={12} md={6}>
                 <Box sx={{ mb: 'auto' }}>
                   <Grid item xs={12}>
@@ -313,32 +325,16 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
                   <Grid item xs={12}>
                     <ControllerMultiFile
                       files={files}
+                      max={6}
                       setFiles={setFiles}
                       viewOnly={disabled}
                     />
                   </Grid>
                 </Box>
               </Grid>
-              <Grid item xs={12} md={6}></Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 'auto' }}>
-                  <Grid item xs={12}>
-                    <FormLabel
-                      title="Trạng thái hoạt động"
-                      name="bussinessLicense"
-                    />
-                  </Grid>
-                </Box>
 
-                <Grid item xs={12}>
-                  <ControllerSwitch
-                    name="status"
-                    label={status ? 'Hoạt động' : 'Không hoạt động'}
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
+              <Grid item xs={12} md={6}></Grid>
+
             </Grid>
           </FormGroup>
         </FormContent>
@@ -352,7 +348,9 @@ const FormDialog = ({ open, handleClose, currentID, disable }: Props) => {
               Chỉnh sửa thông tin
             </Button>
           )}
-          {!disabled && <LoadingButton type="submit">Lưu</LoadingButton>}
+
+          {!disabled && <LoadingButton loading={loading} type="submit">Lưu</LoadingButton>}
+
         </FormFooter>
       </FormPaperGrid>
     </Dialog>
