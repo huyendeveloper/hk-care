@@ -61,7 +61,7 @@ const validationSchema = yup.object().shape({
 const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }: Props) => {
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
-  const [pathFile, setPathFile] = useState<string[]>([]);
+  //const [pathFile, setPathFile] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
 
   useEffect(() => {
@@ -137,15 +137,15 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
         setFiles([]);
       }
       console.log("rel", rel);
-     
+
 
     }).catch(error => {
     });
   };
 
   useEffect(() => {
-    if (currentID !== null) { reset({ status: true }); fetchData(); }
-    else { reset({ status: true }); }
+    if (currentID) { reset({ status: true }); fetchData(); }
+    else { reset({ status: true }); setFiles([]); }
   }, [currentID, open]);
 
   const onSubmit = async (tenant: SalePointDto) => {
@@ -162,10 +162,8 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
     });
 
     tenant.attachments = filesConvert;
-    console.log(tenant);
     if (currentID) {
       const data = await service.update(currentID, tenant);
-      console.log("data", data);
       if (data.status >= 500) {
         setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
       }
@@ -179,7 +177,6 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
     }
     else {
       const data = await service.create(tenant);
-      console.log(data);
       if (data.status >= 500) {
         setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
       }
@@ -302,6 +299,25 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
                 <Box sx={{ mb: 'auto' }}>
                   <Grid item xs={12}>
                     <FormLabel
+                      title="Trạng thái hoạt động"
+                      name="bussinessLicense"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerSwitch
+                      name="status"
+                      label={status ? 'Hoạt động' : 'Không hoạt động'}
+                      control={control}
+                      disabled={disabled}
+                    />
+                  </Grid>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 'auto' }}>
+                  <Grid item xs={12}>
+                    <FormLabel
                       title="Tài liệu đính kèm"
                       name="bussinessLicense"
                     />
@@ -309,43 +325,15 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
                   <Grid item xs={12}>
                     <ControllerMultiFile
                       files={files}
+                      max={6}
                       setFiles={setFiles}
                       viewOnly={disabled}
                     />
                   </Grid>
                 </Box>
-
-                <Grid item xs={12}>
-                  <ControllerMultiFile
-                    files={files}
-                    max={6}
-                    setFiles={setFiles}
-                    viewOnly={disabled}
-                  />
-                </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}></Grid>
-
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 'auto' }}>
-                  <Grid item xs={12}>
-                    <FormLabel
-                      title="Trạng thái hoạt động"
-                      name="bussinessLicense"
-                    />
-                  </Grid>
-                </Box>
-
-                <Grid item xs={12}>
-                  <ControllerSwitch
-                    name="status"
-                    label={status ? 'Hoạt động' : 'Không hoạt động'}
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
 
             </Grid>
           </FormGroup>
