@@ -2,34 +2,20 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import {
-  Button,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
+import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
-import {
-  TableContent,
-  TableHeader,
-  TablePagination,
-  TableSearchField,
-  TableWrapper,
-} from 'components/Table';
+import { TableContent, TableHeader, TablePagination, TableSearchField, TableWrapper } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { ITenant } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
-import FormDialog from '../FormDialog';
+import FormDialog from './formDialog';
+import service from '../service';
+import { SalePointOutDto } from '../dto/salePointDto';
 
-const getCells = (): Cells<ITenant> => [
+const getCells = (): Cells<SalePointOutDto> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Tên điểm bán' },
   { id: 'address', label: 'Địa chỉ' },
@@ -42,7 +28,7 @@ const TableData = () => {
   const setNotification = useNotification();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [tenantList, setTenantList] = useState<ITenant[]>([]);
+  const [tenantList, setTenantList] = useState<SalePointOutDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentID, setCurrentID] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
@@ -56,95 +42,20 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    // @ts-ignore
-    // const { payload, error } = await dispatch(getAllProduct(filters));
-
-    // if (error) {
-    // setNotification({ error: 'Lỗi!' });
-    //   return;
-    // }
-    // setTenantList(payload.tenantList);
-    // setTotalRows(payload.totalCount);
-    const tenantList: ITenant[] = [
-      {
-        id: '1',
-        name: 'Salvidor',
-        address: 'Joselin',
-        hotline: '355-395-4971',
-        status: false,
-      },
-      {
-        id: '2',
-        name: 'Ynes',
-        address: 'Potkin',
-        hotline: '267-556-7768',
-        status: false,
-      },
-      {
-        id: '3',
-        name: 'Mahmoud',
-        address: "O'Ferris",
-        hotline: '926-268-7074',
-        status: true,
-      },
-      {
-        id: '4',
-        name: 'Andree',
-        address: 'Grigoliis',
-        hotline: '742-998-5236',
-        status: true,
-      },
-      {
-        id: '5',
-        name: 'Tonye',
-        address: 'Rekes',
-        hotline: '142-232-5415',
-        status: false,
-      },
-      {
-        id: '6',
-        name: 'Erie',
-        address: 'Breissan',
-        hotline: '563-857-9600',
-        status: true,
-      },
-      {
-        id: '7',
-        name: 'Hoebart',
-        address: 'Palphramand',
-        hotline: '540-218-1008',
-        status: false,
-      },
-      {
-        id: '8',
-        name: 'Inez',
-        address: 'Casajuana',
-        hotline: '692-598-4730',
-        status: true,
-      },
-      {
-        id: '9',
-        name: 'Dorisa',
-        address: 'Adkins',
-        hotline: '244-373-1319',
-        status: false,
-      },
-      {
-        id: '10',
-        name: 'Johnath',
-        address: 'Britee',
-        hotline: '750-330-8990',
-        status: false,
-      },
-    ];
-    setTenantList(tenantList);
-    setTotalRows(tenantList.length);
-    setLoading(false);
+    setLoading(true);
+    const data = async () => await service.search(filters);
+    data().then(rel => {
+      setLoading(false);
+      setTenantList(rel.items);
+      setTotalRows(rel.totalCount);
+    }).catch(error => {
+      setLoading(false);
+      setTenantList([]);
+    });
   };
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const handleSearch = (searchText: string) => {
@@ -178,18 +89,15 @@ const TableData = () => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-    handleCloseDeleteDialog();
-    // @ts-ignore
-    const { error } = await dispatch(deleteUsage(currentID));
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      return;
-    }
-    setNotification({
-      message: 'Xóa thành công!',
-      severity: 'success',
-    });
 
+    const data = await service.delete(currentID);
+    handleCloseDeleteDialog();
+    if (data.status !== 200) {
+      setNotification({ message: data, severity: 'error' });
+    }
+    else {
+      setNotification({ message: data, severity: 'success' });
+    }
     setTenantList(tenantList.filter((x) => x.id !== currentID));
   };
 
@@ -222,7 +130,7 @@ const TableData = () => {
     }
   };
 
-  const renderAction = (row: ITenant) => {
+  const renderAction = (row: SalePointOutDto) => {
     return (
       <>
         <IconButton onClick={handleOpenViewDialog(row.id)}>
@@ -257,6 +165,7 @@ const TableData = () => {
           Thêm điểm bán mới
         </Button>
       </TableSearchField>
+
       <TableContent total={tenantList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
@@ -283,7 +192,7 @@ const TableData = () => {
                         {status ? (
                           <Button>Hoạt động</Button>
                         ) : (
-                          <Button color="error">Hoạt động</Button>
+                          <Button color="error">Dừng Hoạt động</Button>
                         )}
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
