@@ -37,11 +37,11 @@ const getCells = (): Cells<IRequestImport> => [
     label: 'Mã phiếu yêu cầu',
   },
   {
-    id: 'requestDate',
+    id: 'expectedDate',
     label: 'Ngày yêu cầu',
   },
   {
-    id: 'requestDate',
+    id: 'expectedDate',
     label: 'Thao tác',
   },
 ];
@@ -49,10 +49,11 @@ const getCells = (): Cells<IRequestImport> => [
 const TableData = () => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [requestImport, setRequestImport] = useState<IRequestImport[]>([]);
+
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [requestImport, setRequestImport] = useState<IRequestImport[]>([]);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -67,7 +68,7 @@ const TableData = () => {
       setLoading(false);
       return;
     }
-    setRequestImport(payload.expected);
+    setRequestImport(payload.expectedList);
     setTotalRows(payload.totalCount);
     setLoading(false);
   };
@@ -157,14 +158,14 @@ const TableData = () => {
 
               <TableBody>
                 {requestImport.map((item, index) => {
-                  const { id, code, requestDate } = item;
+                  const { id, code, expectedDate } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{code}</TableCell>
-                      <TableCell>{formatDateTime(requestDate)}</TableCell>
+                      <TableCell>{formatDateTime(expectedDate)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>
                   );

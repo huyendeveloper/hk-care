@@ -21,8 +21,8 @@ const ProductEntity = ({
   arrayName,
   control,
 }: IProps) => {
-  const object = `${arrayName}.${index}`;
   const { id } = useParams();
+  const object = `${arrayName}.${index}`;
 
   const expectedMore =
     useWatch({ control, name: `${object}.expectedMore` }) || 0;

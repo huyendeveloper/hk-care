@@ -34,7 +34,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addExpectedDetails, createExpected } from 'redux/slices/expected';
+import {
+  addExpectedDetails,
+  createExpected,
+  getExpected,
+} from 'redux/slices/expected';
 import expectedService from 'services/expected.service';
 import salesOrderService from 'services/salesOrder.service';
 import { FilterParams } from 'types';
@@ -69,16 +73,18 @@ const Create = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const setNotification = useNotification();
-  const [productList, setProductList] = useState<IProductListName[]>([]);
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [loadingProduct, setLoadingProduct] = useState<boolean>(true);
+  const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
+  const [loadingProduct, setLoadingProduct] = useState<boolean>(true);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [productIdAdd, setProductIdAdd] = useState<number | null>(null);
+  const [productList, setProductList] = useState<IProductListName[]>([]);
 
   const cells = useMemo(() => getCells(), []);
 
-  const { control, handleSubmit, getValues, setValue } =
+  const { control, handleSubmit, getValues, setValue, reset } =
     useForm<IRequestImport>({
       mode: 'onChange',
       resolver: yupResolver(validationSchema),
@@ -95,7 +101,7 @@ const Create = () => {
   const fetchToAddExpectedDetails = async () => {
     setLoading(true);
     // @ts-ignore
-    const { payload, error } = await dispatch(addExpectedDetails());
+    const { payload, error } = await dispatch(addExpectedDetails(id));
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
@@ -109,10 +115,26 @@ const Create = () => {
     setLoading(false);
   };
 
+  const fetchDetails = async () => {
+    setLoading(true);
+    // @ts-ignore
+    const { payload, error } = await dispatch(getExpected(id));
+
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      return;
+    }
+    reset(payload.expected);
+
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchProducts();
     if (!id) {
+      fetchProducts();
       fetchToAddExpectedDetails();
+    } else {
+      fetchDetails();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -127,10 +149,7 @@ const Create = () => {
 
   const onSubmit = async (body: IRequestImport) => {
     setLoadingSubmit(true);
-    if (id) {
-      setLoadingSubmit(false);
-      // handle update
-    } else {
+    if (!id) {
       const { error } = await dispatch(
         // @ts-ignore
         createExpected(body)
@@ -171,11 +190,13 @@ const Create = () => {
   });
 
   const addProduct = async () => {
+    setLoadingAdd(true);
     if (!productIdAdd) {
       return;
     }
     const { data } = await expectedService.addExpectedDetail(productIdAdd);
     append(data);
+    setLoadingAdd(false);
   };
 
   return (
@@ -205,7 +226,7 @@ const Create = () => {
                       />
                       <LoadingButton
                         onClick={addProduct}
-                        // loading={loadingAdd}
+                        loading={loadingAdd}
                         loadingPosition="start"
                         startIcon={<></>}
                         sx={{ height: '40px', width: '100px' }}
