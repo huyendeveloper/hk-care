@@ -91,6 +91,21 @@ export const changeStatus = createAsyncThunk(
   }
 );
 
+export const updateNorm = createAsyncThunk(
+  'productList/updateNorm',
+  async (params: { productId: number; norm: number }, { rejectWithValue }) => {
+    const { productId, norm } = params;
+    try {
+      const { data } = await productListService.updateNorm(productId, norm);
+      return {
+        message: data,
+      };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const deleteProductList = createAsyncThunk(
   'productList/delete',
   async (id: number, { rejectWithValue }) => {

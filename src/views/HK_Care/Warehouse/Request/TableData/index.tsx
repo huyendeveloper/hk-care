@@ -19,8 +19,11 @@ import {
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
+import { useNotification } from 'hooks';
 import { IRequestImport } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getAllExpected } from 'redux/slices/expected';
 import { FilterParams } from 'types';
 import formatDateTime from 'utils/dateTimeFormat';
 
@@ -44,34 +47,33 @@ const getCells = (): Cells<IRequestImport> => [
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [requestImport, setRequestImport] = useState<IRequestImport[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
-    const payload = {
-      requestImport: [
-        { id: 1, code: 'Ahmed', requestDate: new Date('2022/12/15') },
-        { id: 2, code: 'Erika', requestDate: new Date('2022/12/15') },
-        { id: 3, code: 'Casie', requestDate: new Date('2022/12/15') },
-        { id: 4, code: 'Derril', requestDate: new Date('2022/12/15') },
-        { id: 5, code: 'Jobyna', requestDate: new Date('2022/12/15') },
-        { id: 6, code: 'Corbett', requestDate: new Date('2022/12/15') },
-        { id: 7, code: 'Ivor', requestDate: new Date('2022/12/15') },
-        { id: 8, code: 'Robbi', requestDate: new Date('2022/12/15') },
-        { id: 9, code: 'Elinor', requestDate: new Date('2022/12/15') },
-        { id: 10, code: 'Mathian', requestDate: new Date('2022/12/15') },
-      ],
-      totalCount: 35,
-    };
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllExpected(filters));
 
-    setRequestImport(payload.requestImport);
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoading(false);
+      return;
+    }
+    setRequestImport(payload.expected);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -142,7 +144,7 @@ const TableData = () => {
         </LinkButton>
       </TableSearchField>
 
-      <TableContent total={requestImport.length} loading={false}>
+      <TableContent total={requestImport.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">

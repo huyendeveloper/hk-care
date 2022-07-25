@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { connectURL } from 'config';
 import { useState } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useDebounce } from 'react-use';
@@ -17,6 +18,7 @@ interface Props<T, O extends FieldValues[]>
   options: O;
   renderLabel: (option: O[number]) => string;
   renderValue?: keyof O[number] & string;
+  images?: keyof O[number] & string;
   sublabel?: (option: O[number]) => string;
   onChangeSelect?: (id: number | null) => Promise<void> | void;
   getOptionDisabled?: (option: number) => boolean;
@@ -35,6 +37,7 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
     options,
     renderLabel,
     renderValue,
+    images,
     sublabel,
     onChangeSelect,
     placeholder,
@@ -52,8 +55,9 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
 
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.productId;
+    const image = images ? option[images] : null;
     const caption = sublabel ? sublabel(option) : null;
-    acc[id] = { id, name: renderLabel(option), caption };
+    acc[id] = { id, name: renderLabel(option), caption, image };
     return acc;
   }, {});
 
@@ -97,10 +101,25 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
         );
       }}
       renderOption={(props, option: number) => {
-        const { name, caption } = labels[option];
+        const { name, caption, image } = labels[option];
         return (
           <Box component="li" {...props} key={option}>
-            <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {images && (
+                <Box
+                  component="img"
+                  sx={{
+                    width: '100px',
+                    height: '70px',
+                  }}
+                  src={
+                    image === ''
+                      ? '/static/default.jpg'
+                      : `${connectURL}/${image}`
+                  }
+                  alt=""
+                />
+              )}
               {name || defaultValue}
               {caption && (
                 <Typography variant="caption" display="block">
