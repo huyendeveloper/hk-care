@@ -14,10 +14,12 @@ export const getAllExpected = createAsyncThunk(
       const { data } = await expectedService.getAll(filters);
 
       if (data) {
-        const expectedList = data;
+        const expectedList = data.items;
+        const totalCount = data.totalCount;
 
         return {
           expectedList,
+          totalCount,
         };
       }
 
@@ -52,8 +54,20 @@ export const createExpected = createAsyncThunk(
   async (payload: IImportReceipt, { rejectWithValue }) => {
     try {
       const { data } = await expectedService.create(payload);
-      console.log('data', data);
       return { id: data };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getExpected = createAsyncThunk(
+  'expected/getExpected',
+  async (payload: string, { rejectWithValue }) => {
+    try {
+      const { data } = await expectedService.getExpected(payload);
+      console.log('data', data);
+      return { expected: data };
     } catch (error) {
       return rejectWithValue(error);
     }

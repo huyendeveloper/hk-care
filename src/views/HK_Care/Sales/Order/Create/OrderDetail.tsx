@@ -1,4 +1,6 @@
-import { Box, Stack } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, IconButton, Stack } from '@mui/material';
+import { LinkIconButton } from 'components/common';
 import { ControllerTextarea, EntitySelecter } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { useEffect, useMemo } from 'react';
@@ -40,6 +42,14 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     []
   );
 
+  const mockCustomers = useMemo(
+    () => [
+      { id: 1, name: 'Nguyễn Thu Hà', phone: '0987654321' },
+      { id: 2, name: 'Tô Thanh Minh', phone: '0987654321' },
+    ],
+    []
+  );
+
   useEffect(() => {
     setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +57,34 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
 
   return (
     <Stack p={2} gap={2}>
-      <Stack flexDirection="row" justifyContent="space-between">
+      <Stack
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Box sx={{ width: '87%' }}>
+          <EntitySelecter
+            name="customer"
+            control={control}
+            options={mockCustomers}
+            renderLabel={(field) => field.name}
+            renderValue="id"
+            moreInfor="phone"
+            placeholder=""
+            disableClearable
+          />
+        </Box>
+        <LinkIconButton target="_blank" to="/add-customer">
+          <IconButton>
+            <AddIcon />
+          </IconButton>
+        </LinkIconButton>
+      </Stack>
+      <Stack
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <div>Loại hóa đơn</div>
         <Box sx={{ width: '60%' }}>
           <EntitySelecter

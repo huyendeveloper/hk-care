@@ -77,7 +77,6 @@ const ControllerImageField = ({
               onMouseOut={() => setEnable(false)}
             />
             <AddPhotoAlternateIcon
-              // className={`preview-image-icon ${disabled ? 'disabled' : ''}`}
               sx={{
                 position: 'absolute',
                 top: 'calc((100% - 35px) / 2)',

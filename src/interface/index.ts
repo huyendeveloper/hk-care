@@ -310,7 +310,7 @@ export interface IProductRequestImport {
 export interface IRequestImport {
   id: number;
   code: string;
-  requestDate?: Date;
+  expectedDate?: Date;
   description?: string;
   tenant?: string;
   quantity?: number;

@@ -39,6 +39,14 @@ class ExpectedService {
     });
   }
 
+  getExpected(expectedId: string) {
+    return axiosClient.get(`${baseURL}/Expected/GetExpected`, {
+      params: {
+        expectedId,
+      },
+    });
+  }
+
   create(payload: IImportReceipt) {
     return axiosClient.post(`${baseURL}/Expected/CreateExpected`, payload);
   }
