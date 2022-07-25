@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { LoadingButton, usePagination } from '@mui/lab';
+import { LoadingButton } from '@mui/lab';
 import {
   Grid,
   Paper,
@@ -20,7 +20,12 @@ import {
   FormPaperGrid,
   Selecter,
 } from 'components/Form';
-import { TableContent, TableHeader, TableWrapper } from 'components/Table';
+import {
+  TableContent,
+  TableHeader,
+  TablePagination,
+  TableWrapper,
+} from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -28,8 +33,10 @@ import { IProductRequestImport, IRequestImport } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { getAllProduct } from 'redux/slices/exportWHRotation';
+import { useNavigate, useParams } from 'react-router-dom';
+import { addExpectedDetails, createExpected } from 'redux/slices/expected';
+import expectedService from 'services/expected.service';
+import salesOrderService from 'services/salesOrder.service';
 import { FilterParams } from 'types';
 
 import * as yup from 'yup';
@@ -42,6 +49,9 @@ interface IProductListName {
   name: string;
   amount: number;
   path: string;
+  productName: string;
+  productId: number;
+  productImage: string;
 }
 
 const getCells = (): Cells<IProductRequestImport> => [
@@ -57,10 +67,14 @@ const getCells = (): Cells<IProductRequestImport> => [
 const Create = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const setNotification = useNotification();
   const [productList, setProductList] = useState<IProductListName[]>([]);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingProduct, setLoadingProduct] = useState<boolean>(true);
+  const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
+  const [productIdAdd, setProductIdAdd] = useState<number | null>(null);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -71,21 +85,35 @@ const Create = () => {
       defaultValues: validationSchema.getDefault(),
     });
 
-  const fetchData = async () => {
+  const fetchProducts = async () => {
+    setLoadingProduct(true);
+    const { data } = await salesOrderService.getSearchProductList(filters);
+    setProductList(data.items);
+    setLoadingProduct(false);
+  };
+
+  const fetchToAddExpectedDetails = async () => {
     setLoading(true);
     // @ts-ignore
-    const { payload, error } = await dispatch(getAllProduct(filters));
+    const { payload, error } = await dispatch(addExpectedDetails());
 
     if (error) {
       setNotification({ error: 'Lỗi!' });
       return;
     }
-    setProductList(payload.productList);
+    const expectedList = payload.expectedList;
+    expectedList.forEach((item: any) => {
+      append(item);
+    });
+
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchProducts();
+    if (!id) {
+      fetchToAddExpectedDetails();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -97,12 +125,58 @@ const Create = () => {
     }));
   };
 
-  const onSubmit = async (data: IRequestImport) => {};
+  const onSubmit = async (body: IRequestImport) => {
+    setLoadingSubmit(true);
+    if (id) {
+      setLoadingSubmit(false);
+      // handle update
+    } else {
+      const { error } = await dispatch(
+        // @ts-ignore
+        createExpected(body)
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi!' });
+        setLoadingSubmit(false);
+        return;
+      }
+      setNotification({
+        message: 'Tạo yêu cầu nhập kho thành công',
+        severity: 'success',
+      });
+
+      setLoadingSubmit(false);
+      return navigate('/hk_care/warehouse/request');
+    }
+  };
+
+  const handleChangePage = (pageIndex: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex,
+    }));
+  };
+
+  const handleChangeRowsPerPage = (rowsPerPage: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex: 1,
+      pageSize: rowsPerPage,
+    }));
+  };
 
   const { fields, append, remove } = useFieldArray<IRequestImport>({
     control,
-    name: 'productRequestImports',
+    name: 'expectedDetails',
   });
+
+  const addProduct = async () => {
+    if (!productIdAdd) {
+      return;
+    }
+    const { data } = await expectedService.addExpectedDetail(productIdAdd);
+    append(data);
+  };
 
   return (
     <PageWrapperFullwidth title="Tạo mới yêu cầu nhập hàng">
@@ -117,19 +191,20 @@ const Create = () => {
                     <FormLabel title="Tìm kiếm sản phẩm" name="name" />
                     <Stack flexDirection="row" gap={2}>
                       <Selecter
-                        renderValue="id"
+                        renderValue="productId"
                         options={productList}
-                        renderLabel={(field) => field.name}
+                        renderLabel={(field) => field.productName}
                         noOptionsText="Không tìm thấy sản phẩm"
                         placeholder=""
+                        images="productImage"
                         onChangeSelect={(value: number | null) => {
-                          // setDetailAdd({ ...detailAdd, productId: value })
+                          setProductIdAdd(value);
                         }}
                         defaultValue=""
-                        loading={loading}
+                        loading={loadingProduct}
                       />
                       <LoadingButton
-                        // onClick={addProduct}
+                        onClick={addProduct}
                         // loading={loadingAdd}
                         loadingPosition="start"
                         startIcon={<></>}
@@ -145,7 +220,7 @@ const Create = () => {
                   sx={{ height: 1, minHeight: '50vh' }}
                   component={Paper}
                 >
-                  <TableContent total={1} noDataText=" " loading={false}>
+                  <TableContent total={1} noDataText=" " loading={loading}>
                     <TableContainer sx={{ p: 1.5 }}>
                       <Scrollbar>
                         <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -157,18 +232,22 @@ const Create = () => {
                           />
 
                           <TableBody>
-                            {fields.map((item, index) => (
-                              <ProductEntity
-                                item={item}
-                                key={index}
-                                index={index}
-                                remove={remove}
-                                getValues={getValues}
-                                arrayName="productRequestImports"
-                                setValue={setValue}
-                                control={control}
-                              />
-                            ))}
+                            {[...fields]
+                              .splice(
+                                (filters.pageIndex - 1) * 10,
+                                filters.pageIndex * 10
+                              )
+                              .map((item, index) => (
+                                <ProductEntity
+                                  key={index}
+                                  index={index}
+                                  remove={remove}
+                                  getValues={getValues}
+                                  arrayName="expectedDetails"
+                                  setValue={setValue}
+                                  control={control}
+                                />
+                              ))}
                           </TableBody>
                         </Table>
                       </Scrollbar>
@@ -176,10 +255,26 @@ const Create = () => {
                   </TableContent>
                 </TableWrapper>
               </Grid>
+              <Grid container alignItems="center">
+                <Grid item xs={12}>
+                  <TablePagination
+                    pageIndex={filters.pageIndex}
+                    totalPages={fields.length}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                    rowsPerPage={filters.pageSize}
+                    rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                  />
+                </Grid>
+              </Grid>
             </FormContent>
             <FormFooter>
               <LinkButton to="/hk_care/warehouse/request">Hủy</LinkButton>
-              {!id && <LoadingButton type="submit">Gửi yêu cầu</LoadingButton>}
+              {!id && (
+                <LoadingButton type="submit" loading={loadingSubmit}>
+                  Gửi yêu cầu
+                </LoadingButton>
+              )}
             </FormFooter>
           </FormPaperGrid>
         </Grid>

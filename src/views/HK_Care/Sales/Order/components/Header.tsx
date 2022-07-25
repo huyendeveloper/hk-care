@@ -4,7 +4,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { TabList } from '@mui/lab';
 import { IconButton, Stack, Tab } from '@mui/material';
 import { Box } from '@mui/system';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { LinkIconButton } from 'components/common';
 import SearchField from 'components/Table/SearchField';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import salesOrderService from 'services/salesOrder.service';
 import { FilterParams } from 'types';
+import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
   tab: string;
@@ -133,7 +134,7 @@ const Header = ({
                     />
                     <Box pl={2}>{item.productName}</Box>
                   </Stack>
-                  <div>Có thể bán: {item.stockQuantity}</div>
+                  <div>Có thể bán: {numberFormat(item.stockQuantity)}</div>
                 </Stack>
               ))}
             </Stack>

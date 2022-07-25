@@ -31,7 +31,7 @@ import { deleteProductList, getAllProduct } from 'redux/slices/productList';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
-import QuotaUpdate from './QuotaUpdate';
+import QuotaUpdate from './NormUpdate';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -41,7 +41,7 @@ const getCells = (): Cells<IProductList> => [
   { id: 'stockQuantity', label: 'Hàng tồn' },
   { id: 'importPrice', label: 'Giá nhập' },
   { id: 'price', label: 'Giá bán' },
-  { id: 'quota', label: 'Định mức' },
+  { id: 'norm', label: 'Định mức' },
   { id: 'price', label: 'Thao tác' },
 ];
 
@@ -193,17 +193,17 @@ const TableData = ({ active = 1 }: IProps) => {
               <TableBody>
                 {productList.map((item, index) => {
                   const {
-                    productId,
+                    id,
                     productName,
                     productGroup,
                     importPrice,
                     price,
                     mesure,
                     stockQuantity,
-                    quota,
+                    norm,
                   } = item;
                   return (
-                    <TableRow hover tabIndex={-1} key={productId}>
+                    <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
@@ -214,7 +214,12 @@ const TableData = ({ active = 1 }: IProps) => {
                       <TableCell>{numberFormat(importPrice)}</TableCell>
                       <TableCell>{numberFormat(price)}</TableCell>
                       <TableCell sx={{ width: '120px' }}>
-                        <QuotaUpdate quota={quota} />
+                        <QuotaUpdate
+                          norm={norm}
+                          productId={id}
+                          showBackdrop={showBackdrop}
+                          setShowBackdrop={setShowBackdrop}
+                        />
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
