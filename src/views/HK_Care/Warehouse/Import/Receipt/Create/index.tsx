@@ -6,7 +6,7 @@ import {
   Paper,
   Table,
   TableBody,
-  TableContainer
+  TableContainer,
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -17,7 +17,7 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import ChooseOption from 'components/Form/ChooseOption';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
@@ -34,7 +34,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   createImportReceipt,
   getImportReceipt,
-  updateImportReceipt
+  updateImportReceipt,
 } from 'redux/slices/importReceipt';
 import { getAllProduct } from 'redux/slices/productList';
 import importReceiptService from 'services/importReceipt.service';
@@ -60,7 +60,7 @@ const validationSchema = yup.object().shape({
           if (!dateManufacture || !expiryDate) {
             return true;
           }
-          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
+          if (moment(expiryDate).isBefore(moment(dateManufacture))) {
             return false;
           }
           return true;
@@ -77,7 +77,7 @@ const validationSchema = yup.object().shape({
           if (!dateManufacture || !expiryDate) {
             return true;
           }
-          if (moment(dateManufacture).isAfter(moment(expiryDate))) {
+          if (moment(expiryDate).isBefore(moment(dateManufacture))) {
             return false;
           }
           return true;

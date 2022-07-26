@@ -98,7 +98,13 @@ const ReceiptEntity = ({
           {getValues(`${object}.measure`)}
         </Box>
       </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', paddingY: '20px', width: '80px' }}>
+      <TableCell
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '80px !important',
+        }}
+      >
         <ControllerNumberInput
           name={`${object}.amount`}
           setValue={setValue}
@@ -108,7 +114,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '130px !important',
+        }}
       >
         <ControllerNumberInput
           name={`${object}.importPrice`}
@@ -118,7 +128,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '130px !important',
+        }}
       >
         <ControllerNumberInput
           name={`${object}.price`}
@@ -129,7 +143,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '130px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '130px !important',
+        }}
       >
         <ControllerNumberInput
           name={`${object}.discount`}
@@ -143,7 +161,11 @@ const ReceiptEntity = ({
       </TableCell>
 
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '120px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '120px !important',
+        }}
       >
         <ControllerTextField
           name={`${object}.lotNumber`}
@@ -152,7 +174,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '120px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '120px !important',
+        }}
       >
         <ControllerTextField
           name={`${object}.numberRegister`}
@@ -161,7 +187,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '178px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '178px !important',
+        }}
       >
         <ControllerDatePicker
           name={`${object}.dateManufacture`}
@@ -171,7 +201,11 @@ const ReceiptEntity = ({
         />
       </TableCell>
       <TableCell
-        sx={{ verticalAlign: 'top', paddingY: '20px', width: '178px' }}
+        sx={{
+          verticalAlign: 'top',
+          paddingY: '20px',
+          width: '178px !important',
+        }}
       >
         <ControllerDatePicker
           name={`${object}.expiryDate`}

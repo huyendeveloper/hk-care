@@ -21,6 +21,7 @@ import {
   FormHeader,
   FormLabel,
   FormPaperGrid,
+  Selecter,
 } from 'components/Form';
 import {
   TableContent,
@@ -295,102 +296,23 @@ const FormData = ({ defaultValue }: IProps) => {
                       position: 'relative',
                     }}
                   >
-                    <SearchField
-                      placeHolder="Thêm sản phẩm vào đơn"
-                      searchText=""
-                      onSearch={handleSearch}
-                      haveIcon
-                      onFocus={() => setHidden(false)}
-                      onBlur={timer}
+                    <Selecter
+                      renderValue="id"
+                      options={productList}
+                      renderLabel={(field) => field.name}
+                      noOptionsText="Không tìm thấy sản phẩm"
+                      placeholder="Thêm sản phẩm vào đơn"
+                      images="path"
+                      onChangeSelect={(value: number | null) => {
+                        if (!value) {
+                          return;
+                        }
+                        const item = productList.find((x) => x.id === value);
+                        item && addItem(item);
+                      }}
+                      defaultValue=""
+                      loading={loading}
                     />
-                    {!hidden && productList.length > 0 && (
-                      <Stack
-                        sx={{
-                          position: 'absolute',
-                          top: '55px',
-                          right: '0px',
-                          left: 0,
-                          marginRight: '8px',
-                          borderRadius: '4px',
-                          background: 'white',
-                          border: '1px solid #d9d9d9',
-                          maxHeight: '350px',
-                          overflowY: 'scroll',
-                          zIndex: 99,
-                        }}
-                      >
-                        {productList
-                          .filter((x) =>
-                            x.name
-                              .toLocaleLowerCase()
-                              .includes(filters.searchText.toLocaleLowerCase())
-                          )
-                          .map((item, index) => (
-                            <Stack
-                              flexDirection="row"
-                              justifyContent="space-between"
-                              alignItems="center"
-                              key={index}
-                              // @ts-ignore
-                              onClick={() => addItem(item)}
-                              p={2}
-                              sx={{ borderBottom: '1px solid #d9d9d9' }}
-                            >
-                              <Stack flexDirection="row">
-                                <Box
-                                  component="img"
-                                  sx={{
-                                    width: '100px',
-                                    height: '70px',
-                                    backgroundImage:
-                                      'https://www.vigcenter.com/public/all/images/default-image.jpg',
-                                  }}
-                                  src={
-                                    item.path === ''
-                                      ? '/static/default.jpg'
-                                      : `${connectURL}/${item.path}`
-                                  }
-                                  alt=""
-                                />
-                                <Box pl={2}>{item.name}</Box>
-                              </Stack>
-                            </Stack>
-                          ))}
-                      </Stack>
-                    )}
-                    {!hidden &&
-                      productList.filter((x) =>
-                        x.name
-                          .toLocaleLowerCase()
-                          .includes(filters.searchText.toLocaleLowerCase())
-                      ).length === 0 && (
-                        <Stack
-                          sx={{
-                            position: 'absolute',
-                            top: '55px',
-                            right: '0px',
-                            left: 0,
-                            marginRight: '8px',
-                            borderRadius: '4px',
-                            background: 'white',
-                            border: '1px solid #d9d9d9',
-                            maxHeight: '350px',
-                            zIndex: 99,
-                          }}
-                        >
-                          <Stack
-                            flexDirection="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            p={2}
-                            sx={{ borderBottom: '1px solid #d9d9d9' }}
-                          >
-                            {loading
-                              ? 'Đang tải . . .'
-                              : 'Không tìm thấy kết quả nào.'}
-                          </Stack>
-                        </Stack>
-                      )}
                   </Box>
                 </Grid>
                 <Grid item xs={12} sx={{ minHeight: '200px' }}>
