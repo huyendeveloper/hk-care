@@ -108,7 +108,8 @@ export interface IProductList {
   mesureLevelFisrtName: string;
   mesureLevelSecondName: string;
   mesureLevelThirdName: string;
-  quota: number;
+  norm: number;
+  id: number;
 }
 
 export interface IProductReceiptWHDtos {
@@ -309,14 +310,14 @@ export interface IProductRequestImport {
 export interface IRequestImport {
   id: number;
   code: string;
-  requestDate?: Date;
+  expectedDate?: Date;
   description?: string;
   tenant?: string;
   quantity?: number;
-  productRequestImports?: IProductRequestImport[];
+  expectedDetails?: IProductRequestImport[];
 }
 
-export interface IQuota {
+export interface INorm {
   id: number;
   productName: string;
   measureName: string;
@@ -324,7 +325,7 @@ export interface IQuota {
   stockQuantity: number;
   importPrice: number;
   price: number;
-  quota: number;
+  norm: number;
 }
 
 export interface IInventoryRecordProduct {

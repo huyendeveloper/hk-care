@@ -49,13 +49,13 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: IRequestImport) => {
-          const { id, tenant, quantity, requestDate } = item;
+          const { id, tenant, quantity, expectedDate } = item;
           return (
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell></TableCell>
               <TableCell>{tenant}</TableCell>
               <TableCell>{numberFormat(quantity || 0)}</TableCell>{' '}
-              <TableCell>{formatDateTime(requestDate)}</TableCell>
+              <TableCell>{formatDateTime(expectedDate)}</TableCell>
             </TableRow>
           );
         })}

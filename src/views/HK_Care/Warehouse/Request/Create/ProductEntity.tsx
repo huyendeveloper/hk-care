@@ -1,17 +1,12 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, TableCell, TableRow } from '@mui/material';
-import { ControllerDatePicker, ControllerTextField } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { defaultFilters } from 'constants/defaultFilters';
 import { useWatch } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
 interface IProps {
-  item: any;
   index: number;
   remove: any;
-  errors?: any;
-  register?: any;
   setValue: any;
   getValues: any;
   arrayName?: string;
@@ -19,20 +14,18 @@ interface IProps {
 }
 
 const ProductEntity = ({
-  item,
   index,
   remove,
-  errors,
-  register,
   setValue,
   getValues,
   arrayName,
   control,
 }: IProps) => {
-  const object = `${arrayName}.${index}`;
   const { id } = useParams();
+  const object = `${arrayName}.${index}`;
 
-  const addBudget = useWatch({ control, name: `${object}.addBudget` }) || 0;
+  const expectedMore =
+    useWatch({ control, name: `${object}.expectedMore` }) || 0;
 
   return (
     <TableRow hover tabIndex={-1} key={index}>
@@ -47,7 +40,7 @@ const ProductEntity = ({
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.name`)}
+          {getValues(`${object}.productName`)}
         </Box>
       </TableCell>
       <TableCell>
@@ -61,18 +54,18 @@ const ProductEntity = ({
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.budget`)}
+          {getValues(`${object}.expectedAuto`)}
         </Box>
       </TableCell>
       <TableCell sx={{ width: '140px' }}>
         {id ? (
-          getValues(`${object}.addBudget`)
+          getValues(`${object}.expectedMore`)
         ) : (
           <ControllerNumberInput
-            name={`${object}.amount`}
+            name={`${object}.expectedMore`}
             setValue={setValue}
             control={control}
-            defaultValue={getValues(`${object}.addBudget`)}
+            defaultValue={getValues(`${object}.expectedMore`)}
           />
         )}
       </TableCell>
@@ -80,7 +73,7 @@ const ProductEntity = ({
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.budget`) + addBudget}
+          {getValues(`${object}.expectedAuto`) + expectedMore}
         </Box>
       </TableCell>
       {!id && (

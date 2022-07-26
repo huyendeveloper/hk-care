@@ -15,7 +15,7 @@ const getCells = (): Cells<IRequestImport> => [
   { id: 'id', label: 'STT' },
   { id: 'id', label: 'Điểm bán' },
   { id: 'id', label: 'Số lượng' },
-  { id: 'requestDate', label: 'Ngày yêu cầu' },
+  { id: 'expectedDate', label: 'Ngày yêu cầu' },
 ];
 
 const TableData = () => {
@@ -37,13 +37,6 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    // @ts-ignore
-    // const { payload, error } = await dispatch(getAllExportWHRotation(filters));
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   setLoading(false);
-    //   return;
-    // }
     const payload = {
       requestImportList: [
         {
@@ -121,7 +114,8 @@ const TableData = () => {
                   return (
                     <ExpandRow
                       key={key}
-                      groupName={key} // @ts-ignore
+                      groupName={key}
+                      // @ts-ignore
                       list={requestImport[key]}
                       filters={filters}
                       index={index + 1}

@@ -407,18 +407,23 @@ const FormData = ({ defaultValue }: IProps) => {
                             />
 
                             <TableBody>
-                              {fields.map((item, index) => (
-                                <ReceiptEntity
-                                  item={item}
-                                  key={index}
-                                  index={index}
-                                  setValue={setValue}
-                                  getValues={getValues}
-                                  arrayName="exportWHDetails"
-                                  control={control}
-                                  remove={remove}
-                                />
-                              ))}
+                              {[...fields]
+                                .splice(
+                                  (filters.pageIndex - 1) * 10,
+                                  filters.pageIndex * 10
+                                )
+                                .map((item, index) => (
+                                  <ReceiptEntity
+                                    item={item}
+                                    key={index}
+                                    index={index}
+                                    setValue={setValue}
+                                    getValues={getValues}
+                                    arrayName="exportWHDetails"
+                                    control={control}
+                                    remove={remove}
+                                  />
+                                ))}
                             </TableBody>
                           </Table>
                         </Scrollbar>
@@ -438,9 +443,7 @@ const FormData = ({ defaultValue }: IProps) => {
                     />
                   </Grid>
                   <Grid item xs={12} p={2}>
-                    <TotalBill
-                      control={control}
-                    />
+                    <TotalBill control={control} />
                   </Grid>
                 </Grid>
               </FormGroup>

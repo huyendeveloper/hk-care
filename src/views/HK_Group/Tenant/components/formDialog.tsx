@@ -1,7 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid } from '@mui/material';
-import { ControllerMultiFile, ControllerTextarea, ControllerTextField, FormContent, FormFooter, FormGroup, FormHeader, FormLabel, FormPaperGrid, } from 'components/Form';
+import {
+  ControllerMultiFile,
+  ControllerTextarea,
+  ControllerTextField,
+  FormContent,
+  FormFooter,
+  FormGroup,
+  FormHeader,
+  FormLabel,
+  FormPaperGrid,
+} from 'components/Form';
 import ControllerSwitch from 'components/Form/ControllerSwitch';
 import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
@@ -58,7 +68,13 @@ const validationSchema = yup.object().shape({
   status: yup.boolean().default(true),
 });
 
-const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }: Props) => {
+const FormDialog = ({
+  open,
+  handleClose,
+  currentID,
+  disable,
+  loading = false,
+}: Props) => {
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
   //const [pathFile, setPathFile] = useState<string[]>([]);
@@ -123,38 +139,43 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
     setFiles([]);
     // get Data
     const data = async () => await service.detail(currentID);
-    data().then(rel => {
-      reset(rel);
-      // eslint-disable-next-line no-labels
-      var fileName = rel.attachments.map((m) => { return { name: m.url } });
-      if (fileName.length) {
-        setFiles(fileName);
-      }
-      else {
-        setFiles([]);
-      }
-      console.log("rel", rel);
-
-
-    }).catch(error => {
-    });
+    data()
+      .then((rel) => {
+        reset(rel);
+        // eslint-disable-next-line no-labels
+        var fileName = rel.attachments.map((m) => {
+          return { name: m.url };
+        });
+        if (fileName.length) {
+          setFiles(fileName);
+        } else {
+          setFiles([]);
+        }
+      })
+      .catch((error) => {});
   };
 
   useEffect(() => {
-    if (currentID) { reset({ status: true }); fetchData(); }
-    else { reset({ status: true }); setFiles([]); }
+    if (currentID) {
+      reset({ status: true });
+      fetchData();
+    } else {
+      reset({ status: true });
+      setFiles([]);
+    }
   }, [currentID, open]);
 
   const onSubmit = async (tenant: SalePointDto) => {
     setloadding(true);
     var filesConvert: AttachmentsFile[] = [];
     files.forEach((m: File | object | any) => {
-
       if (m instanceof File && m !== null && m !== undefined) {
-        filesConvert = [...filesConvert, { url: "", file: m }]
-      }
-      else if (typeof m === 'object' && m !== null && m !== undefined) {
-        filesConvert = [...filesConvert, { url: m.name as string, file: undefined }]
+        filesConvert = [...filesConvert, { url: '', file: m }];
+      } else if (typeof m === 'object' && m !== null && m !== undefined) {
+        filesConvert = [
+          ...filesConvert,
+          { url: m.name as string, file: undefined },
+        ];
       }
     });
 
@@ -163,26 +184,27 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
       const data = await service.update(currentID, tenant);
       setloadding(false);
       if (data.status >= 500) {
-        setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
-      }
-      else if (data.status !== 200) {
+        setNotification({
+          message: 'Không thể gửi dữ liệu.',
+          severity: 'error',
+        });
+      } else if (data.status !== 200) {
         setNotification({ message: data.data, severity: 'error' });
-      }
-      else {
+      } else {
         setNotification({ message: data.data, severity: 'success' });
         handleClose();
       }
-    }
-    else {
+    } else {
       const data = await service.create(tenant);
       setloadding(false);
       if (data.status >= 500) {
-        setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
-      }
-      else if (data.status !== 200) {
+        setNotification({
+          message: 'Không thể gửi dữ liệu.',
+          severity: 'error',
+        });
+      } else if (data.status !== 200) {
         setNotification({ message: data.data, severity: 'error' });
-      }
-      else {
+      } else {
         setNotification({ message: data.data, severity: 'success' });
         handleClose();
       }
@@ -334,7 +356,6 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
               </Grid>
 
               <Grid item xs={12} md={6}></Grid>
-
             </Grid>
           </FormGroup>
         </FormContent>

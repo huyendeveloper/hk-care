@@ -88,6 +88,18 @@ class ProductService {
       },
     });
   }
+
+  updateNorm(productId: number, norm: number) {
+    return axiosClient.put(
+      `${baseURL}/ProductList/UpdateNorm?productListId=${productId}&norm=${norm}`
+    );
+    // return axiosClient.put(`${baseURL}/ProductList/UpdateNorm`, null, {
+    //   params: {
+    //     productId,
+    //     norm,
+    //   },
+    // });
+  }
 }
 
 export default new ProductService();

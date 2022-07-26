@@ -3,10 +3,8 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { useDebounce } from 'react-use';
 
 export interface Label extends FieldValues {
   name: string;
@@ -29,6 +27,7 @@ interface Props<T, O extends FieldValues[]>
   handleChangeInput?: (value: string) => void;
   loading?: boolean;
   disableClearable?: boolean;
+  moreInfor?: keyof O[number] & string;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -49,13 +48,15 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     getOptionDisabled,
     handleChangeInput,
     loading = false,
+    moreInfor,
     disableClearable = false,
     ...rest
   } = props;
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.id;
+    const desc = moreInfor ? option[moreInfor] : '';
     const caption = sublabel ? sublabel(option) : null;
-    acc[id] = { id, name: renderLabel(option), caption };
+    acc[id] = { id, name: renderLabel(option), caption, desc };
     return acc;
   }, {});
 
@@ -89,11 +90,17 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
             );
           }}
           renderOption={(props, option: number) => {
-            const { name, caption } = labels[option];
+            const { name, caption, desc } = labels[option];
             return (
               <Box component="li" {...props} key={option}>
                 <Box>
                   {name || ''}
+                  {moreInfor && (
+                    <>
+                      <br />
+                      {desc}
+                    </>
+                  )}
                   {caption && (
                     <Typography variant="caption" display="block">
                       {caption}

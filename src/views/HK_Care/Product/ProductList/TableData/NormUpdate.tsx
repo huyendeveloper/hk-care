@@ -3,28 +3,57 @@ import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton, Paper, Stack } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { IQuota } from 'interface';
+import { useNotification } from 'hooks';
+import { INorm } from 'interface';
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { updateNorm } from 'redux/slices/productList';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({});
 
 interface IProps {
-  quota: number;
+  norm: number;
+  productId: number;
+  showBackdrop: boolean;
+  setShowBackdrop: (showBackdrop: boolean) => void;
 }
 
-const QuotaUpdate = ({ quota }: IProps) => {
+const NormUpdate = ({
+  norm,
+  productId,
+  showBackdrop,
+  setShowBackdrop,
+}: IProps) => {
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
   const [editing, setEditing] = useState<boolean>(false);
 
-  const { control, setValue, getValues, handleSubmit } = useForm<IQuota>({
+  const { control, setValue, getValues, handleSubmit } = useForm<INorm>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
-    defaultValues: { quota },
+    defaultValues: { norm },
   });
 
-  const onSubmit = async (payload: IQuota) => {
-    console.log('payload', payload);
+  const onSubmit = async (body: INorm) => {
+    setShowBackdrop(true);
+    const { error, payload } = await dispatch(
+      // @ts-ignore
+      updateNorm({ productId, norm: body.norm })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: payload.message,
+      severity: 'success',
+    });
+    // fetchData();
+    setShowBackdrop(false);
+    setEditing(false);
   };
 
   const handleOpenEditing = useCallback(() => {
@@ -39,11 +68,12 @@ const QuotaUpdate = ({ quota }: IProps) => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <ControllerNumberInput
-          name="quota"
+          name="norm"
           setValue={setValue}
-          defaultValue={getValues(`quota`)}
+          defaultValue={getValues(`norm`)}
           inputProps={{ style: { width: '52px' } }}
           control={control}
+          disabled={!editing}
         />
         {editing && (
           <IconButton type="submit">
@@ -60,4 +90,4 @@ const QuotaUpdate = ({ quota }: IProps) => {
   );
 };
 
-export default React.memo(QuotaUpdate);
+export default React.memo(NormUpdate);
