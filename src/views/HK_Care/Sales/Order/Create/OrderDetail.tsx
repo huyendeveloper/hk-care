@@ -14,21 +14,21 @@ interface IProps {
 }
 
 const OrderDetail = ({ control, setValue, getValues }: IProps) => {
-  const createOrderDetailDtos = useWatch({
+  const orderDetailDtos = useWatch({
     control,
-    name: 'createOrderDetailDtos',
+    name: 'orderDetailDtos',
   });
 
   const bill = useMemo(
     () =>
-      createOrderDetailDtos
-        ? createOrderDetailDtos.reduce(
+      orderDetailDtos
+        ? orderDetailDtos.reduce(
             // @ts-ignore
             (prev, cur) => prev + (Number(cur?.billPerProduct) || 0),
             0
           )
         : 0,
-    [createOrderDetailDtos]
+    [orderDetailDtos]
   );
   const discountValue = useWatch({ control, name: 'disCount' }) || 0;
   const paid = useWatch({ control, name: 'giveMoney' }) || 0;
@@ -49,6 +49,11 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     ],
     []
   );
+
+  useEffect(() => {
+    setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
@@ -99,7 +104,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         </Box>
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
-        <div>Tổng tiền: ({createOrderDetailDtos?.length || 0} sản phẩm)</div>
+        <div>Tổng tiền: ({orderDetailDtos?.length || 0} sản phẩm)</div>
         <div>{numberFormat(bill)}</div>
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">

@@ -29,7 +29,7 @@ const OrderProduct = ({
   getValues,
   handleRemove,
 }: IProps) => {
-  const object = `createOrderDetailDtos.${index}`;
+  const object = `orderDetailDtos.${index}`;
   const product = useWatch({
     control,
     name: `${object}`,

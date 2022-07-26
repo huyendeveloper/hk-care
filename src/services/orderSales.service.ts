@@ -11,7 +11,7 @@ interface OrderSales {
   giveMoney: number;
   orderId?: number;
   description: string;
-  createOrderDetailDtos: {
+  orderDetailDtos: {
     productId: number;
     productName: string;
     quantity: number;

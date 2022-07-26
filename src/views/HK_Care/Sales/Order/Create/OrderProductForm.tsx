@@ -53,7 +53,7 @@ interface IForm {
     giveMoney: number;
     description: string;
   };
-  createOrderDetailDtos: {
+  orderDetailDtos: {
     productId: number;
     productName: string;
     quantity: number;
@@ -109,7 +109,7 @@ const OrderProductForm = ({
 
   const { fields, append, remove } = useFieldArray<IForm>({
     control,
-    name: `createOrderDetailDtos`,
+    name: `orderDetailDtos`,
   });
 
   useEffect(() => {
@@ -130,7 +130,7 @@ const OrderProductForm = ({
   }, [productSales]);
 
   const onSubmit = async (body: OrderSales) => {
-    if (body.createOrderDetailDtos.length < 1) {
+    if (body.orderDetailDtos.length < 1) {
       setNotification({ error: 'Bạn chưa chọn sản phẩm nào!' });
       return;
     }
@@ -138,7 +138,7 @@ const OrderProductForm = ({
     if (id) {
       const { error } = await dispatch(
         // @ts-ignore
-        updateSalesOrder({ ...body, orderId: id })
+        updateSalesOrder({ ...body, orderId: Number(id) })
       );
       if (error) {
         setNotification({ error: 'Lỗi!' });
