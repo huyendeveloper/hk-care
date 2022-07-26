@@ -51,11 +51,11 @@ const DashboardNavbar: FC<Props> = (props) => {
   return (
     <StyledAppBar open={openDrawer} elevation={0}>
       <Toolbar>
-        {/* <Hidden lgDown>
+        <Hidden lgDown>
           <IconButton edge="start">
             <MenuIcon />
           </IconButton>
-        </Hidden> */}
+        </Hidden>
         <Hidden lgUp>
           <IconButton onClick={onToggleMobileSidebar}>
             <MenuIcon />

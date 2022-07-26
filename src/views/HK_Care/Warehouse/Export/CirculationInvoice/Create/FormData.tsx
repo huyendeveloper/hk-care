@@ -345,12 +345,15 @@ const FormData = ({ defaultValue }: IProps) => {
                                     backgroundImage:
                                       'https://www.vigcenter.com/public/all/images/default-image.jpg',
                                   }}
-                                  src={`${connectURL}/${item.path}`}
+                                  src={
+                                    item.path === ''
+                                      ? '/static/default.jpg'
+                                      : `${connectURL}/${item.path}`
+                                  }
                                   alt=""
                                 />
                                 <Box pl={2}>{item.name}</Box>
                               </Stack>
-                              {/* <div>Có thể bán: {item.amount}</div> */}
                             </Stack>
                           ))}
                       </Stack>

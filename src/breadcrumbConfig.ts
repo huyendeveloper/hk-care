@@ -77,19 +77,17 @@ const breadcrumbConfig = (tennant: string) => {
     },
     // hk care
     { breadcrumb: tennant, path: '/hk_care' },
-    { breadcrumb: 'Quản lý sản phẩm', path: '/hk_care/product' },
     { breadcrumb: 'Danh sách sản phẩm', path: '/hk_care/product/list' },
     // hk care warehouse
     { breadcrumb: 'Quản lý kho', path: '/hk_care/warehouse' },
-    { breadcrumb: 'Phân quyền người dùng', path: '/hk_care/roles' },
+    { breadcrumb: 'Phân quyền', path: '/hk_care/operate/roles' },
     { breadcrumb: 'Yêu cầu nhập kho', path: '/hk_care/warehouse/request' },
     {
       breadcrumb: 'Biên bản kiểm kê kho',
       path: '/hk_care/warehouse/inventory_record',
     },
-    { breadcrumb: 'Nhập kho', path: '/hk_care/warehouse/import' },
     {
-      breadcrumb: 'Hóa đơn nhập kho',
+      breadcrumb: 'Nhập kho',
       path: '/hk_care/warehouse/import/receipt',
     },
     {
@@ -109,7 +107,7 @@ const breadcrumbConfig = (tennant: string) => {
     },
     {
       exact: true,
-      breadcrumb: 'Báo cáo/Thống kê',
+      breadcrumb: 'Báo cáo',
       path: '/hk_care/sales_statistical',
     },
     {
@@ -129,7 +127,7 @@ const breadcrumbConfig = (tennant: string) => {
     },
     // hk care sales
     { breadcrumb: 'Quản lý bán hàng', path: '/hk_care/sales' },
-    { breadcrumb: 'Hóa đơn bán hàng', path: '/hk_care/sales/order' },
+    { breadcrumb: 'Danh sách hóa đơn', path: '/hk_care/sales/order' },
     // hk trading
     {
       breadcrumb: 'HK Trading',
