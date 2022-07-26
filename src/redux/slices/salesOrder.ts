@@ -11,7 +11,7 @@ interface OrderSales {
   orderId?: number;
   moneyToPay: number;
   orderType: number;
-  createOrderDetailDtos: {
+  orderDetailDtos: {
     productId: number;
     productName: string;
     quantity: number;
@@ -43,7 +43,7 @@ const initialState: IInitialState = {
       giveMoney: 0,
       orderType: 1,
       description: '',
-      createOrderDetailDtos: [],
+      orderDetailDtos: [],
       moneyToPay: 0,
     },
   ],

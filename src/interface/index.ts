@@ -222,7 +222,7 @@ export interface OrderSales {
   disCount: number;
   giveMoney: number;
   description: string;
-  createOrderDetailDtos: {
+  orderDetailDtos: {
     productId: number;
     productName: string;
     quantity: number;
@@ -330,12 +330,12 @@ export interface INorm {
 
 export interface IInventoryRecordProduct {
   id: number;
-  productName: string;
-  measureName: string;
-  stockQuantityApp: number;
-  realStockQuantity: number;
-  importPrice: number;
-  price: number;
+  name: string;
+  unit: string;
+  amountOld: number;
+  amountNew: number;
+  priceImport: number;
+  priceExport: number;
 }
 
 export interface IInventoryRecord {
@@ -344,8 +344,8 @@ export interface IInventoryRecord {
   date: Date;
   staff: string;
   totalRevenueDiff: number;
-  description?: string;
-  inventoryRecordProducts?: IInventoryRecordProduct[];
+  Note?: string;
+  Items?: IInventoryRecordProduct[];
 }
 
 export interface IUser {

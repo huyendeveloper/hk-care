@@ -30,7 +30,7 @@ interface IForm {
   giveMoney: number;
   description: string;
   moneyToPay: number;
-  createOrderDetailDtos: {
+  orderDetailDtos: {
     productId: number;
     productName: string;
     quantity: number;
@@ -66,12 +66,13 @@ const Create = () => {
   const handleSaveCurrentTab = async (newTab: string) => {
     dispatch(updateOrderSales({ id: ids[Number(tab)], ...getValues() }));
     const orderSale = orderSales.find((x) => x.id === ids[Number(newTab)]);
+
     setValue('disCount', orderSale?.disCount || 0);
     setValue('giveMoney', orderSale?.giveMoney || 0);
     setValue('description', orderSale?.description || '');
     setValue('orderType', orderSale?.orderType || 1);
     setValue('moneyToPay', orderSale?.moneyToPay || 0);
-    setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
+    setValue('orderDetailDtos', orderSale?.orderDetailDtos || []);
   };
 
   const handleAddTab = async () => {
@@ -84,7 +85,7 @@ const Create = () => {
         giveMoney: 0,
         description: '',
         moneyToPay: 0,
-        createOrderDetailDtos: [],
+        orderDetailDtos: [],
       })
     );
 
@@ -125,8 +126,8 @@ const Create = () => {
 
     reset({
       disCount,
-      createOrderDetailDtos: orderDetailDtos,
-      moneyToPay: giveMoney,
+      orderDetailDtos: orderDetailDtos,
+      giveMoney,
       description,
       orderType,
     });
@@ -160,7 +161,7 @@ const Create = () => {
     setValue('giveMoney', orderSale?.giveMoney || 0);
     setValue('description', orderSale?.description || '');
     setValue('orderType', orderSale?.orderType || 1);
-    setValue('createOrderDetailDtos', orderSale?.createOrderDetailDtos || []);
+    setValue('orderDetailDtos', orderSale?.orderDetailDtos || []);
   };
 
   return (
