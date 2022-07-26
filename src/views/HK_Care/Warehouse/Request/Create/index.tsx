@@ -190,10 +190,10 @@ const Create = () => {
   });
 
   const addProduct = async () => {
-    setLoadingAdd(true);
     if (!productIdAdd) {
       return;
     }
+    setLoadingAdd(true);
     const { data } = await expectedService.addExpectedDetail(productIdAdd);
     append(data);
     setLoadingAdd(false);

@@ -118,7 +118,7 @@ const HKCareRoutes: RouteObject = {
       children: [{ index: true, element: <CreateInventoryRecord /> }],
     },
     {
-      path: 'roles',
+      path: 'operate/roles',
       children: [{ index: true, element: <Roles /> }],
     },
     {

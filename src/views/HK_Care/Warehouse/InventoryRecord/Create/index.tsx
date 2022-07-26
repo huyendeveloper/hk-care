@@ -13,7 +13,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
@@ -25,9 +25,9 @@ import {
   FormHeader,
   FormLabel,
   FormPaperGrid,
-  Selecter
+  Selecter,
 } from 'components/Form';
-import { TableContent, TableWrapper } from 'components/Table';
+import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -189,6 +189,21 @@ const Create = () => {
     setOpenMapDialog(false);
   };
 
+  const handleChangePage = (pageIndex: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex,
+    }));
+  };
+
+  const handleChangeRowsPerPage = (rowsPerPage: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex: 1,
+      pageSize: rowsPerPage,
+    }));
+  };
+
   return (
     <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm bản kiểm kho'}>
       <Stack gap={2}>
@@ -275,65 +290,82 @@ const Create = () => {
                         />
 
                         <TableBody>
-                          {inventoryRecordProducts.map((item, index) => {
-                            const {
-                              productName,
-                              measureName,
-                              stockQuantityApp,
-                              realStockQuantity,
-                              importPrice,
-                              price,
-                            } = item;
-                            return (
-                              <TableRow hover tabIndex={-1} key={index}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell
-                                  sx={{ padding: 0, width: 'fit-content' }}
-                                >
-                                  <IconButton
-                                    sx={{ mr: 0.5, p: 0 }}
-                                    color="inherit"
-                                    // onClick={handleClose}
+                          {[...inventoryRecordProducts]
+                            .splice(
+                              (filters.pageIndex - 1) * 10,
+                              filters.pageIndex * 10
+                            )
+                            .map((item, index) => {
+                              const {
+                                productName,
+                                measureName,
+                                stockQuantityApp,
+                                realStockQuantity,
+                                importPrice,
+                                price,
+                              } = item;
+                              return (
+                                <TableRow hover tabIndex={-1} key={index}>
+                                  <TableCell>{index + 1}</TableCell>
+                                  <TableCell
+                                    sx={{ padding: 0, width: 'fit-content' }}
                                   >
-                                    <CloseIcon />
-                                  </IconButton>
-                                </TableCell>
-                                <TableCell>{productName}</TableCell>
-                                <TableCell>{measureName}</TableCell>
-                                <TableCell>
-                                  {numberFormat(stockQuantityApp)}
-                                </TableCell>
-                                <TableCell>
-                                  {numberFormat(realStockQuantity)}
-                                </TableCell>
-                                <TableCell>
-                                  {numberFormat(
-                                    stockQuantityApp - realStockQuantity
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  {numberFormat(importPrice)}
-                                </TableCell>
-                                <TableCell>
-                                  {numberFormat(
-                                    importPrice *
-                                      (stockQuantityApp - realStockQuantity)
-                                  )}
-                                </TableCell>
-                                <TableCell>{numberFormat(price)}</TableCell>
-                                <TableCell>
-                                  {numberFormat(
-                                    price *
-                                      (stockQuantityApp - realStockQuantity)
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                                    <IconButton
+                                      sx={{ mr: 0.5, p: 0 }}
+                                      color="inherit"
+                                      // onClick={handleClose}
+                                    >
+                                      <CloseIcon />
+                                    </IconButton>
+                                  </TableCell>
+                                  <TableCell>{productName}</TableCell>
+                                  <TableCell>{measureName}</TableCell>
+                                  <TableCell>
+                                    {numberFormat(stockQuantityApp)}
+                                  </TableCell>
+                                  <TableCell>
+                                    {numberFormat(realStockQuantity)}
+                                  </TableCell>
+                                  <TableCell>
+                                    {numberFormat(
+                                      stockQuantityApp - realStockQuantity
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {numberFormat(importPrice)}
+                                  </TableCell>
+                                  <TableCell>
+                                    {numberFormat(
+                                      importPrice *
+                                        (stockQuantityApp - realStockQuantity)
+                                    )}
+                                  </TableCell>
+                                  <TableCell>{numberFormat(price)}</TableCell>
+                                  <TableCell>
+                                    {numberFormat(
+                                      price *
+                                        (stockQuantityApp - realStockQuantity)
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                         </TableBody>
                       </Table>
                     </Scrollbar>
                   </TableContainer>
+                  <Grid container alignItems="center">
+                    <Grid item xs={12}>
+                      <TablePagination
+                        pageIndex={filters.pageIndex}
+                        totalPages={inventoryRecordProducts.length}
+                        onChangePage={handleChangePage}
+                        onChangeRowsPerPage={handleChangeRowsPerPage}
+                        rowsPerPage={filters.pageSize}
+                        rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                      />
+                    </Grid>
+                  </Grid>
                 </TableContent>
               </TableWrapper>
               <table style={{ float: 'right' }}>
