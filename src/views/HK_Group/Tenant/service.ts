@@ -56,6 +56,9 @@ class TenantService {
                     }
                 });
             }
+            else{
+                params.append(`attachments`, ''.toString());
+            }
 
             const token = LocalStorage.get('accessToken');
 

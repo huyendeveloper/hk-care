@@ -64,10 +64,6 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
   //const [pathFile, setPathFile] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
 
-  useEffect(() => {
-    console.log(files);
-  }, [files]);
-
   const { control, handleSubmit, setValue, reset } = useForm<SalePointDto>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -79,7 +75,8 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
   }, [disable, open]);
 
   const status = useWatch({ control, name: 'status' });
-
+  
+  const [loadding, setloadding] = useState<boolean>(false);
   // const uploadFile = async () => {
   //   // @ts-ignore
   //   let filePaths = [];
@@ -149,7 +146,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
   }, [currentID, open]);
 
   const onSubmit = async (tenant: SalePointDto) => {
-    loading = true;
+    setloadding(true);
     var filesConvert: AttachmentsFile[] = [];
     files.forEach((m: File | object | any) => {
 
@@ -164,6 +161,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
     tenant.attachments = filesConvert;
     if (currentID) {
       const data = await service.update(currentID, tenant);
+      setloadding(false);
       if (data.status >= 500) {
         setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
       }
@@ -177,6 +175,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
     }
     else {
       const data = await service.create(tenant);
+      setloadding(false);
       if (data.status >= 500) {
         setNotification({ message: "Không thể gửi dữ liệu.", severity: 'error' });
       }
@@ -188,6 +187,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
         handleClose();
       }
     }
+    
   };
 
   return (
@@ -195,7 +195,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            currentID ? 'Chỉnh sửa thông tin điểm bán' : 'Thêm mới điểm bán'
+            disabled ? "Xem thông tin điểm bán": (currentID ? 'Chỉnh sửa thông tin điểm bán' : 'Thêm mới điểm bán')
           }
         />
 
@@ -349,7 +349,7 @@ const FormDialog = ({ open, handleClose, currentID, disable, loading = false, }:
             </Button>
           )}
 
-          {!disabled && <LoadingButton loading={loading} type="submit">Lưu</LoadingButton>}
+          {!disabled && <LoadingButton loading={loadding} type="submit">Lưu</LoadingButton>}
 
         </FormFooter>
       </FormPaperGrid>
