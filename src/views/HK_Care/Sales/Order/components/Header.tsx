@@ -107,36 +107,43 @@ const Header = ({
                 overflowY: 'scroll',
                 zIndex: 99,
               }}
+              p={loading ? 2 : 0}
             >
-              {products.map((item, index) => (
-                <Stack
-                  flexDirection="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  key={index}
-                  onClick={() => addItem({ ...item, quantity: 1 })}
-                  p={2}
-                  sx={{ borderBottom: '1px solid #d9d9d9' }}
-                >
-                  <Stack flexDirection="row">
-                    <Box
-                      component="img"
-                      sx={{
-                        width: '100px',
-                        height: '70px',
-                      }}
-                      src={
-                        item.productImage === ''
-                          ? '/static/default.jpg'
-                          : `${connectURL}/${item.productImage}`
-                      }
-                      alt=""
-                    />
-                    <Box pl={2}>{item.productName}</Box>
-                  </Stack>
-                  <div>Có thể bán: {numberFormat(item.stockQuantity)}</div>
-                </Stack>
-              ))}
+              {loading ? (
+                'Đang tải . . .'
+              ) : (
+                <>
+                  {products.map((item, index) => (
+                    <Stack
+                      flexDirection="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      key={index}
+                      onClick={() => addItem({ ...item, quantity: 1 })}
+                      p={2}
+                      sx={{ borderBottom: '1px solid #d9d9d9' }}
+                    >
+                      <Stack flexDirection="row">
+                        <Box
+                          component="img"
+                          sx={{
+                            width: '100px',
+                            height: '70px',
+                          }}
+                          src={
+                            item.productImage === ''
+                              ? '/static/default.jpg'
+                              : `${connectURL}/${item.productImage}`
+                          }
+                          alt=""
+                        />
+                        <Box pl={2}>{item.productName}</Box>
+                      </Stack>
+                      <div>Có thể bán: {numberFormat(item.stockQuantity)}</div>
+                    </Stack>
+                  ))}
+                </>
+              )}
             </Stack>
           )}
           {!hidden && products.length === 0 && (
@@ -182,7 +189,7 @@ const Header = ({
                         tab === index.toString() ? 'white' : '#c3c3c3',
                       pl: 2,
                       pr: 1,
-                      width: '145px',
+                      width: '129px',
                       marginX: '4px',
                       marginY: '5px',
                       borderRadius: '8px',
@@ -191,7 +198,7 @@ const Header = ({
                     Hóa đơn {item}
                     <Stack
                       justifyContent="center"
-                      p={1}
+                      paddingY={1}
                       onClick={() => handleRemoveTab(index)}
                     >
                       <CloseIcon />
@@ -204,7 +211,7 @@ const Header = ({
             />
           ))}
         </TabList>
-        {ids.length < 9 && !id && (
+        {ids.length < 10 && !id && (
           <Stack flexDirection="row" alignItems="center">
             <IconButton onClick={handleAddTab}>
               <AddIcon fontSize="large" style={{ color: 'white' }} />

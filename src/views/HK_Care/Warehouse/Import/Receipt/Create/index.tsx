@@ -44,19 +44,23 @@ import * as yup from 'yup';
 import ReceiptEntity from './ReceiptEntity';
 import TotalBill from './TotalBill';
 
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+
 const validationSchema = yup.object().shape({
   productReceiptWHDtos: yup.array().of(
     yup.object().shape({
-      lotNumber: yup.string().default(''),
-      numberRegister: yup.string().default(''),
+      lotNumber: yup.string().nullable().default(''),
+      numberRegister: yup.string().nullable().default(''),
       dateManufacture: yup
         .date()
+        .nullable()
         .notRequired()
-        .nullable(true)
         .typeError('Sai định dạng')
         .test('validateDateManufacture', 'Trước hạn sử dụng!', function (item) {
           const dateManufacture = item;
           const { expiryDate } = this.parent;
+          if (!item) return true;
           if (!dateManufacture || !expiryDate) {
             return true;
           }
@@ -64,16 +68,16 @@ const validationSchema = yup.object().shape({
             return false;
           }
           return true;
-        })
-        .default(null),
+        }),
       expiryDate: yup
         .date()
+        .nullable()
         .notRequired()
-        .nullable(true)
         .typeError('Sai định dạng')
         .test('validateExpiryDate', 'Sau ngày sản xuất!', function (item) {
           const { dateManufacture } = this.parent;
           const expiryDate = item;
+          if (!item) return true;
           if (!dateManufacture || !expiryDate) {
             return true;
           }
@@ -126,8 +130,12 @@ const CreateForm = () => {
   const cells = useMemo(() => getCells(), []);
 
   const today = useMemo(() => new Date(), []);
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
+  const yesterday = useMemo(() => {
+    const ytd = new Date();
+    ytd.setDate(today.getDate() - 1);
+    return ytd;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getPathFile = async () => {
     const { data } = await importReceiptService.getPathFileReceipt(files[0]);
@@ -239,6 +247,7 @@ const CreateForm = () => {
   }, []);
 
   const onSubmit = async (data: IReceipt) => {
+    console.log('data', data);
     // @ts-ignore
     if (data?.productReceiptWHDtos?.length < 1) {
       setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
@@ -339,8 +348,9 @@ const CreateForm = () => {
       name: productSelected.productName,
       measure: productSelected.mesureNameLevelFirst,
       amount: 0,
-      discount: 0,
-      expiryDate: productSelected.outOfDate,
+      discount: 0, // @ts-ignore
+      dateManufacture: productSelected?.dateManufacture || null,
+      expiryDate: productSelected.outOfDate || null,
     });
     setProductChoosed(null);
   };

@@ -34,7 +34,8 @@ import { IInventoryRecord, IInventoryRecordProduct } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createWhInventory } from 'redux/slices/whInventory';
 import importReceiptService from 'services/importReceipt.service';
 import whInventoryService from 'services/whInventory.service';
 import { FilterParams } from 'types';
@@ -89,6 +90,7 @@ const validationSchema = yup.object().shape({});
 const Create = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const setNotification = useNotification();
 
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
@@ -97,6 +99,7 @@ const Create = () => {
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [openMapDialog, setOpenMapDialog] = useState<boolean>(false);
   const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     idProduct: null,
@@ -115,7 +118,7 @@ const Create = () => {
   const { fields, append, remove } = useFieldArray<IInventoryRecord>({
     control,
     // @ts-ignore
-    name: `Items`,
+    name: `items`,
   });
 
   const handleOnSort = (field: string) => {
@@ -130,7 +133,7 @@ const Create = () => {
     whInventoryService
       .getNameProduct()
       .then(({ data }) => {
-        setProductList(data);
+        setProductList(data.data);
       })
       .catch((err) => {})
       .finally(() => {});
@@ -140,7 +143,7 @@ const Create = () => {
     whInventoryService
       .getGroupProduct()
       .then(({ data }) => {
-        setProductGroupList(data);
+        setProductGroupList(data.data);
       })
       .catch((err) => {})
       .finally(() => {});
@@ -155,12 +158,12 @@ const Create = () => {
     setLoadingAdd(true);
     try {
       const { data } = await whInventoryService.getwhInventory(detailAdd);
-      if (data.items.length === 0) {
+      if (data.data.length === 0) {
         setNotification({ error: 'Không có sản phẩm nào!' });
         setLoadingAdd(false);
         return;
       }
-      data.items.forEach((item: any) => {
+      data.data.forEach((item: any) => {
         // @ts-ignore
         if (!fields.some((e) => e.productId === item.productId)) {
           if (id) {
@@ -200,58 +203,46 @@ const Create = () => {
   };
 
   const onSubmit = async (body: IInventoryRecord) => {
-    let image = '';
+    let file = '';
 
     if (files.length > 0) {
       const { data } = await importReceiptService.getPathFileReceipt(files[0]);
-      image = data;
+      file = data;
     }
-    console.log('image', image);
-    console.log('body', { ...body, image });
-    // setLoading(true);
-    // const newPayload = {
-    //   ...body,
-    //   totalFee:
-    //     body.exportWHDetails.reduce(
-    //       // @ts-ignore
-    //       (prev, cur) =>
-    //         prev + (Number(cur?.amount) || 0) * (Number(cur?.importPrice) || 0),
-    //       0
-    //     ) || 0,
-    //   exportType: 4,
-    // };
-    // if (id) {
-    //   const { error } = await dispatch(
-    //     // @ts-ignore
-    //     updateExportCancel({ ...newPayload, id })
-    //   );
-    //   if (error) {
-    //     setNotification({ error: 'Lỗi!' });
-    //     setLoading(false);
-    //     return;
-    //   }
-    //   setNotification({
-    //     message: 'Cập nhật thành công',
-    //     severity: 'success',
-    //   });
-    //   setLoading(false);
-    //   return navigate(`/hk_care/warehouse/export/cancel`);
-    // }
-    // const { error } = await dispatch(
-    //   // @ts-ignore
-    //   createExportWH(newPayload)
-    // );
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   setLoading(false);
-    //   return;
-    // }
-    // setNotification({
-    //   message: 'Thêm thành công',
-    //   severity: 'success',
-    // });
-    // setLoading(false);
-    // return navigate(`/hk_care/warehouse/export/cancel`);
+    setLoading(true);
+    const newPayload = { ...body, fileAttach: [file] };
+    if (id) {
+      // const { error } = await dispatch(
+      //   // @ts-ignore
+      //   updateExportCancel({ ...newPayload, id })
+      // );
+      // if (error) {
+      //   setNotification({ error: 'Lỗi!' });
+      //   setLoading(false);
+      //   return;
+      // }
+      // setNotification({
+      //   message: 'Cập nhật thành công',
+      //   severity: 'success',
+      // });
+      // setLoading(false);
+      // return navigate(`/hk_care/warehouse/export/cancel`);
+    }
+    const { error } = await dispatch(
+      // @ts-ignore
+      createWhInventory(newPayload)
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setLoading(false);
+      return;
+    }
+    setNotification({
+      message: 'Thêm thành công',
+      severity: 'success',
+    });
+    setLoading(false);
+    return navigate('/hk_care/warehouse/inventory_record');
   };
 
   return (
@@ -352,7 +343,7 @@ const Create = () => {
                                     <IconButton
                                       sx={{ mr: 0.5, p: 0 }}
                                       color="inherit"
-                                      // onClick={handleClose}
+                                      onClick={() => remove(index)}
                                     >
                                       <CloseIcon />
                                     </IconButton>
@@ -426,16 +417,16 @@ const Create = () => {
               </table>
               <Grid container>
                 <Grid item xs={12} md={6} pr={2}>
-                  <FormLabel title="Ghi chú" name="Note" />
+                  <FormLabel title="Ghi chú" name="note" />
                   <ControllerTextarea
                     maxRows={11}
                     minRows={11}
-                    name="Note"
+                    name="note"
                     control={control}
                   />
                 </Grid>
                 <Grid item xs={12} md={6} pl={2}>
-                  <FormLabel title="File đính kèm" name="Note" />
+                  <FormLabel title="File đính kèm" name="note" />
                   <ControllerMultiFile
                     files={files}
                     setFiles={setFiles}
@@ -451,7 +442,7 @@ const Create = () => {
             <LinkButton to="/hk_care/warehouse/inventory_record">
               Hủy
             </LinkButton>
-            <LoadingButton type="submit">
+            <LoadingButton type="submit" loading={loading}>
               {id ? 'Lưu' : 'Chốt kiểm kê'}
             </LoadingButton>
           </FormFooter>

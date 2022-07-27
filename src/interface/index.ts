@@ -344,8 +344,8 @@ export interface IInventoryRecord {
   date: Date;
   staff: string;
   totalRevenueDiff: number;
-  Note?: string;
-  Items?: IInventoryRecordProduct[];
+  note?: string;
+  items?: IInventoryRecordProduct[];
 }
 
 export interface IUser {
@@ -387,4 +387,8 @@ export interface ISalesReport {
   staffName: string;
   saleDate: Date;
   orderValue: number;
+}
+
+export interface IWhInventory {
+  id: number;
 }

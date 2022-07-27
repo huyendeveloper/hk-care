@@ -1,3 +1,4 @@
+import DownloadIcon from '@mui/icons-material/Download';
 import { DatePicker, LoadingButton } from '@mui/lab';
 import {
   Box,
@@ -11,7 +12,6 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { Selecter } from 'components/Form';
-import ChooseOption from 'components/Form/ChooseOption';
 import { TableContent, TableWrapper } from 'components/Table';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -22,7 +22,6 @@ import { getAllImportReceipt } from 'redux/slices/importReceipt';
 import type { FilterParams } from 'types/common';
 import DefaultFilter from '../components/DefaultFilter';
 import FilterByStaff from '../components/FilterByStaff';
-import DownloadIcon from '@mui/icons-material/Download';
 
 const TableData = () => {
   const dispatch = useDispatch();
@@ -35,7 +34,7 @@ const TableData = () => {
   const [staffList, setStaffList] = useState<IStaff[]>([]);
 
   useEffect(() => {
-    setStaffList([{ id: 1, name: 'Nguyễn Thu Trang' }]);
+    setStaffList([{ id: 1, name: 'Nhân viên bán hàng' }]);
   }, []);
 
   const onChangeSelect = (value: number | null) => {

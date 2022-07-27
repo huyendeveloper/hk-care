@@ -57,7 +57,7 @@ const ProductEntity = ({
           {getValues(`${object}.expectedAuto`)}
         </Box>
       </TableCell>
-      <TableCell sx={{ width: '140px' }}>
+      <TableCell sx={{ width: '140px !important' }}>
         {id ? (
           getValues(`${object}.expectedMore`)
         ) : (

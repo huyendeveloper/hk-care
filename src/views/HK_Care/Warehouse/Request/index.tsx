@@ -3,7 +3,7 @@ import TableData from './TableData';
 
 const Receipt = () => {
   return (
-    <PageWrapper title="Yêu cầu nhập kho">
+    <PageWrapper title="Yêu cầu nhập hàng">
       <TableData />
     </PageWrapper>
   );
