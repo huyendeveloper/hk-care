@@ -68,11 +68,12 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: IProductExportCancel, index) => {
-          const { id, code, creationTime, cancellationPrice } = item;
+          const { id, code, creationTime, cancellationPrice, rowId } = item;
           return (
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell>
-                {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                {/* {(filters.pageIndex - 1) * filters.pageSize + index + 1 } */}
+                {rowId}
               </TableCell>
               <TableCell>{code}</TableCell>
               <TableCell>{formatDateTime(creationTime)}</TableCell>

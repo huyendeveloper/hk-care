@@ -5,7 +5,6 @@ import {
   FormGroup,
   Grid,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableContainer,
@@ -29,9 +28,7 @@ import {
   TablePagination,
   TableWrapper,
 } from 'components/Table';
-import SearchField from 'components/Table/SearchField';
 import { Cells } from 'components/Table/TableHeader';
-import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IExportWHRotation, ITenant } from 'interface';
@@ -97,7 +94,6 @@ const FormData = ({ defaultValue }: IProps) => {
   const [productList, setProductList] = useState<IProductListName[]>([]);
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
   const [loadingTenant, setLoadingTenant] = useState<boolean>(true);
-  const [hidden, setHidden] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -220,24 +216,6 @@ const FormData = ({ defaultValue }: IProps) => {
     setFilters((state) => ({
       ...state,
       sortBy: field,
-    }));
-  };
-
-  const handleClose = () => {
-    setHidden(true);
-  };
-
-  const timer = () => {
-    setTimeout(() => {
-      handleClose();
-    }, 500);
-  };
-
-  const handleSearch = (searchText: string) => {
-    setFilters((state) => ({
-      ...state,
-      searchText,
-      pageSize: 1000,
     }));
   };
 

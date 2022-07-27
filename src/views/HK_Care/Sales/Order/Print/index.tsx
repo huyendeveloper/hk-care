@@ -115,7 +115,6 @@ const PrintOrder = () => {
               <Box sx={{ mb: 2 }}>Điện thoại: 0337664222</Box>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <h6 style={{ fontSize: '13px', margin: 0 }}>
-                  {' '}
                   HÓA ĐƠN BÁN HÀNG
                 </h6>
                 (Ngày {moment(order?.saleDate).format('DD/MM/YYYY')})
@@ -128,7 +127,7 @@ const PrintOrder = () => {
                   Mã HĐ: <b>{order?.code}</b>
                 </div>
               </Stack>
-              <table style={{ marginBottom: '20px' }}>
+              <table style={{ marginBottom: '20px', width: '100%' }}>
                 <thead>
                   <tr>
                     <td colSpan={5} style={{ padding: '0' }}>

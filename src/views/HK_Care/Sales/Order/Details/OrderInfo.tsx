@@ -29,7 +29,7 @@ const OrderInfo = ({ order }: IProps) => {
         >
           <Typography variant="h5">Thông tin khách hàng</Typography>
           <div>
-            Khách hàng: <b>Nguyễn Thu Trang</b> - <b>0123456789</b>
+            Khách hàng: <b>Nhân viên bán hàng</b> - <b>0123456789</b>
           </div>
         </TableWrapper>
         <TableWrapper
@@ -155,7 +155,7 @@ const OrderInfo = ({ order }: IProps) => {
             </tr>
             <tr>
               <td>Bán bởi:</td>
-              <td>Nguyễn Thu Trang</td>
+              <td>Nhân viên bán hàng</td>
             </tr>
             <tr>
               <td>Ngày bán:</td>

@@ -104,7 +104,9 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         </Box>
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
-        <div>Tổng tiền: ({orderDetailDtos?.length || 0} sản phẩm)</div>
+        <div>
+          Tổng tiền: (<b>{orderDetailDtos?.length || 0}</b> sản phẩm)
+        </div>
         <div>{numberFormat(bill)}</div>
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">

@@ -66,7 +66,6 @@ export const getExpected = createAsyncThunk(
   async (payload: string, { rejectWithValue }) => {
     try {
       const { data } = await expectedService.getExpected(payload);
-      console.log('data', data);
       return { expected: data };
     } catch (error) {
       return rejectWithValue(error);

@@ -160,7 +160,7 @@ const Create = () => {
         return;
       }
       setNotification({
-        message: 'Tạo yêu cầu nhập kho thành công',
+        message: 'Tạo yêu cầu nhập hàng thành công',
         severity: 'success',
       });
 

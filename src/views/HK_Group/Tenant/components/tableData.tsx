@@ -2,18 +2,33 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
+import {
+  Button,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
-import { TableContent, TableHeader, TablePagination, TableSearchField, TableWrapper } from 'components/Table';
+import {
+  TableContent,
+  TableHeader,
+  TablePagination,
+  TableSearchField,
+  TableWrapper,
+} from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
-import FormDialog from './formDialog';
-import service from '../service';
 import { SalePointOutDto } from '../dto/salePointDto';
+import service from '../service';
+import FormDialog from './formDialog';
 
 const getCells = (): Cells<SalePointOutDto> => [
   { id: 'id', label: 'STT' },
@@ -28,17 +43,12 @@ const TableData = () => {
   const setNotification = useNotification();
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [tenantList, setTenantList] = useState<SalePointOutDto[]>([]);
-  //const [loading, setLoading] = useState<boolean>(true);
-  const [currentID, setCurrentID] = useState<string | null>(null);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
-  //const [currentID, setCurrentID] = useState<string | null>(null);
-  //const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [currentID, setCurrentID] = useState<string | null>(null);
+  const [tenantList, setTenantList] = useState<SalePointOutDto[]>([]);
+  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  //const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  //const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -47,16 +57,17 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    setLoading(true);
     const data = async () => await service.search(filters);
-    data().then(rel => {
-      setLoading(false);
-      setTenantList(rel.items);
-      setTotalRows(rel.totalCount);
-    }).catch(error => {
-      setLoading(false);
-      setTenantList([]);
-    });
+    data()
+      .then((rel) => {
+        setTenantList(rel.items);
+        setTotalRows(rel.totalCount);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setTenantList([]);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -100,8 +111,7 @@ const TableData = () => {
     handleCloseDeleteDialog();
     if (data.status !== 200) {
       setNotification({ message: data, severity: 'error' });
-    }
-    else {
+    } else {
       setNotification({ message: data, severity: 'success' });
     }
     setTenantList(tenantList.filter((x) => x.id !== currentID));
@@ -223,6 +233,7 @@ const TableData = () => {
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
         disable={disableView}
+        fetchTable={fetchData}
       />
 
       <DeleteDialog

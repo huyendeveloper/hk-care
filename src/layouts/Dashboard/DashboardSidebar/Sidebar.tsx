@@ -120,7 +120,7 @@ const getSections = (): SectionItem[] => [
             ],
           },
           {
-            title: 'Yêu cầu nhập kho',
+            title: 'Yêu cầu nhập hàng',
             path: '/hk_care/warehouse/request',
             roles: ['hkl2_1_2'],
           },

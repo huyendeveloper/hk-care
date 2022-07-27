@@ -52,6 +52,7 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
+    let rowId = 1;
     // @ts-ignore
     const { payload, error } = await dispatch(getAllExportWHRotation(filters));
     if (error) {
@@ -67,7 +68,8 @@ const TableData = () => {
       // @ts-ignore
       group[rotationName] = group[rotationName] ?? [];
       // @ts-ignore
-      group[rotationName].push(product);
+      group[rotationName].push({ ...product, rowId });
+      rowId = rowId + 1;
       return group;
     }, {});
 

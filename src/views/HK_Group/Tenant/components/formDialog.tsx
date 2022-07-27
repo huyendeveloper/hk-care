@@ -26,12 +26,8 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: string | null;
   data?: SalePointDto;
-  loading?: boolean;
   disable: boolean;
-}
-
-interface fileUrl {
-  url: string;
+  fetchTable: () => void;
 }
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
@@ -73,11 +69,10 @@ const FormDialog = ({
   handleClose,
   currentID,
   disable,
-  loading = false,
+  fetchTable,
 }: Props) => {
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
-  //const [pathFile, setPathFile] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
 
   const { control, handleSubmit, setValue, reset } = useForm<SalePointDto>({
@@ -91,53 +86,10 @@ const FormDialog = ({
   }, [disable, open]);
 
   const status = useWatch({ control, name: 'status' });
-  
+
   const [loadding, setloadding] = useState<boolean>(false);
-  // const uploadFile = async () => {
-  //   // @ts-ignore
-  //   let filePaths = [];
-  //   files.forEach(async (item) => {
-  //     if (
-  //       // @ts-ignore
-  //       item.type &&
-  //       // @ts-ignore
-  //       (item.type === 'application/pdf' ||
-  //         // @ts-ignore
-  //         item.type.substr(0, 5) === 'image')
-  //     ) {
-  //       //const { data } = await importReceiptService.getPathFileReceipt(item);
-  //       filePaths.push({ name: data });
-  //       // @ts-ignore
-  //       setPathFile([...pathFile, { name: data }]);
-  //       // setFiles([...files, { name: data }]); // @ts-ignore
-  //     } else {
-  //       // @ts-ignore
-  //       setPathFile([...pathFile, { name: item.name }]); // @ts-ignore
-  //       // setFiles([...files, { name: item.name }]); // @ts-ignore
-  //     }
-  //   }); // @ts-ignore
-  // };
-
-  // useEffect(() => {
-  //   const fileToUpload = files.filter(
-  //     (item) =>
-  //       // @ts-ignore
-  //       item.type &&
-  //       // @ts-ignore
-  //       (item.type === 'application/pdf' ||
-  //         // @ts-ignore
-  //         item.type.substr(0, 5) === 'image')
-  //   );
-
-  //   if (fileToUpload.length > 0) {
-  //     uploadFile();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [files]);
-
   const fetchData = async () => {
     setFiles([]);
-    // get Data
     const data = async () => await service.detail(currentID);
     data()
       .then((rel) => {
@@ -156,13 +108,14 @@ const FormDialog = ({
   };
 
   useEffect(() => {
-    if (currentID) {
+    if (currentID && open) {
       reset({ status: true });
       fetchData();
     } else {
       reset({ status: true });
       setFiles([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 
   const onSubmit = async (tenant: SalePointDto) => {
@@ -193,6 +146,7 @@ const FormDialog = ({
       } else {
         setNotification({ message: data.data, severity: 'success' });
         handleClose();
+        fetchTable();
       }
     } else {
       const data = await service.create(tenant);
@@ -207,9 +161,9 @@ const FormDialog = ({
       } else {
         setNotification({ message: data.data, severity: 'success' });
         handleClose();
+        fetchTable();
       }
     }
-    
   };
 
   return (
@@ -217,7 +171,11 @@ const FormDialog = ({
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           title={
-            disabled ? "Xem thông tin điểm bán": (currentID ? 'Chỉnh sửa thông tin điểm bán' : 'Thêm mới điểm bán')
+            disabled
+              ? 'Xem thông tin điểm bán'
+              : currentID
+              ? 'Chỉnh sửa thông tin điểm bán'
+              : 'Thêm mới điểm bán'
           }
         />
 
@@ -370,8 +328,11 @@ const FormDialog = ({
             </Button>
           )}
 
-          {!disabled && <LoadingButton loading={loadding} type="submit">Lưu</LoadingButton>}
-
+          {!disabled && (
+            <LoadingButton loading={loadding} type="submit">
+              Lưu
+            </LoadingButton>
+          )}
         </FormFooter>
       </FormPaperGrid>
     </Dialog>
