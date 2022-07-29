@@ -1,4 +1,3 @@
-import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
@@ -7,7 +6,7 @@ import {
   Divider,
   Grid,
   Stack,
-  Tooltip,
+  Tooltip
 } from '@mui/material';
 
 interface Props {

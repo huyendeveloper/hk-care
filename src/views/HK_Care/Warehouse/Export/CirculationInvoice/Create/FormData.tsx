@@ -281,6 +281,8 @@ const FormData = ({ defaultValue }: IProps) => {
                       noOptionsText="Không tìm thấy sản phẩm"
                       placeholder="Thêm sản phẩm vào đơn"
                       images="path"
+                      rightContentRender="amount"
+                      rightContent="Có thể xuất: "
                       onChangeSelect={(value: number | null) => {
                         if (!value) {
                           return;

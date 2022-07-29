@@ -28,6 +28,7 @@ interface Props<T, O extends FieldValues[]>
   loading?: boolean;
   disableClearable?: boolean;
   moreInfor?: keyof O[number] & string;
+  startAdornment?: any;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -49,6 +50,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     handleChangeInput,
     loading = false,
     moreInfor,
+    startAdornment,
     disableClearable = false,
     ...rest
   } = props;
@@ -85,6 +87,11 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
                 helperText={error?.message && error.message}
                 placeholder={placeholder}
                 {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  // @ts-ignore
+                  startAdornment: startAdornment || null,
+                }}
                 {...rest}
               />
             );

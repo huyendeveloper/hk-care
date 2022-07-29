@@ -211,7 +211,8 @@ const Header = ({
             />
           ))}
         </TabList>
-        {ids.length < 10 && !id && (
+        {/* ids.length < 10 && */}
+        {!id && (
           <Stack flexDirection="row" alignItems="center">
             <IconButton onClick={handleAddTab}>
               <AddIcon fontSize="large" style={{ color: 'white' }} />

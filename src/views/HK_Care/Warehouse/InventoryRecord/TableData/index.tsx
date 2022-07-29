@@ -3,7 +3,18 @@ import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Backdrop, Box, CircularProgress, IconButton, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography
+  Backdrop,
+  Box,
+  CircularProgress,
+  IconButton,
+  Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Typography,
 } from '@mui/material';
 import { LinkButton, LinkIconButton } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
@@ -67,7 +78,9 @@ const TableData = () => {
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>([]);
+  const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>(
+    []
+  );
 
   const [currentID, setCurrentID] = useState<number | string | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
@@ -77,24 +90,27 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = () => {
-    whInventoryService.searchInventoryWH(filters).then(({ data }) => {
-      setInventoryRecord(data.data);
-      setTotalRows(data.totalCount);
-    })
-      .catch((err) => { })
-      .finally(() => { });
+    whInventoryService
+      .searchInventoryWH(filters)
+      .then(({ data }) => {
+        setInventoryRecord(data.data);
+        setTotalRows(data.totalCount);
+      })
+      .catch((err) => {})
+      .finally(() => {});
 
     //setInventoryRecord(payload.inventoryRecord);
     setLoading(false);
   };
 
   const fetchDowloadFile = (id: string) => {
-   whInventoryService.dowLoadFile(id).then((data) => {
-    })
-      .catch((err) => { })
-      .finally(() => { });
-  }
-  
+    whInventoryService
+      .dowLoadFile(id)
+      .then((data) => {})
+      .catch((err) => {})
+      .finally(() => {});
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchData();
@@ -168,7 +184,7 @@ const TableData = () => {
   const _onclickDowload = (id: string) => () => {
     handleOpen();
     fetchDowloadFile(id);
-  }
+  };
 
   const renderAction = (row: InventoryItemDto) => {
     return (
@@ -236,7 +252,12 @@ const TableData = () => {
 
               <TableBody>
                 {inventoryRecord.map((item, index) => {
-                  const { codeInventory, createByName, createByOnUtc, totalRevenue } = item;
+                  const {
+                    codeInventory,
+                    createByName,
+                    createByOnUtc,
+                    totalRevenue,
+                  } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={codeInventory}>
                       <TableCell>

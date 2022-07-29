@@ -19,6 +19,7 @@ interface Props<T, O extends FieldValues[]>
   renderLabel: (option: O[number]) => string;
   renderValue?: keyof O[number] & string;
   images?: keyof O[number] & string;
+  rightContentRender?: keyof O[number] & string;
   sublabel?: (option: O[number]) => string;
   onChangeSelect?: (id: number | null) => Promise<void> | void;
   getOptionDisabled?: (option: number) => boolean;
@@ -28,6 +29,7 @@ interface Props<T, O extends FieldValues[]>
   handleChangeInput?: (value: string) => void;
   defaultValue?: string;
   loading?: boolean;
+  rightContent?: string;
 }
 
 const Selecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -39,6 +41,7 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
     renderValue,
     images,
     sublabel,
+    rightContentRender,
     onChangeSelect,
     placeholder,
     disabled,
@@ -48,6 +51,7 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
     handleChangeInput,
     defaultValue,
     loading = false,
+    rightContent,
     ...rest
   } = props;
 
@@ -56,8 +60,17 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.productId;
     const image = images ? option[images] : null;
+    const rightContentValue = rightContentRender
+      ? option[rightContentRender]
+      : null;
     const caption = sublabel ? sublabel(option) : null;
-    acc[id] = { id, name: renderLabel(option), caption, image };
+    acc[id] = {
+      id,
+      name: renderLabel(option),
+      caption,
+      image,
+      rightContentValue,
+    };
     return acc;
   }, {});
 
@@ -101,31 +114,46 @@ const Selecter = <T extends FieldValues, O extends FieldValues[]>(
         );
       }}
       renderOption={(props, option: number) => {
-        const { name, caption, image } = labels[option];
+        const { name, caption, image, rightContentValue } = labels[option];
         return (
           <Box component="li" {...props} key={option}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {images && (
-                <Box
-                  component="img"
-                  sx={{
-                    width: '100px',
-                    height: '70px',
-                  }}
-                  src={
-                    image === ''
-                      ? '/static/default.jpg'
-                      : `${connectURL}/${image}`
-                  }
-                  alt=""
-                />
-              )}
-              {name || defaultValue}
-              {caption && (
-                <Typography variant="caption" display="block">
-                  {caption}
-                </Typography>
-              )}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                gap: 2,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {images && (
+                  <Box
+                    component="img"
+                    sx={{
+                      width: '100px',
+                      height: '70px',
+                    }}
+                    src={
+                      image === ''
+                        ? '/static/default.jpg'
+                        : `${connectURL}/${image}`
+                    }
+                    alt=""
+                  />
+                )}
+                {name || defaultValue}
+                {caption && (
+                  <Typography variant="caption" display="block">
+                    {caption}
+                  </Typography>
+                )}
+              </Box>
+
+              <Box>
+                {rightContent}
+                {rightContentValue}
+              </Box>
             </Box>
           </Box>
         );

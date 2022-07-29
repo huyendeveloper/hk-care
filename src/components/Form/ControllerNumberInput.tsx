@@ -36,33 +36,36 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
   if (type === 'percent') {
     return (
       <Controller
-        render={({ field: { ref, ...others }, fieldState: { error } }) => (
-          <NumberFormat
-            fullWidth
-            value={value}
-            customInput={TextField}
-            name={name}
-            inputRef={ref}
-            onValueChange={({ value: v }) =>
-              // @ts-ignore
-              setValue(name, v ? Number(v) : null)
-            }
-            allowedDecimalSeparators={[',', '.']}
-            decimalScale={0}
-            isNumericString
-            thousandSeparator=","
-            allowNegative={false}
-            variant={variant}
-            disabled={disabled}
-            isAllowed={(values) => {
-              const { floatValue } = values;
-              // @ts-ignore
-              return !floatValue || (floatValue <= 100 && floatValue >= 0);
-            }}
-            error={Boolean(error)}
-            inputProps={inputProps}
-          />
-        )}
+        render={({ field: { ref, ...others }, fieldState: { error } }) => {
+          console.log('error', error);
+          return (
+            <NumberFormat
+              fullWidth
+              value={value}
+              customInput={TextField}
+              name={name}
+              inputRef={ref}
+              onValueChange={({ value: v }) =>
+                // @ts-ignore
+                setValue(name, v ? Number(v) : null)
+              }
+              allowedDecimalSeparators={[',', '.']}
+              decimalScale={0}
+              isNumericString
+              thousandSeparator=","
+              allowNegative={false}
+              variant={variant}
+              disabled={disabled}
+              isAllowed={(values) => {
+                const { floatValue } = values;
+                // @ts-ignore
+                return !floatValue || (floatValue <= 100 && floatValue >= 0);
+              }}
+              error={Boolean(error)}
+              inputProps={inputProps}
+            />
+          );
+        }}
         name={name}
         control={control}
       />

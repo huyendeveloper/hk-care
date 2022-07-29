@@ -49,11 +49,17 @@ class ImportReceiptService {
   }
 
   create(payload: OrderSales) {
-    return axiosClient.post(`${baseURL}/BillOfSale/CreateBillOfSale`, payload);
+    return axiosClient.post(`${baseURL}/BillOfSale/CreateBillOfSale`, {
+      ...payload,
+      disCount: payload.disCount || 0,
+    });
   }
 
   update(payload: OrderSales) {
-    return axiosClient.put(`${baseURL}/BillOfSale/UpdateBillOfSale`, payload);
+    return axiosClient.put(`${baseURL}/BillOfSale/UpdateBillOfSale`, {
+      ...payload,
+      disCount: payload.disCount || 0,
+    });
   }
 
   getAll({
