@@ -3,17 +3,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Backdrop,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow
+  Backdrop, Box, CircularProgress, IconButton, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography
 } from '@mui/material';
-import { LinkButton } from 'components/common';
+import { LinkButton, LinkIconButton } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
 import TableContent from 'components/Table/TableContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
@@ -22,12 +14,13 @@ import TableSearchField from 'components/Table/TableSearchField';
 import TableWrapper from 'components/Table/TableWrapper';
 import { defaultFilters } from 'constants/defaultFilters';
 import useNotification from 'hooks/useNotification';
-import { IInventoryRecord } from 'interface';
+import { IInventoryRecord, InventoryItemDto } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ClickEventCurrying, FilterParams } from 'types';
 import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
+import whInventoryService from 'services/whInventory.service';
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -55,6 +48,17 @@ const getCells = (): Cells<IInventoryRecord> => [
     label: 'Thao tác',
   },
 ];
+const styleModal = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const TableData = () => {
   const dispatch = useDispatch();
@@ -63,98 +67,34 @@ const TableData = () => {
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [inventoryRecord, setInventoryRecord] = useState<IInventoryRecord[]>(
-    []
-  );
-  const [currentID, setCurrentID] = useState<number | null>(null);
+  const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>([]);
+
+  const [currentID, setCurrentID] = useState<number | string | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = async () => {
-    const payload = {
-      inventoryRecord: [
-        {
-          id: 1,
-          code: '13537-445',
-          date: new Date('8/16/2021'),
-          staff: 'Terzo',
-          totalRevenueDiff: 87872,
-        },
-        {
-          id: 2,
-          code: '36987-2460',
-          date: new Date('4/15/2022'),
-          staff: 'Davioud',
-          totalRevenueDiff: 76375,
-        },
-        {
-          id: 3,
-          code: '33992-1307',
-          date: new Date('5/5/2022'),
-          staff: 'Graber',
-          totalRevenueDiff: 18260,
-        },
-        {
-          id: 4,
-          code: '51345-115',
-          date: new Date('11/8/2021'),
-          staff: 'Duffyn',
-          totalRevenueDiff: 82972,
-        },
-        {
-          id: 5,
-          code: '22431-640',
-          date: new Date('9/21/2021'),
-          staff: 'Menichino',
-          totalRevenueDiff: 55772,
-        },
-        {
-          id: 6,
-          code: '0093-7350',
-          date: new Date('12/27/2021'),
-          staff: 'Adams',
-          totalRevenueDiff: 35887,
-        },
-        {
-          id: 7,
-          code: '52810-214',
-          date: new Date('7/21/2021'),
-          staff: 'Woodeson',
-          totalRevenueDiff: 83272,
-        },
-        {
-          id: 8,
-          code: '50523-489',
-          date: new Date('11/17/2021'),
-          staff: 'Abrahmer',
-          totalRevenueDiff: 36194,
-        },
-        {
-          id: 9,
-          code: '59779-404',
-          date: new Date('10/15/2021'),
-          staff: "O'Hartnedy",
-          totalRevenueDiff: 11672,
-        },
-        {
-          id: 10,
-          code: '59640-154',
-          date: new Date('3/16/2022'),
-          staff: 'Costa',
-          totalRevenueDiff: 58563,
-        },
-      ],
-      totalCount: 35,
-    };
+  const fetchData = () => {
+    whInventoryService.searchInventoryWH(filters).then(({ data }) => {
+      setInventoryRecord(data.data);
+      setTotalRows(data.totalCount);
+    })
+      .catch((err) => { })
+      .finally(() => { });
 
-    setInventoryRecord(payload.inventoryRecord);
-    setTotalRows(payload.totalCount);
+    //setInventoryRecord(payload.inventoryRecord);
     setLoading(false);
   };
 
+  const fetchDowloadFile = (id: string) => {
+   whInventoryService.dowLoadFile(id).then((data) => {
+    })
+      .catch((err) => { })
+      .finally(() => { });
+  }
+  
   useEffect(() => {
     setLoading(true);
     fetchData();
@@ -209,32 +149,50 @@ const TableData = () => {
     setOpenFormDialog(false);
   };
 
-  const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenUpdateDialog = (id: string) => () => {
     setCurrentID(id);
     setOpenFormDialog(true);
     setDisableView(false);
   };
 
-  const handleOpenViewDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenViewDialog = (id: string) => () => {
     setCurrentID(id);
     setDisableView(true);
     setOpenFormDialog(true);
   };
 
-  const renderAction = (row: IInventoryRecord) => {
-    return (
-      <>
-        <IconButton onClick={handleOpenViewDialog(row.id)}>
-          <VisibilityIcon />
-        </IconButton>
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-        <IconButton onClick={handleOpenUpdateDialog(row.id)}>
-          <EditIcon />
-        </IconButton>
-        <IconButton>
-          <DownloadIcon />
-        </IconButton>
-      </>
+  const _onclickDowload = (id: string) => () => {
+    handleOpen();
+    fetchDowloadFile(id);
+  }
+
+  const renderAction = (row: InventoryItemDto) => {
+    return (
+      <div style={{ display: 'flex' }}>
+        <div onClick={handleOpenViewDialog(row.codeInventory)}>
+          <LinkIconButton to={`create/${row.codeInventory}/0`}>
+            <IconButton>
+              <VisibilityIcon />
+            </IconButton>
+          </LinkIconButton>
+        </div>
+        <div onClick={handleOpenUpdateDialog(row.codeInventory)}>
+          <LinkIconButton to={`create/${row.codeInventory}/1`}>
+            <IconButton>
+              <EditIcon />
+            </IconButton>
+          </LinkIconButton>
+        </div>
+        <div onClick={_onclickDowload(row.codeInventory)}>
+          <IconButton>
+            <DownloadIcon />
+          </IconButton>
+        </div>
+      </div>
     );
   };
 
@@ -278,16 +236,16 @@ const TableData = () => {
 
               <TableBody>
                 {inventoryRecord.map((item, index) => {
-                  const { id, code, date, staff, totalRevenueDiff } = item;
+                  const { codeInventory, createByName, createByOnUtc, totalRevenue } = item;
                   return (
-                    <TableRow hover tabIndex={-1} key={id}>
+                    <TableRow hover tabIndex={-1} key={codeInventory}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell>{code}</TableCell>
-                      <TableCell>{formatDateTime(date)}</TableCell>
-                      <TableCell>{staff}</TableCell>
-                      <TableCell>{numberFormat(totalRevenueDiff)}</TableCell>
+                      <TableCell>{codeInventory}</TableCell>
+                      <TableCell>{formatDateTime(createByOnUtc)}</TableCell>
+                      <TableCell>{createByName}</TableCell>
+                      <TableCell>{numberFormat(totalRevenue)}</TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
                   );
@@ -314,6 +272,20 @@ const TableData = () => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+
+      <Modal
+        keepMounted
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="keep-mounted-modal-title"
+        aria-describedby="keep-mounted-modal-description"
+      >
+        <Box sx={styleModal}>
+          <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
+            Đang tải xuống. Vui lòng chờ!
+          </Typography>
+        </Box>
+      </Modal>
     </TableWrapper>
   );
 };

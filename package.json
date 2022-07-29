@@ -21,6 +21,7 @@
     "axios-mock-adapter": "^1.20.0",
     "core-js": "^3.23.2",
     "date-fns": "^2.28.0",
+    "js-file-download": "^0.4.12",
     "lodash.merge": "^4.6.2",
     "moment": "^2.29.3",
     "nprogress": "^0.2.0",

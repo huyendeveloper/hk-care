@@ -78,6 +78,7 @@ class TenantService {
   }
 
   public async update(id: string | undefined, input: SalePointDto | undefined) {
+    
     try {
       const params = new FormData();
       input?.name && params.append('name', input.name.toString());

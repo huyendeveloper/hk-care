@@ -1,3 +1,5 @@
+import { number } from "yup";
+
 export interface ITenant {
   id: string;
   name: string;
@@ -271,6 +273,7 @@ export interface IProductExportCancel {
   code: string;
   exportWHId: number;
   maxQuantity: number;
+  rowId?: number;
 }
 
 export interface IExportCancel {
@@ -329,13 +332,28 @@ export interface INorm {
 }
 
 export interface IInventoryRecordProduct {
-  id: number;
   name: string;
   unit: string;
+  productListId: number;
   amountOld: number;
   amountNew: number;
   priceImport: number;
   priceExport: number;
+  productId: number;
+}
+export interface IInventoryRecordProductShow extends IInventoryRecordProduct {
+  id: number;
+  quantityDifference: number;
+  moneyDifference : number;
+  estimatedRevenue:number;
+}
+
+export interface InventoryItemDto {
+  codeInventory: string;
+  createBy: string;
+  createByName: string;
+  createByOnUtc: Date;
+  totalRevenue: number;
 }
 
 export interface IInventoryRecord {

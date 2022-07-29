@@ -1,38 +1,21 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import CloseIcon from '@mui/icons-material/Close';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { LoadingButton } from '@mui/lab';
 import {
-  Button,
-  Grid,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
+  Button, Grid, Paper, Stack, Table, TableBody, TableContainer
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import {
-  ControllerMultiFile,
-  ControllerTextarea,
-  FormContent,
-  FormFooter,
-  FormHeader,
-  FormLabel,
-  FormPaperGrid,
-  Selecter,
+  ControllerMultiFile, ControllerTextarea, FormContent, FormFooter, FormHeader, FormLabel, FormPaperGrid, Selecter
 } from 'components/Form';
 import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { IInventoryRecord, IInventoryRecordProduct } from 'interface';
+import { IInventoryRecord, IInventoryRecordProduct, IInventoryRecordProductShow } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createWhInventory } from 'redux/slices/whInventory';
@@ -42,6 +25,7 @@ import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 import * as yup from 'yup';
 import MapDialog from './MapDialog';
+import ReceiptEntity from './ReceiptEntity';
 
 interface IDetailAdd {
   idProduct: number | null;
@@ -53,13 +37,12 @@ interface ISelect {
   name: string;
 }
 
-const getCells = (): Cells<IInventoryRecordProduct> => [
+const getCells = (): Cells<IInventoryRecordProductShow> => [
   { id: 'id', label: 'STT' },
-  { id: 'id', label: '' },
-  { id: 'id', label: 'Tên SP' },
-  { id: 'id', label: 'Đ.Vị' },
+  { id: 'name', label: 'Tên SP' },
+  { id: 'unit', label: 'Đ.Vị' },
   {
-    id: 'id',
+    id: 'amountOld',
     label: (
       <>
         Tồn
@@ -69,7 +52,7 @@ const getCells = (): Cells<IInventoryRecordProduct> => [
     ),
   },
   {
-    id: 'id',
+    id: 'amountNew',
     label: (
       <>
         Tồn
@@ -78,17 +61,17 @@ const getCells = (): Cells<IInventoryRecordProduct> => [
       </>
     ),
   },
-  { id: 'id', label: 'C.L' },
-  { id: 'id', label: 'Giá nhập' },
-  { id: 'id', label: 'Tiền lệch' },
-  { id: 'id', label: 'Giá bán' },
-  { id: 'id', label: 'D.T.dự tính' },
+  { id: 'quantityDifference', label: 'C.L' },
+  { id: 'priceImport', label: 'Giá nhập' },
+  { id: 'moneyDifference', label: 'Tiền lệch' },
+  { id: 'priceExport', label: 'Giá bán' },
+  { id: 'estimatedRevenue', label: 'D.T.dự tính' }
 ];
 
 const validationSchema = yup.object().shape({});
 
 const Create = () => {
-  const { id } = useParams();
+  const { id, v } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const setNotification = useNotification();
@@ -121,6 +104,97 @@ const Create = () => {
     name: `items`,
   });
 
+  const items = useWatch({
+    control,
+    name: `items`,
+  });
+
+
+  useEffect(() => {
+    getNameProduct();
+    getGroupProduct();
+    _initScreen();
+  }, []);
+
+  const _initScreen = () => {
+    if (id) {
+      setLoadingAdd(true);
+      const dataCall = async () => await whInventoryService.detailInventoryWH(id);
+      dataCall().then((data: any) => {
+        var result = data.data;
+        console.log('result :>> ', result);
+        if (result.statusCode === 400) {
+          setNotification({ error: data.data });
+        }
+        else if (result.statusCode === 200 && result.data.length === 0) {
+          setNotification({ error: 'Không có sản phẩm nào!' });
+          setLoadingAdd(false);
+          return;
+        }
+        else {
+          console.log(result.data.fileAttach);
+          setFiles(result.data.fileAttach === null ? [] : [{ name: result.data.fileAttach[0] }])
+          result.data.items.forEach((item: any) => {
+            // @ts-ignore
+            if (!fields.some((e) => e.productId === item.productId)) {
+              if (id) {
+                // @ts-ignore
+                append({ ...item, productId: item.productId, id: 0 });
+              } else {
+                // @ts-ignore
+                append({ ...item, productId: item.productId });
+              }
+            }
+          });
+          setFilters({ ...filters, sortBy: '' });
+        }
+      }).catch((err) => {
+        console.log('err :>> ', err);
+        setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
+        setLoadingAdd(false);
+      });
+      setLoadingAdd(false);
+    }
+  }
+
+  const addProduct = async () => {
+    setLoadingAdd(true);
+    try {
+      const { data } = await whInventoryService.getwhInventory(detailAdd);
+      if (data.statusCode === 400) {
+        setNotification({ error: data.data });
+      }
+      else if (data.statusCode === 200 && data.data.length === 0) {
+        setNotification({ error: 'Không có sản phẩm nào!' });
+        setLoadingAdd(false);
+        return;
+      }
+      else {
+        data.data.forEach((item: any) => {
+          // @ts-ignore
+          if (!fields.some((e) => e.productId === item.productId)) {
+            if (id) {
+              // @ts-ignore
+              append({ ...item, productId: item.id, id: 0 });
+            } else {
+              // @ts-ignore
+              append({ ...item, productId: item.productId });
+            }
+          }
+        });
+        setFilters({ ...filters, sortBy: '' });
+      }
+    } catch (error) {
+      setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
+      setLoadingAdd(false);
+    }
+    setLoadingAdd(false);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenMapDialog(false);
+  };
+
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
       ...state,
@@ -135,8 +209,8 @@ const Create = () => {
       .then(({ data }) => {
         setProductList(data.data);
       })
-      .catch((err) => {})
-      .finally(() => {});
+      .catch((err) => { })
+      .finally(() => { });
   };
 
   const getGroupProduct = () => {
@@ -145,46 +219,8 @@ const Create = () => {
       .then(({ data }) => {
         setProductGroupList(data.data);
       })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
-  useEffect(() => {
-    getNameProduct();
-    getGroupProduct();
-  }, []);
-
-  const addProduct = async () => {
-    setLoadingAdd(true);
-    try {
-      const { data } = await whInventoryService.getwhInventory(detailAdd);
-      if (data.data.length === 0) {
-        setNotification({ error: 'Không có sản phẩm nào!' });
-        setLoadingAdd(false);
-        return;
-      }
-      data.data.forEach((item: any) => {
-        // @ts-ignore
-        if (!fields.some((e) => e.productId === item.productId)) {
-          if (id) {
-            // @ts-ignore
-            append({ ...item, productId: item.id, id: 0 });
-          } else {
-            // @ts-ignore
-            append({ ...item, productId: item.productId });
-          }
-        }
-      });
-      setFilters({ ...filters, sortBy: '' });
-    } catch (error) {
-      setNotification({ error: 'Lỗi!' });
-      setLoadingAdd(false);
-    }
-    setLoadingAdd(false);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenMapDialog(false);
+      .catch((err) => { })
+      .finally(() => { });
   };
 
   const handleChangePage = (pageIndex: number) => {
@@ -204,45 +240,60 @@ const Create = () => {
 
   const onSubmit = async (body: IInventoryRecord) => {
     let file = '';
-
-    if (files.length > 0) {
+    if (files[0] instanceof File && files !== null && files !== undefined) {
       const { data } = await importReceiptService.getPathFileReceipt(files[0]);
+      console.log('data', data)
       file = data;
     }
+    else if (typeof files[0] === 'object' && files !== null && files !== undefined) {
+      console.log('files :>> ', files);
+      file = (files[0] as any).name as string;
+    }
+
     setLoading(true);
+
     const newPayload = { ...body, fileAttach: [file] };
-    if (id) {
-      // const { error } = await dispatch(
-      //   // @ts-ignore
-      //   updateExportCancel({ ...newPayload, id })
-      // );
-      // if (error) {
-      //   setNotification({ error: 'Lỗi!' });
-      //   setLoading(false);
-      //   return;
-      // }
-      // setNotification({
-      //   message: 'Cập nhật thành công',
-      //   severity: 'success',
-      // });
-      // setLoading(false);
-      // return navigate(`/hk_care/warehouse/export/cancel`);
+    if (v === '0') {
+      if (id) {
+        console.log('newPayload :>> ', newPayload);
+        whInventoryService.update(newPayload, id)
+          .then((rs) => {
+            console.log('rs', rs);
+            setLoading(false);
+            return navigate('/hk_care/warehouse/inventory_record');
+          })
+          .catch((err) => {
+            setNotification({ error: 'Lỗi!' });
+            setLoading(false);
+            return;
+          });
+      }
+      else {
+        const { error } = await dispatch(
+          // @ts-ignore
+          searchInventoryWH(newPayload)
+        );
+
+        if (error) {
+          setNotification({ error: 'Lỗi!' });
+          setLoading(false);
+          return;
+        }
+
+        setNotification({
+          message: 'Thêm thành công',
+          severity: 'success',
+        });
+
+        setLoading(false);
+        return navigate('/hk_care/warehouse/inventory_record');
+      }
     }
-    const { error } = await dispatch(
-      // @ts-ignore
-      createWhInventory(newPayload)
-    );
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
+    else {
       setLoading(false);
-      return;
+      return navigate(`/hk_care/warehouse/inventory_record/create/${id}/0`);
     }
-    setNotification({
-      message: 'Thêm thành công',
-      severity: 'success',
-    });
-    setLoading(false);
-    return navigate('/hk_care/warehouse/inventory_record');
+
   };
 
   return (
@@ -260,7 +311,7 @@ const Create = () => {
           </Button>
         </Stack>
         <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
-          <FormHeader title="Danh sách sản phẩm" />
+          <FormHeader title={id ? "Chỉnh sửa biên bản kiểm kê" : "Danh sách sản phẩm"} />
           <FormContent>
             <Grid container spacing={2} mb={2} alignItems="flex-end">
               <Grid item xs={12} md={5}>
@@ -318,7 +369,6 @@ const Create = () => {
                           sortDirection={filters.sortDirection}
                           sortBy={filters.sortBy}
                         />
-
                         <TableBody>
                           {[...fields]
                             .splice(
@@ -326,56 +376,16 @@ const Create = () => {
                               filters.pageIndex * 10
                             )
                             .map((item, index) => {
-                              const {
-                                name,
-                                unit,
-                                amountOld,
-                                amountNew,
-                                priceImport,
-                                priceExport,
-                              } = item;
                               return (
-                                <TableRow hover tabIndex={-1} key={index}>
-                                  <TableCell>{index + 1}</TableCell>
-                                  <TableCell
-                                    sx={{ padding: 0, width: 'fit-content' }}
-                                  >
-                                    <IconButton
-                                      sx={{ mr: 0.5, p: 0 }}
-                                      color="inherit"
-                                      onClick={() => remove(index)}
-                                    >
-                                      <CloseIcon />
-                                    </IconButton>
-                                  </TableCell>
-                                  <TableCell>{name}</TableCell>
-                                  <TableCell>{unit}</TableCell>
-                                  <TableCell>
-                                    {numberFormat(amountOld)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(amountNew)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(amountOld - amountNew)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(priceImport)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(
-                                      priceImport * (amountOld - amountNew)
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(priceExport)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {numberFormat(
-                                      priceExport * (amountOld - amountNew)
-                                    )}
-                                  </TableCell>
-                                </TableRow>
+                                <ReceiptEntity
+                                  product={item}
+                                  remove={remove}
+                                  index={index}
+                                  key={index}
+                                  setValue={setValue}
+                                  control={control}
+                                  arrayName="items"
+                                />
                               );
                             })}
                         </TableBody>
@@ -404,12 +414,7 @@ const Create = () => {
                     </td>
                     <td>
                       {numberFormat(
-                        [...fields].reduce(
-                          (pre, cur) =>
-                            pre +
-                            cur.priceExport * (cur.amountOld - cur.amountNew),
-                          0
-                        )
+                        items === undefined ? 0 : items.reduce((pre: any, cur: any) => pre + cur.priceExport * (cur.amountOld - cur.amountNew), 0)
                       )}
                     </td>
                   </tr>
@@ -419,6 +424,7 @@ const Create = () => {
                 <Grid item xs={12} md={6} pr={2}>
                   <FormLabel title="Ghi chú" name="note" />
                   <ControllerTextarea
+                    disabled={v !== '1'}
                     maxRows={11}
                     minRows={11}
                     name="note"
@@ -428,6 +434,7 @@ const Create = () => {
                 <Grid item xs={12} md={6} pl={2}>
                   <FormLabel title="File đính kèm" name="note" />
                   <ControllerMultiFile
+                    viewOnly={v !== '1'}
                     files={files}
                     setFiles={setFiles}
                     max={1}
@@ -443,7 +450,7 @@ const Create = () => {
               Hủy
             </LinkButton>
             <LoadingButton type="submit" loading={loading}>
-              {id ? 'Lưu' : 'Chốt kiểm kê'}
+              {id ? (v === '1' ? 'Chỉnh sửa' : 'Chốt kiểm kê') : 'Chốt kiểm kê'}
             </LoadingButton>
           </FormFooter>
         </FormPaperGrid>

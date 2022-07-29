@@ -104,7 +104,7 @@ const FormDialog = ({
           setFiles([]);
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   useEffect(() => {
@@ -174,8 +174,8 @@ const FormDialog = ({
             disabled
               ? 'Xem thông tin điểm bán'
               : currentID
-              ? 'Chỉnh sửa thông tin điểm bán'
-              : 'Thêm mới điểm bán'
+                ? 'Chỉnh sửa thông tin điểm bán'
+                : 'Thêm mới điểm bán'
           }
         />
 
