@@ -65,7 +65,7 @@ const getCells = (): Cells<IInventoryRecordProductShow> => [
   { id: 'priceImport', label: 'Giá nhập' },
   { id: 'moneyDifference', label: 'Tiền lệch' },
   { id: 'priceExport', label: 'Giá bán' },
-  { id: 'estimatedRevenue', label: 'D.T.dự tính' }
+  { id: 'estimatedRevenue', label: 'D.T.dự tính' },
 ];
 
 const validationSchema = yup.object().shape({});
@@ -122,7 +122,6 @@ const Create = () => {
       const dataCall = async () => await whInventoryService.detailInventoryWH(id);
       dataCall().then((data: any) => {
         var result = data.data;
-        console.log('result :>> ', result);
         if (result.statusCode === 400) {
           setNotification({ error: data.data });
         }
@@ -149,7 +148,6 @@ const Create = () => {
           setFilters({ ...filters, sortBy: '' });
         }
       }).catch((err) => {
-        console.log('err :>> ', err);
         setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
         setLoadingAdd(false);
       });
@@ -170,19 +168,24 @@ const Create = () => {
         return;
       }
       else {
-        data.data.forEach((item: any) => {
-          // @ts-ignore
-          if (!fields.some((e) => e.productId === item.productId)) {
-            if (id) {
-              // @ts-ignore
-              append({ ...item, productId: item.id, id: 0 });
-            } else {
-              // @ts-ignore
-              append({ ...item, productId: item.productId });
+        if (data.data == undefined) {
+          setNotification({ error: 'Không có sản phẩm nào!' });
+        } else {
+
+          data.data.forEach((item: any) => {
+            // @ts-ignore
+            if (!fields.some((e) => e.productId === item.productId)) {
+              if (id) {
+                // @ts-ignore
+                append({ ...item, productId: item.id, id: 0 });
+              } else {
+                // @ts-ignore
+                append({ ...item, productId: item.productId });
+              }
             }
-          }
-        });
-        setFilters({ ...filters, sortBy: '' });
+          });
+          setFilters({ ...filters, sortBy: '' });
+        }
       }
     } catch (error) {
       setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
@@ -239,61 +242,55 @@ const Create = () => {
   };
 
   const onSubmit = async (body: IInventoryRecord) => {
+
+    //[vi] Khởi tạo file
     let file = '';
     if (files[0] instanceof File && files !== null && files !== undefined) {
       const { data } = await importReceiptService.getPathFileReceipt(files[0]);
-      console.log('data', data)
       file = data;
     }
     else if (typeof files[0] === 'object' && files !== null && files !== undefined) {
-      console.log('files :>> ', files);
       file = (files[0] as any).name as string;
     }
 
     setLoading(true);
-
+    const UPDATEAD = '1';
     const newPayload = { ...body, fileAttach: [file] };
-    if (v === '0') {
-      if (id) {
-        console.log('newPayload :>> ', newPayload);
-        whInventoryService.update(newPayload, id)
-          .then((rs) => {
-            console.log('rs', rs);
-            setLoading(false);
-            return navigate('/hk_care/warehouse/inventory_record');
-          })
-          .catch((err) => {
-            setNotification({ error: 'Lỗi!' });
-            setLoading(false);
-            return;
+    if (id === undefined && v === undefined) {
+      whInventoryService.create(newPayload)
+        .then((rs) => {
+          setNotification({
+            message: 'Thêm thành công',
+            severity: 'success',
           });
-      }
-      else {
-        const { error } = await dispatch(
-          // @ts-ignore
-          searchInventoryWH(newPayload)
-        );
 
-        if (error) {
+          setLoading(false);
+          return navigate('/hk_care/warehouse/inventory_record');
+        })
+        .catch((err) => {
           setNotification({ error: 'Lỗi!' });
           setLoading(false);
           return;
-        }
-
-        setNotification({
-          message: 'Thêm thành công',
-          severity: 'success',
         });
+    }
 
-        setLoading(false);
-        return navigate('/hk_care/warehouse/inventory_record');
-      }
+    //[vi] kiem tra man hinh viewer
+    if (id !== undefined && v === UPDATEAD) {
+      whInventoryService.update(newPayload, id)
+        .then((rs) => {
+          setLoading(false);
+          return navigate('/hk_care/warehouse/inventory_record');
+        })
+        .catch((err) => {
+          setNotification({ error: 'Lỗi!' });
+          setLoading(false);
+          return;
+        });
     }
     else {
       setLoading(false);
-      return navigate(`/hk_care/warehouse/inventory_record/create/${id}/0`);
+      return navigate(`/hk_care/warehouse/inventory_record/create/${id}/1`);
     }
-
   };
 
   return (
@@ -322,6 +319,7 @@ const Create = () => {
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy sản phẩm"
                   placeholder=""
+                  disabled={v==='0'}
                   onChangeSelect={(value: number | null) =>
                     setDetailAdd({ ...detailAdd, idProduct: value })
                   }
@@ -337,6 +335,7 @@ const Create = () => {
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy nhóm sản phẩm"
                   placeholder=""
+                  disabled={v === '0'}
                   onChangeSelect={(value: number | null) =>
                     setDetailAdd({ ...detailAdd, idGroupProduct: value })
                   }
@@ -378,6 +377,7 @@ const Create = () => {
                             .map((item, index) => {
                               return (
                                 <ReceiptEntity
+                                  show={v === '0'}
                                   product={item}
                                   remove={remove}
                                   index={index}
@@ -424,7 +424,7 @@ const Create = () => {
                 <Grid item xs={12} md={6} pr={2}>
                   <FormLabel title="Ghi chú" name="note" />
                   <ControllerTextarea
-                    disabled={v !== '1'}
+                    disabled={v === '0'}
                     maxRows={11}
                     minRows={11}
                     name="note"
@@ -432,9 +432,9 @@ const Create = () => {
                   />
                 </Grid>
                 <Grid item xs={12} md={6} pl={2}>
-                  <FormLabel title="File đính kèm" name="note" />
+                  <FormLabel title="File đính kèm" name="file" />
                   <ControllerMultiFile
-                    viewOnly={v !== '1'}
+                    viewOnly={v === '0'}
                     files={files}
                     setFiles={setFiles}
                     max={1}
@@ -450,7 +450,7 @@ const Create = () => {
               Hủy
             </LinkButton>
             <LoadingButton type="submit" loading={loading}>
-              {id ? (v === '1' ? 'Chỉnh sửa' : 'Chốt kiểm kê') : 'Chốt kiểm kê'}
+              {id ? (v === '0' ? 'Chỉnh sửa' : 'Chốt kiểm kê') : 'Chốt kiểm kê'}
             </LoadingButton>
           </FormFooter>
         </FormPaperGrid>

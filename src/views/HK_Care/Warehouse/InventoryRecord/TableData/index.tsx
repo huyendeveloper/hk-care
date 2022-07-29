@@ -21,6 +21,7 @@ import { ClickEventCurrying, FilterParams } from 'types';
 import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import whInventoryService from 'services/whInventory.service';
+import { baseURL, connectURL } from 'config';
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -61,25 +62,27 @@ const styleModal = {
 };
 
 const TableData = () => {
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
   const [loading, setLoading] = useState<boolean>(true);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>([]);
-
+  const setNotification = useNotification();
   const [currentID, setCurrentID] = useState<number | string | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = () => {
     whInventoryService.searchInventoryWH(filters).then(({ data }) => {
-      setInventoryRecord(data.data);
-      setTotalRows(data.totalCount);
+      if (data.statusCode === 400) {
+        setNotification({ error: data.data });
+        setInventoryRecord([]);
+      } else {
+        setInventoryRecord(data.data);
+        setTotalRows(data.totalCount);
+      }
     })
       .catch((err) => { })
       .finally(() => { });
@@ -88,13 +91,6 @@ const TableData = () => {
     setLoading(false);
   };
 
-  const fetchDowloadFile = (id: string) => {
-   whInventoryService.dowLoadFile(id).then((data) => {
-    })
-      .catch((err) => { })
-      .finally(() => { });
-  }
-  
   useEffect(() => {
     setLoading(true);
     fetchData();
@@ -115,12 +111,6 @@ const TableData = () => {
     }));
   };
 
-  const handleOpenCreateDialog = () => {
-    setCurrentID(null);
-    setOpenFormDialog(true);
-    setDisableView(false);
-  };
-
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
       ...state,
@@ -134,19 +124,6 @@ const TableData = () => {
       pageIndex: 1,
       pageSize: rowsPerPage,
     }));
-  };
-
-  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
-    setCurrentID(id);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  const handleCloseFormDialog = () => {
-    setOpenFormDialog(false);
   };
 
   const handleOpenUpdateDialog = (id: string) => () => {
@@ -164,10 +141,34 @@ const TableData = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const [urlDowload, seturlDowload] = useState<string>();
+  const [contentDowload, setcontentDowload] = useState<string>();
+  const [idDowLoad, setidDowLoad] = useState<string>();
   const _onclickDowload = (id: string) => () => {
-    handleOpen();
-    fetchDowloadFile(id);
+    if (id) {
+      setcontentDowload(" Đang xử lý. Vui lòng chờ!");
+      handleOpen();
+      setidDowLoad(id);
+
+      return whInventoryService.dowLoadFile(id).then((re: any) => {
+        const url = `${connectURL}/` + re.data.data;
+        //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
+        const link = document.createElement('a');
+        link.setAttribute('target', '_blank');
+        link.href = url;
+        link.setAttribute('download', id + ".pdf");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        handleClose();
+      }).catch(err => {
+        setNotification({ error: "xử lý file lỗi!" });
+        handleClose();
+      });
+    }
+    else {
+      setNotification({ error: "Bản ghi không xác định." });
+    }
   }
 
   const renderAction = (row: InventoryItemDto) => {
@@ -192,6 +193,7 @@ const TableData = () => {
             <DownloadIcon />
           </IconButton>
         </div>
+        <iframe id="my_iframe" style={{ display: "none" }}></iframe>
       </div>
     );
   };
@@ -282,7 +284,7 @@ const TableData = () => {
       >
         <Box sx={styleModal}>
           <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-            Đang tải xuống. Vui lòng chờ!
+            {contentDowload}
           </Typography>
         </Box>
       </Modal>

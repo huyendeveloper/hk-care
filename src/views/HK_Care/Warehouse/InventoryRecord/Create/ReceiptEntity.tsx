@@ -12,6 +12,7 @@ interface IProps {
   setValue: any;
   arrayName: string;
   control: any;
+  show: boolean
 }
 
 const ReceiptEntity = ({
@@ -20,7 +21,8 @@ const ReceiptEntity = ({
   remove,
   setValue,
   arrayName,
-  control
+  control,
+  show
 }: IProps) => {
 
   const object = `${arrayName}.${index}`;
@@ -52,6 +54,7 @@ const ReceiptEntity = ({
       <TableCell>{numberFormat(amountOld)}</TableCell>
       <TableCell sx={{ width: '130px !important' }}>
         <ControllerNumberInput
+          disabled={show}
           name={`${object}.amountNew`}
           setValue={setValue}
           control={control}
@@ -61,11 +64,11 @@ const ReceiptEntity = ({
       <TableCell>{numberFormat(amountOld - amountNew)}</TableCell>
       <TableCell>{numberFormat(priceImport)} </TableCell>
       <TableCell>
-        {numberFormat(priceImport * (amountOld - amountNew))} 
+        {numberFormat(priceImport * (amountOld - amountNew))}
       </TableCell>
       <TableCell>{numberFormat(priceExport)} </TableCell>
       <TableCell>
-        {numberFormat(priceExport * (amountOld - amountNew))} 
+        {numberFormat(priceExport * (amountOld - amountNew))}
       </TableCell>
     </TableRow>
   );
