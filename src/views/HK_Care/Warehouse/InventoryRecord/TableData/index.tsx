@@ -91,10 +91,11 @@ const TableData = () => {
         }
       })
       .catch((err) => {})
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
 
     //setInventoryRecord(payload.inventoryRecord);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -236,31 +237,33 @@ const TableData = () => {
 
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
-      <TableSearchField
-        title="Danh sách bản kiểm kê kho"
-        placeHolder="Tìm kiếm bản kiểm kho"
-        onSearch={handleSearch}
-        searchText={filters.searchText}
-      >
-        <LinkButton
-          variant="outlined"
-          startIcon={<AddIcon />}
-          sx={{ fontSize: '1rem' }}
-          to="create"
+      <div>
+        {' '}
+        <TableSearchField
+          title="Danh sách bản kiểm kê kho"
+          placeHolder="Tìm kiếm bản kiểm kho"
+          onSearch={handleSearch}
+          searchText={filters.searchText}
         >
-          Thêm bản kiểm kho
-        </LinkButton>
-      </TableSearchField>
-
+          <LinkButton
+            variant="outlined"
+            startIcon={<AddIcon />}
+            sx={{ fontSize: '1rem' }}
+            to="create"
+          >
+            Thêm bản kiểm kho
+          </LinkButton>
+        </TableSearchField>
+        <SelectTime
+          defaultTime={{
+            startDate: filters.startDate,
+            lastDate: filters.lastDate,
+          }}
+          onSelectTime={handleSelectTime}
+        />
+      </div>
       <TableContent total={inventoryRecord.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <SelectTime
-            defaultTime={{
-              startDate: filters.startDate,
-              lastDate: filters.lastDate,
-            }}
-            onSelectTime={handleSelectTime}
-          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader

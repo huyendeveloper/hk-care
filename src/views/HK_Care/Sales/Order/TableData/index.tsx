@@ -148,22 +148,23 @@ const TableData = () => {
 
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
-      <TableSearchField
-        title="Danh sách hóa đơn bán hàng"
-        placeHolder="Tìm kiếm hóa đơn"
-        onSearch={handleSearch}
-        searchText={filters.searchText}
-      />
-
+      <div>
+        <TableSearchField
+          title="Danh sách hóa đơn bán hàng"
+          placeHolder="Tìm kiếm hóa đơn"
+          onSearch={handleSearch}
+          searchText={filters.searchText}
+        />
+        <SelectTime
+          defaultTime={{
+            startDate: filters.startDate,
+            lastDate: filters.lastDate,
+          }}
+          onSelectTime={handleSelectTime}
+        />
+      </div>
       <TableContent total={salesOrder.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <SelectTime
-            defaultTime={{
-              startDate: filters.startDate,
-              lastDate: filters.lastDate,
-            }}
-            onSelectTime={handleSelectTime}
-          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
