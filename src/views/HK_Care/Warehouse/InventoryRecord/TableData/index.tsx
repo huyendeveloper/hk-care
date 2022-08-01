@@ -33,7 +33,8 @@ import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import whInventoryService from 'services/whInventory.service';
 import { baseURL, connectURL } from 'config';
-import '../index.css'
+import '../index.css';
+import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -67,7 +68,9 @@ const TableData = () => {
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>([]);
+  const [inventoryRecord, setInventoryRecord] = useState<InventoryItemDto[]>(
+    []
+  );
   const setNotification = useNotification();
   const [currentID, setCurrentID] = useState<number | string | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
@@ -76,17 +79,19 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = () => {
-    whInventoryService.searchInventoryWH(filters).then(({ data }) => {
-      if (data.statusCode === 400) {
-        setNotification({ error: data.data });
-        setInventoryRecord([]);
-      } else {
-        setInventoryRecord(data.data);
-        setTotalRows(data.totalCount);
-      }
-    })
-      .catch((err) => { })
-      .finally(() => { });
+    whInventoryService
+      .searchInventoryWH(filters)
+      .then(({ data }) => {
+        if (data.statusCode === 400) {
+          setNotification({ error: data.data });
+          setInventoryRecord([]);
+        } else {
+          setInventoryRecord(data.data);
+          setTotalRows(data.totalCount);
+        }
+      })
+      .catch((err) => {})
+      .finally(() => {});
 
     //setInventoryRecord(payload.inventoryRecord);
     setLoading(false);
@@ -147,51 +152,60 @@ const TableData = () => {
   const [idDowLoad, setidDowLoad] = useState<string>();
   const _onclickDowload = (id: string) => () => {
     if (id) {
-      setcontentDowload(" Đang xử lý. Vui lòng chờ!");
+      setcontentDowload(' Đang xử lý. Vui lòng chờ!');
       handleOpen();
       setidDowLoad(id);
 
-      return whInventoryService.dowLoadFile(id).then((re: any) => {
-        setcontentDowload("Kiểm tra dữ liệu và tải xuống!");
-        setTimeout(() => {
-          const url = `${connectURL}/` + re.data.data;
-          //download_file(url);
-          var save = document.createElement('a');
-          save.href = url;
-          save.target = '_blank';
-          var filename = url.substring(url.lastIndexOf('/') + 1);
-          save.download = filename;
-          if (navigator.userAgent.toLowerCase().match(/(ipad|iphone|safari)/) && navigator.userAgent.search("Chrome") < 0) {
-            document.location = save.href;
-            // window event not working here
-          } else {
-            var evt = new MouseEvent('click', {
-              'view': window,
-              'bubbles': true,
-              'cancelable': false
-            });
-            save.dispatchEvent(evt);
-            (window.URL || window.webkitURL).revokeObjectURL(save.href);
-          }
-          // //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
-          // const link = document.createElement('a');
-          // //link.setAttribute('target', '_blank');
-          // link.href = url;
-          // link.setAttribute('download', id + ".pdf");
-          // document.body.appendChild(link);
-          // link.dispatchEvent(new MouseEvent('click'));
-          // document.body.removeChild(link);         
+      return whInventoryService
+        .dowLoadFile(id)
+        .then((re: any) => {
+          setcontentDowload('Kiểm tra dữ liệu và tải xuống!');
+          setTimeout(() => {
+            const url = `${connectURL}/` + re.data.data;
+            //download_file(url);
+            var save = document.createElement('a');
+            save.href = url;
+            save.target = '_blank';
+            var filename = url.substring(url.lastIndexOf('/') + 1);
+            save.download = filename;
+            if (
+              navigator.userAgent.toLowerCase().match(/(ipad|iphone|safari)/) &&
+              navigator.userAgent.search('Chrome') < 0
+            ) {
+              document.location = save.href;
+              // window event not working here
+            } else {
+              var evt = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: false,
+              });
+              save.dispatchEvent(evt);
+              (window.URL || window.webkitURL).revokeObjectURL(save.href);
+            }
+            // //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
+            // const link = document.createElement('a');
+            // //link.setAttribute('target', '_blank');
+            // link.href = url;
+            // link.setAttribute('download', id + ".pdf");
+            // document.body.appendChild(link);
+            // link.dispatchEvent(new MouseEvent('click'));
+            // document.body.removeChild(link);
+            handleClose();
+          }, 5000);
+        })
+        .catch((err) => {
+          setNotification({ error: 'xử lý file lỗi!' });
           handleClose();
-        }, 5000);
-      }).catch(err => {
-        setNotification({ error: "xử lý file lỗi!" });
-        handleClose();
-      });
+        });
+    } else {
+      setNotification({ error: 'Bản ghi không xác định.' });
     }
-    else {
-      setNotification({ error: "Bản ghi không xác định." });
-    }
-  }
+  };
+
+  const handleSelectTime = (time: ISelectTime) => {
+    setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
+  };
 
   const renderAction = (row: InventoryItemDto) => {
     return (
@@ -215,7 +229,7 @@ const TableData = () => {
             <DownloadIcon />
           </IconButton>
         </div>
-        <iframe id="my_iframe" style={{ display: "none" }}></iframe>
+        <iframe id="my_iframe" style={{ display: 'none' }}></iframe>
       </div>
     );
   };
@@ -227,15 +241,6 @@ const TableData = () => {
         placeHolder="Tìm kiếm bản kiểm kho"
         onSearch={handleSearch}
         searchText={filters.searchText}
-        start={filters.startDate}
-        end={filters.lastDate}
-        setStart={(val) =>
-          setFilters({ ...filters, pageIndex: 1, startDate: val })
-        }
-        setEnd={(val) =>
-          setFilters({ ...filters, pageIndex: 1, lastDate: val })
-        }
-        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -249,6 +254,13 @@ const TableData = () => {
 
       <TableContent total={inventoryRecord.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+          <SelectTime
+            defaultTime={{
+              startDate: filters.startDate,
+              lastDate: filters.lastDate,
+            }}
+            onSelectTime={handleSelectTime}
+          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -309,7 +321,7 @@ const TableData = () => {
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
       >
-        <Box className='JVIjaoBNQp'>
+        <Box className="JVIjaoBNQp">
           <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
             <CircularProgress /> <span>{contentDowload}</span>
           </Typography>
