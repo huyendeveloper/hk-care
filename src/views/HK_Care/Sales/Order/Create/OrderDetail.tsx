@@ -1,11 +1,22 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, IconButton, Stack } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  Stack,
+} from '@mui/material';
 import { LinkIconButton } from 'components/common';
 import { ControllerTextarea, EntitySelecter } from 'components/Form';
+import ControllerMultiImages from 'components/Form/ControllerMultiImages';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
+import importReceiptService from 'services/importReceipt.service';
 import { numberFormat } from 'utils/numberFormat';
+import MapDialog from './MapDialog';
 
 interface IProps {
   control: any;
@@ -14,6 +25,10 @@ interface IProps {
 }
 
 const OrderDetail = ({ control, setValue, getValues }: IProps) => {
+  const [files, setFiles] = useState<File[] | object[]>([]);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [previewImages, setPreviewImages] = useState<boolean>(false);
+
   const orderDetailDtos = useWatch({
     control,
     name: 'orderDetailDtos',
@@ -33,6 +48,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
   const discountValue = useWatch({ control, name: 'disCount' }) || 0;
   const paid = useWatch({ control, name: 'giveMoney' }) || 0;
   const moneyToPay = useWatch({ control, name: 'moneyToPay' }) || 0;
+  const orderType = useWatch({ control, name: 'orderType' });
 
   const selectOrderTypeOptions = useMemo(
     () => [
@@ -60,6 +76,38 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bill, discountValue]);
 
+  const handleView = async () => {
+    if (files.length === 0) {
+      return;
+    }
+    setShowBackdrop(true);
+
+    await files.forEach(async (file, index, array) => {
+      // @ts-ignore
+      if (file?.type) {
+        const { data } = await importReceiptService.getPathFileReceipt(file);
+        // @ts-ignore
+        setFiles((prev) => {
+          const newFile = [...prev];
+          // @ts-ignore
+          newFile[index] = { name: file?.name, url: data };
+          return newFile;
+        });
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (!showBackdrop) return;
+    // @ts-ignore
+    const fileList = files.filter((item) => Boolean(item.type));
+    if (fileList.length === 0) {
+      setShowBackdrop(false);
+      setPreviewImages(true);
+    }
+    console.log('fileList', fileList);
+  }, [files, showBackdrop]);
+
   return (
     <Stack p={2} gap={2}>
       <Stack
@@ -75,8 +123,14 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             renderLabel={(field) => field.name}
             renderValue="id"
             moreInfor="phone"
-            placeholder=""
+            placeholder="Thêm khách hàng vào hóa đơn"
             disableClearable
+            variant="standard"
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
           />
         </Box>
         <LinkIconButton target="_blank" to="/add-customer">
@@ -100,9 +154,19 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             renderValue="id"
             placeholder=""
             disableClearable
+            variant="standard"
           />
         </Box>
       </Stack>
+      {orderType === 2 && (
+        <ControllerMultiImages
+          files={files}
+          setFiles={setFiles}
+          message="Tài liệu đính kèm chỉ cho phép file ảnh."
+          handleView={handleView}
+        />
+      )}
+
       <Stack flexDirection="row" justifyContent="space-between">
         <div>
           Tổng tiền: (<b>{orderDetailDtos?.length || 0}</b> sản phẩm)
@@ -111,7 +175,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       </Stack>
       <Stack flexDirection="row" justifyContent="space-between">
         <div>Chiết khấu (%)</div>
-        <div>
+        <div style={{ width: '40%' }}>
           <ControllerNumberInput
             name="disCount"
             variant="standard"
@@ -129,8 +193,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       </Stack>
       <hr style={{ width: '100%' }} />
       <Stack flexDirection="row" justifyContent="space-between">
-        <b>Tiền khách đưa</b>{' '}
-        <div>
+        <b>Tiền khách đưa</b>
+        <div style={{ width: '40%' }}>
           <ControllerNumberInput
             name="giveMoney"
             variant="standard"
@@ -161,6 +225,20 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         name="description"
         control={control}
       />
+
+      <MapDialog
+        open={previewImages}
+        onClose={() => setPreviewImages(false)}
+        images={files}
+      />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Stack>
   );
 };

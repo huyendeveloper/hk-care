@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import CheckIcon from '@mui/icons-material/Check';
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton, Paper, Stack } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
@@ -37,6 +37,10 @@ const NormUpdate = ({
   });
 
   const onSubmit = async (body: INorm) => {
+    if (!body.norm) {
+      setNotification({ error: 'Chưa nhập định mức!' });
+      return;
+    }
     setShowBackdrop(true);
     const { error, payload } = await dispatch(
       // @ts-ignore
@@ -71,13 +75,21 @@ const NormUpdate = ({
           name="norm"
           setValue={setValue}
           defaultValue={getValues(`norm`)}
-          inputProps={{ style: { width: '52px' } }}
+          inputProps={{
+            style: {
+              width: '84px',
+              height: '44px',
+              border: editing ? '2px solid #00AB55' : 'none',
+              borderRadius: 'inherit',
+              boxSizing: 'border-box',
+            },
+          }}
           control={control}
           disabled={!editing}
         />
         {editing && (
           <IconButton type="submit">
-            <CheckIcon />
+            <DoneOutlineIcon sx={{ color: '#137b3e' }} />
           </IconButton>
         )}
       </Paper>

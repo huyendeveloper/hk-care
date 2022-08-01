@@ -46,7 +46,7 @@ const getCells = (): Cells<ISupplier> => [
   { id: 'name', label: 'Tên nhà cung cấp' },
   { id: 'address', label: 'Địa chỉ' },
   { id: 'nameContact', label: 'Người liên hệ' },
-  { id: 'telephoneNumber', label: 'Số điện thoại' },
+  { id: 'telephoneNumber', label: 'Điện thoại' },
   { id: 'active', label: 'Trạng thái' },
   { id: 'active', label: 'Thao tác' },
 ];

@@ -118,7 +118,7 @@ class ProductService {
   }
 
   changeStatus(id: number | null, status: boolean) {
-    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, {
+    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, null, {
       params: {
         status,
       },

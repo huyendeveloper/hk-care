@@ -65,20 +65,6 @@ export const registProductList = createAsyncThunk(
   }
 );
 
-export const updatePrice = createAsyncThunk(
-  'productList/update',
-  async (
-    payload: { price: number; productId: number },
-    { rejectWithValue }
-  ) => {
-    try {
-      await productListService.update(payload);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
 export const changeStatus = createAsyncThunk(
   'productList/changeStatus',
   async (params: { id: number; status: boolean }, { rejectWithValue }) => {

@@ -17,10 +17,7 @@ import * as yup from 'yup';
 import { Header } from '../components';
 import OrderProductForm from './OrderProductForm';
 
-const validationSchema = yup.object().shape({
-  disCount: yup.number().default(0),
-  orderType: yup.number().default(1),
-});
+const validationSchema = yup.object().shape({});
 
 interface IForm {
   name: string;
@@ -136,6 +133,11 @@ const Create = () => {
   useEffect(() => {
     if (id) {
       fetchDataUpdate();
+    } else {
+      reset({
+        disCount: 0,
+        orderType: 1,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

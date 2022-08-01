@@ -108,6 +108,10 @@ const Create = () => {
       return;
     }
     const expectedList = payload.expectedList;
+    // @ts-ignore
+    expectedList.sort((a, b) => {
+      return ('' + a.productName).localeCompare(b.productName);
+    });
     expectedList.forEach((item: any) => {
       append(item);
     });
@@ -261,7 +265,8 @@ const Create = () => {
                               .map((item, index) => (
                                 <ProductEntity
                                   key={index}
-                                  index={index}
+                                  index={(filters.pageIndex - 1) * 10 + index}
+                                  item={item}
                                   remove={remove}
                                   getValues={getValues}
                                   arrayName="expectedDetails"

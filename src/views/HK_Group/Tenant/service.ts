@@ -70,8 +70,6 @@ class TenantService {
         },
       });
 
-      //let rs = await axiosClient.post(`${baseURL}/SalePoint/Create`, input);
-      // return rs;
     } catch (error: any) {
       return error.response;
     }
@@ -114,18 +112,9 @@ class TenantService {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      //let rs = await axiosClient.post(`${baseURL}/SalePoint/Create`, input);
-      // return rs;
     } catch (error: any) {
       return error.response;
     }
-    // try {
-    //     //let rs = await axiosClient.put(`${baseURL}/SalePoint/Update/${id}`, input);
-    //     //return rs;
-    // } catch (error: any) {
-    //     return error.response;
-    // }
   }
 
   public async search(
