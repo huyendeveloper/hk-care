@@ -247,7 +247,6 @@ const CreateForm = () => {
   }, []);
 
   const onSubmit = async (data: IReceipt) => {
-    console.log('data', data);
     // @ts-ignore
     if (data?.productReceiptWHDtos?.length < 1) {
       setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });

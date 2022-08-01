@@ -3,7 +3,18 @@ import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Backdrop, Box, CircularProgress, IconButton, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography
+  Backdrop,
+  Box,
+  CircularProgress,
+  IconButton,
+  Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Typography,
 } from '@mui/material';
 import { LinkButton, LinkIconButton } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
@@ -238,7 +249,12 @@ const TableData = () => {
 
               <TableBody>
                 {inventoryRecord.map((item, index) => {
-                  const { codeInventory, createByName, createByOnUtc, totalRevenue } = item;
+                  const {
+                    codeInventory,
+                    createByName,
+                    createByOnUtc,
+                    totalRevenue,
+                  } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={codeInventory}>
                       <TableCell>

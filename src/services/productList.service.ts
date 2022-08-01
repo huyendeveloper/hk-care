@@ -56,17 +56,8 @@ class ProductService {
     );
   }
 
-  update(payload: { price: number; productId: number }) {
-    return axiosClient.put(`${baseURL}/ProductList/UpdatePrice`, {
-      params: {
-        productId: payload.productId,
-        price: payload.price,
-      },
-    });
-  }
-
   delete(id: number | null) {
-    return axiosClient.post(`${baseURL}/ProductList/UnRegisterProduct`, {
+    return axiosClient.post(`${baseURL}/ProductList/UnRegisterProduct`, null, {
       params: {
         productId: id,
       },
@@ -74,7 +65,7 @@ class ProductService {
   }
 
   changeStatus(id: number | null, status: boolean) {
-    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, {
+    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, null, {
       params: {
         status,
       },
@@ -89,16 +80,13 @@ class ProductService {
     });
   }
 
-  updateNorm(productId: number, norm: number) {
-    return axiosClient.put(
-      `${baseURL}/ProductList/UpdateNorm?productListId=${productId}&norm=${norm}`
-    );
-    // return axiosClient.put(`${baseURL}/ProductList/UpdateNorm`, null, {
-    //   params: {
-    //     productId,
-    //     norm,
-    //   },
-    // });
+  updateNorm(productListId: number, norm: number) {
+    return axiosClient.put(`${baseURL}/ProductList/UpdateNorm`, null, {
+      params: {
+        productListId,
+        norm,
+      },
+    });
   }
 }
 

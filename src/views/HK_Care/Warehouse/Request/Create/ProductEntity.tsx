@@ -11,6 +11,7 @@ interface IProps {
   getValues: any;
   arrayName?: string;
   control: any;
+  item: any;
 }
 
 const ProductEntity = ({
@@ -20,6 +21,7 @@ const ProductEntity = ({
   getValues,
   arrayName,
   control,
+  item,
 }: IProps) => {
   const { id } = useParams();
   const object = `${arrayName}.${index}`;
@@ -40,32 +42,32 @@ const ProductEntity = ({
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.productName`)}
+          {item.productName}
         </Box>
       </TableCell>
       <TableCell>
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.measureName`)}
+          {item.measureName}
         </Box>
       </TableCell>
       <TableCell>
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.expectedAuto`)}
+          {item.expectedAuto}
         </Box>
       </TableCell>
       <TableCell sx={{ width: '140px !important' }}>
         {id ? (
-          getValues(`${object}.expectedMore`)
+          item.expectedMore
         ) : (
           <ControllerNumberInput
             name={`${object}.expectedMore`}
             setValue={setValue}
             control={control}
-            defaultValue={getValues(`${object}.expectedMore`)}
+            defaultValue={item.expectedMore}
           />
         )}
       </TableCell>
@@ -73,7 +75,7 @@ const ProductEntity = ({
         <Box
           sx={{ height: '40px', verticalAlign: 'middle', display: 'inherit' }}
         >
-          {getValues(`${object}.expectedAuto`) + expectedMore}
+          {item.expectedAuto + expectedMore}
         </Box>
       </TableCell>
       {!id && (

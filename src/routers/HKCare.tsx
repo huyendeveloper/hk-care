@@ -20,7 +20,7 @@ const RequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Reques
 const CreateRequestImport = Loadable(lazy(() => import('views/HK_Care/Warehouse/Request/Create')));
 const InventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/InventoryRecord')));
 const CreateInventoryRecord = Loadable(lazy(() => import('views/HK_Care/Warehouse/InventoryRecord/Create')));
-const Roles = Loadable(lazy(() => import('views/HK_Care/Roles')));
+const Roles = Loadable(lazy(() => import('views/HK_Care/Operate/Roles')));
 const SalesReport = Loadable(lazy(() => import('views/HK_Care/SalesStatistical/SalesReport')));
 const OperateStaff = Loadable(lazy(() => import('views/HK_Care/Operate/Staff')));
 const CreateOperateStaff = Loadable(lazy(() => import('views/HK_Care/Operate/Staff/Create')));

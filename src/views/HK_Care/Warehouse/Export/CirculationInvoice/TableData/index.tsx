@@ -52,7 +52,7 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
-    let rowId = 1;
+    let rowId = 1 + (filters.pageIndex - 1) * filters.pageSize;
     // @ts-ignore
     const { payload, error } = await dispatch(getAllExportWHRotation(filters));
     if (error) {
