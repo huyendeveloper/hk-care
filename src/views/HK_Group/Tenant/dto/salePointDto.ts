@@ -3,7 +3,7 @@ export interface SalePointDto {
     name: string;
     address: string;
     hotline: string;
-    status: boolean;
+    isActived: boolean;
     attachments: AttachmentsFile[];
     nameContact: string;
     phone: string;

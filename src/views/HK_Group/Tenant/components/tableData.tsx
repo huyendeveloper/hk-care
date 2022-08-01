@@ -11,6 +11,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
@@ -27,6 +28,7 @@ import { useNotification } from 'hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
 import { SalePointOutDto } from '../dto/salePointDto';
+import { IsDelete, TableActive, TableDelete } from '../enum/IsStatus';
 import service from '../service';
 import FormDialog from './formDialog';
 
@@ -35,7 +37,7 @@ const getCells = (): Cells<SalePointOutDto> => [
   { id: 'name', label: 'Tên điểm bán' },
   { id: 'address', label: 'Địa chỉ' },
   { id: 'hotline', label: 'Hotline' },
-  { id: 'status', label: 'Trạng thái' },
+  { id: 'isActived', label: 'Trạng thái' },
   { id: 'id', label: 'Thao tác' },
 ];
 
@@ -153,7 +155,7 @@ const TableData = () => {
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
         </IconButton>
-        {!row.status && (
+        {!row.isActived === TableActive.Active && (
           <IconButton onClick={handleOpenDeleteDialog(row.id)}>
             <DeleteIcon />
           </IconButton>
@@ -192,18 +194,27 @@ const TableData = () => {
               />
 
               <TableBody>
-                {tenantList.map((item, index) => {
-                  const { id, name, address, hotline, status } = item;
+                {tenantList.map((item: any, index: number) => {
+                  const { id, name, address, hotline, isActived, display } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell>{name}</TableCell>
+                      <TableCell>
+                        {name}
+                      </TableCell>
+
+                      {/* <Tooltip  title={display}>
+                        <TableCell>
+                          {name}
+                        </TableCell>
+                      </Tooltip> */}
+
                       <TableCell>{address}</TableCell>
                       <TableCell>{hotline}</TableCell>
                       <TableCell>
-                        {status ? (
+                        {isActived === TableActive.Active ? (
                           <Button>Hoạt động</Button>
                         ) : (
                           <Button color="error">Dừng Hoạt động</Button>

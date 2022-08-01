@@ -118,27 +118,27 @@ const Create = () => {
 
   const _initScreen = () => {
     if (id) {
-      setLoadingAdd(true);
-      const dataCall = async () => await whInventoryService.detailInventoryWH(id);
-      dataCall().then((data: any) => {
+      setLoading(true);
+      whInventoryService.detailInventoryWH(id).then((data: any) => {
         var result = data.data;
         if (result.statusCode === 400) {
           setNotification({ error: data.data });
         }
         else if (result.statusCode === 200 && result.data.length === 0) {
           setNotification({ error: 'Không có sản phẩm nào!' });
-          setLoadingAdd(false);
+          setLoading(false);
           return;
         }
         else {
-          console.log(result.data.fileAttach);
+          setLoading(true);
           setFiles(result.data.fileAttach === null ? [] : [{ name: result.data.fileAttach[0] }])
+          console.log('data.data', result.data.items);
           result.data.items.forEach((item: any) => {
             // @ts-ignore
             if (!fields.some((e) => e.productId === item.productId)) {
               if (id) {
                 // @ts-ignore
-                append({ ...item, productId: item.productId, id: 0 });
+                append({ ...item, productId: item.productId });
               } else {
                 // @ts-ignore
                 append({ ...item, productId: item.productId });
@@ -146,12 +146,12 @@ const Create = () => {
             }
           });
           setFilters({ ...filters, sortBy: '' });
+          setLoading(false);
         }
       }).catch((err) => {
         setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
-        setLoadingAdd(false);
+        setLoading(false);
       });
-      setLoadingAdd(false);
     }
   }
 
@@ -171,7 +171,6 @@ const Create = () => {
         if (data.data == undefined) {
           setNotification({ error: 'Không có sản phẩm nào!' });
         } else {
-
           data.data.forEach((item: any) => {
             // @ts-ignore
             if (!fields.some((e) => e.productId === item.productId)) {
@@ -227,6 +226,7 @@ const Create = () => {
   };
 
   const handleChangePage = (pageIndex: number) => {
+    console.log('pageIndex :>> ', pageIndex);
     setFilters((state) => ({
       ...state,
       pageIndex,
@@ -234,6 +234,7 @@ const Create = () => {
   };
 
   const handleChangeRowsPerPage = (rowsPerPage: number) => {
+    console.log('pageSize :>> ', rowsPerPage);
     setFilters((state) => ({
       ...state,
       pageIndex: 1,
@@ -319,12 +320,12 @@ const Create = () => {
                   renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy sản phẩm"
                   placeholder=""
-                  disabled={v==='0'}
+                  disabled={v === '0'}
                   onChangeSelect={(value: number | null) =>
                     setDetailAdd({ ...detailAdd, idProduct: value })
                   }
                   defaultValue=""
-                  loading={false}
+                  loading={loading}
                 />
               </Grid>
               <Grid item xs={12} md={5}>
@@ -340,13 +341,14 @@ const Create = () => {
                     setDetailAdd({ ...detailAdd, idGroupProduct: value })
                   }
                   defaultValue=""
-                  loading={false}
+                  loading={loading}
                 />
               </Grid>
               <Grid item xs={12} md={2}>
                 <LoadingButton
                   onClick={addProduct}
                   loading={loadingAdd}
+                  disabled={v === '0'}
                   loadingPosition="start"
                   startIcon={<></>}
                   sx={{ height: '40px', width: '100px', float: 'right' }}
@@ -358,7 +360,7 @@ const Create = () => {
 
             <Grid item xs={12} gap={2}>
               <TableWrapper sx={{ height: 1, mb: 2 }} component={Paper}>
-                <TableContent total={1} noDataText=" " loading={false}>
+                <TableContent total={1} noDataText=" " loading={loading}>
                   <TableContainer sx={{ p: 1.5, minHeight: '40vh' }}>
                     <Scrollbar>
                       <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -367,12 +369,13 @@ const Create = () => {
                           onSort={handleOnSort}
                           sortDirection={filters.sortDirection}
                           sortBy={filters.sortBy}
+
                         />
                         <TableBody>
                           {[...fields]
                             .splice(
-                              (filters.pageIndex - 1) * 10,
-                              filters.pageIndex * 10
+                              (filters.pageIndex - 1) * filters.pageSize,
+                              filters.pageSize
                             )
                             .map((item, index) => {
                               return (
@@ -380,8 +383,8 @@ const Create = () => {
                                   show={v === '0'}
                                   product={item}
                                   remove={remove}
-                                  index={index}
-                                  key={index}
+                                  index={((filters.pageIndex - 1) * filters.pageSize) + index}
+                                  key={((filters.pageIndex - 1) * filters.pageSize) + index}
                                   setValue={setValue}
                                   control={control}
                                   arrayName="items"

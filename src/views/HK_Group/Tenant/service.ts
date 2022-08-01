@@ -37,7 +37,7 @@ class TenantService {
       input?.name && params.append('name', input.name.toString());
       input?.address && params.append('address', input.address.toString());
       input?.hotline && params.append('hotline', input.hotline.toString());
-      input?.status && params.append('status', input.status.toString());
+      input?.isActived && params.append('isActived', input.isActived.toString());
       input?.nameContact &&
         params.append('nameContact', input.nameContact.toString());
       input?.phone && params.append('phone', input.phone.toString());
@@ -82,7 +82,7 @@ class TenantService {
       input?.name && params.append('name', input.name.toString());
       input?.address && params.append('address', input.address.toString());
       input?.hotline && params.append('hotline', input.hotline.toString());
-      input?.status && params.append('status', input.status.toString());
+      input?.isActived && params.append('isActived', input.isActived.toString());
       input?.nameContact &&
         params.append('nameContact', input.nameContact.toString());
       input?.phone && params.append('phone', input.phone.toString());
