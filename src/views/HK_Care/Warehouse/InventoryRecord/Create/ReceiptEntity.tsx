@@ -44,6 +44,7 @@ const ReceiptEntity = ({
           sx={{ mr: 0.5, p: 0 }}
           color="inherit"
           onClick={() => remove(index)}
+          disabled={show}
         >
           <CloseIcon />
         </IconButton>

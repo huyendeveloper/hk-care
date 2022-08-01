@@ -22,6 +22,7 @@ import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import whInventoryService from 'services/whInventory.service';
 import { baseURL, connectURL } from 'config';
+import '../index.css'
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -49,17 +50,6 @@ const getCells = (): Cells<IInventoryRecord> => [
     label: 'Thao tác',
   },
 ];
-const styleModal = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const TableData = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -151,16 +141,37 @@ const TableData = () => {
       setidDowLoad(id);
 
       return whInventoryService.dowLoadFile(id).then((re: any) => {
-        const url = `${connectURL}/` + re.data.data;
-        //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
-        const link = document.createElement('a');
-        link.setAttribute('target', '_blank');
-        link.href = url;
-        link.setAttribute('download', id + ".pdf");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        handleClose();
+        setcontentDowload("Kiểm tra dữ liệu và tải xuống!");
+        setTimeout(() => {
+          const url = `${connectURL}/` + re.data.data;
+          //download_file(url);
+          var save = document.createElement('a');
+          save.href = url;
+          save.target = '_blank';
+          var filename = url.substring(url.lastIndexOf('/') + 1);
+          save.download = filename;
+          if (navigator.userAgent.toLowerCase().match(/(ipad|iphone|safari)/) && navigator.userAgent.search("Chrome") < 0) {
+            document.location = save.href;
+            // window event not working here
+          } else {
+            var evt = new MouseEvent('click', {
+              'view': window,
+              'bubbles': true,
+              'cancelable': false
+            });
+            save.dispatchEvent(evt);
+            (window.URL || window.webkitURL).revokeObjectURL(save.href);
+          }
+          // //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
+          // const link = document.createElement('a');
+          // //link.setAttribute('target', '_blank');
+          // link.href = url;
+          // link.setAttribute('download', id + ".pdf");
+          // document.body.appendChild(link);
+          // link.dispatchEvent(new MouseEvent('click'));
+          // document.body.removeChild(link);         
+          handleClose();
+        }, 5000);
       }).catch(err => {
         setNotification({ error: "xử lý file lỗi!" });
         handleClose();
@@ -282,9 +293,9 @@ const TableData = () => {
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
       >
-        <Box sx={styleModal}>
+        <Box className='JVIjaoBNQp'>
           <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-            {contentDowload}
+            <CircularProgress /> <span>{contentDowload}</span>
           </Typography>
         </Box>
       </Modal>

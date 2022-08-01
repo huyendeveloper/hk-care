@@ -1,16 +1,9 @@
+//#region
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Button, Dialog, Grid } from '@mui/material';
+import { Box, Button, Dialog, Grid, Skeleton } from '@mui/material';
 import {
-  ControllerMultiFile,
-  ControllerTextarea,
-  ControllerTextField,
-  FormContent,
-  FormFooter,
-  FormGroup,
-  FormHeader,
-  FormLabel,
-  FormPaperGrid,
+  ControllerMultiFile, ControllerTextarea, ControllerTextField, FormContent, FormFooter, FormGroup, FormHeader, FormLabel, FormPaperGrid,
 } from 'components/Form';
 import ControllerSwitch from 'components/Form/ControllerSwitch';
 import { typeStringNumber } from 'constants/typeInput';
@@ -20,6 +13,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import service from '../service';
 import * as yup from 'yup';
 import { AttachmentsFile, SalePointDto } from '../dto/salePointDto';
+//#endregion
 
 interface Props {
   open: boolean;
@@ -61,7 +55,7 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập địa chỉ.')
     .max(150, 'Địa chỉ không quá 150 ký tự.')
     .default(''),
-  status: yup.boolean().default(true),
+  isActived: yup.boolean().default(true),
 });
 
 const FormDialog = ({
@@ -85,15 +79,20 @@ const FormDialog = ({
     setDisabled(disable);
   }, [disable, open]);
 
-  const status = useWatch({ control, name: 'status' });
+  const status = useWatch({ control, name: 'isActived' });
 
   const [loadding, setloadding] = useState<boolean>(false);
+  const [loaddingInit, setloaddingInit] = useState<boolean>(false);
+
   const fetchData = async () => {
+    setloaddingInit(true);
     setFiles([]);
     const data = async () => await service.detail(currentID);
     data()
       .then((rel) => {
         reset(rel);
+        setloaddingInit(false);
+        setloadding(false);
         // eslint-disable-next-line no-labels
         var fileName = rel.attachments.map((m) => {
           return { name: m.url };
@@ -102,17 +101,20 @@ const FormDialog = ({
           setFiles(fileName);
         } else {
           setFiles([]);
-        }
+        };
+
       })
-      .catch((error) => { });
+      .catch((error) => { setloaddingInit(false); });
   };
 
   useEffect(() => {
     if (currentID && open) {
-      reset({ status: true });
+      setloadding(false);
+      reset({ isActived: true });
       fetchData();
     } else {
-      reset({ status: true });
+      setloadding(false);
+      reset({ isActived: true });
       setFiles([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,207 +136,236 @@ const FormDialog = ({
 
     tenant.attachments = filesConvert;
     if (currentID) {
-      const data = await service.update(currentID, tenant);
-      setloadding(false);
-      if (data.status >= 500) {
+      try {
+        const data = await service.update(currentID, tenant);
+        if (data.status >= 500) {
+          setloadding(false);
+          setNotification({
+            message: 'Không thể gửi dữ liệu.',
+            severity: 'error',
+          });
+        } else if (data.status !== 200) {
+          setloadding(false);
+          setNotification({ message: data.data, severity: 'error' });
+        } else {
+          setloadding(false);
+          setNotification({ message: data.data, severity: 'success' });
+          handleClose();
+          fetchTable();
+        }
+      } catch (error: any) {
         setNotification({
-          message: 'Không thể gửi dữ liệu.',
+          message: "Tên điểm bán đã tồn tại hoặc Đã sảy ra lỗi nội bộ trong quá trình sử lý. Vui lòng kiểm tra lại thông tin",
           severity: 'error',
         });
-      } else if (data.status !== 200) {
-        setNotification({ message: data.data, severity: 'error' });
-      } else {
-        setNotification({ message: data.data, severity: 'success' });
-        handleClose();
-        fetchTable();
+        setloadding(false);
       }
     } else {
-      const data = await service.create(tenant);
-      setloadding(false);
-      if (data.status >= 500) {
+      try {
+        const data = await service.create(tenant);
+        console.log('data', data);
+        setloadding(false);
+        if (data.status >= 500) {
+          setNotification({
+            message: 'Không thể gửi dữ liệu.',
+            severity: 'error',
+          });
+        } else if (data.status !== 200) {
+          setloadding(false);
+          setNotification({ message: data.data, severity: 'error' });
+        } else {
+          setloadding(false);
+          setNotification({ message: data.data, severity: 'success' });
+          handleClose();
+          fetchTable();
+        }
+      } catch (error: any) {
         setNotification({
-          message: 'Không thể gửi dữ liệu.',
+          message: "Tên điểm bán đã tồn tại hoặc Đã sảy ra lỗi nội bộ trong quá trình sử lý. Vui lòng kiểm tra lại thông tin",
           severity: 'error',
         });
-      } else if (data.status !== 200) {
-        setNotification({ message: data.data, severity: 'error' });
-      } else {
-        setNotification({ message: data.data, severity: 'success' });
-        handleClose();
-        fetchTable();
+        setloadding(false);
       }
     }
   };
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
-      <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
-        <FormHeader
-          title={
-            disabled
-              ? 'Xem thông tin điểm bán'
-              : currentID
-                ? 'Chỉnh sửa thông tin điểm bán'
-                : 'Thêm mới điểm bán'
-          }
-        />
-
-        <FormContent>
-          <FormGroup>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel required title="Tên điểm bán" name="name" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField
-                    name="name"
-                    control={control}
-                    disabled={disabled}
-                    helperText={
-                      <>
-                        HK [ĐỊA CHỈ ĐIỂM BÁN]
-                        <br />
-                        VD: HK 39 Núi Trúc
-                      </>
-                    }
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Người liên hệ" name="nameContact" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField
-                    name="nameContact"
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Hotline" required name="hotline" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField
-                    inputProps={typeStringNumber((value) =>
-                      setValue('hotline', value)
-                    )}
-                    name="hotline"
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Di động" name="phone" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField
-                    inputProps={typeStringNumber((value) =>
-                      setValue('phone', value)
-                    )}
-                    name="phone"
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Địa chỉ" required name="address" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextField
-                    name="address"
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Grid item xs={12}>
-                  <FormLabel title="Ghi chú" name="description" />
-                </Grid>
-                <Grid item xs={12}>
-                  <ControllerTextarea
-                    maxRows={5}
-                    minRows={5}
-                    name="description"
-                    control={control}
-                    disabled={disabled}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 'auto' }}>
+      {loaddingInit ?
+        <Box sx={{ width: '100%', padding: '20px 10px' }}>
+          <Skeleton />
+          <Skeleton animation="wave" />
+          <Skeleton animation={false} />
+        </Box>
+        :
+        <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
+          <FormHeader
+            title={
+              disabled
+                ? 'Xem thông tin điểm bán'
+                : currentID
+                  ? 'Chỉnh sửa thông tin điểm bán'
+                  : 'Thêm mới điểm bán'
+            }
+          />
+          <FormContent>
+            <FormGroup>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
                   <Grid item xs={12}>
-                    <FormLabel
-                      title="Trạng thái hoạt động"
-                      name="bussinessLicense"
-                    />
+                    <FormLabel required title="Tên điểm bán" name="name" />
                   </Grid>
                   <Grid item xs={12}>
-                    <ControllerSwitch
-                      name="status"
-                      label={status ? 'Hoạt động' : 'Không hoạt động'}
+                    <ControllerTextField
+                      name="name"
+                      control={control}
+                      disabled={disabled}
+                      helperText={
+                        <>
+                          HK [ĐỊA CHỈ ĐIỂM BÁN]
+                          <br />
+                          VD: HK 39 Núi Trúc
+                        </>
+                      }
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Grid item xs={12}>
+                    <FormLabel title="Người liên hệ" name="nameContact" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerTextField
+                      name="nameContact"
                       control={control}
                       disabled={disabled}
                     />
                   </Grid>
-                </Box>
-              </Grid>
+                </Grid>
 
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 'auto' }}>
+                <Grid item xs={12} md={6}>
                   <Grid item xs={12}>
-                    <FormLabel
-                      title="Tài liệu đính kèm"
-                      name="bussinessLicense"
-                    />
+                    <FormLabel title="Hotline" required name="hotline" />
                   </Grid>
                   <Grid item xs={12}>
-                    <ControllerMultiFile
-                      files={files}
-                      max={6}
-                      setFiles={setFiles}
-                      viewOnly={disabled}
+                    <ControllerTextField
+                      inputProps={typeStringNumber((value) =>
+                        setValue('hotline', value)
+                      )}
+                      name="hotline"
+                      control={control}
+                      disabled={disabled}
                     />
                   </Grid>
-                </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Grid item xs={12}>
+                    <FormLabel title="Di động" name="phone" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerTextField
+                      inputProps={typeStringNumber((value) =>
+                        setValue('phone', value)
+                      )}
+                      name="phone"
+                      control={control}
+                      disabled={disabled}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Grid item xs={12}>
+                    <FormLabel title="Địa chỉ" required name="address" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerTextField
+                      name="address"
+                      control={control}
+                      disabled={disabled}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Grid item xs={12}>
+                    <FormLabel title="Ghi chú" name="description" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ControllerTextarea
+                      maxRows={5}
+                      minRows={5}
+                      name="description"
+                      control={control}
+                      disabled={disabled}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ mb: 'auto' }}>
+                    <Grid item xs={12}>
+                      <FormLabel
+                        title="Trạng thái hoạt động"
+                        name="bussinessLicense"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ControllerSwitch
+                        name="isActived"
+                        label={status ? 'Hoạt động' : 'Không hoạt động'}
+                        control={control}
+                        disabled={disabled}
+                      />
+                    </Grid>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ mb: 'auto' }}>
+                    <Grid item xs={12}>
+                      <FormLabel
+                        title="Tài liệu đính kèm"
+                        name="bussinessLicense"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ControllerMultiFile
+                        files={files}
+                        max={6}
+                        setFiles={setFiles}
+                        viewOnly={disabled}
+                      />
+                    </Grid>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}></Grid>
               </Grid>
+            </FormGroup>
+          </FormContent>
 
-              <Grid item xs={12} md={6}></Grid>
-            </Grid>
-          </FormGroup>
-        </FormContent>
-
-        <FormFooter>
-          <Button variant="outlined" onClick={() => handleClose()}>
-            {disabled ? 'Đóng' : 'Hủy'}
-          </Button>
-          {disabled && currentID && (
-            <Button onClick={() => setDisabled(false)}>
-              Chỉnh sửa thông tin
+          <FormFooter>
+            <Button variant="outlined" onClick={() => handleClose()}>
+              {disabled ? 'Đóng' : 'Hủy'}
             </Button>
-          )}
+            {disabled && currentID && (
+              <Button onClick={() => setDisabled(false)}>
+                Chỉnh sửa thông tin
+              </Button>
+            )}
 
-          {!disabled && (
-            <LoadingButton loading={loadding} type="submit">
-              Lưu
-            </LoadingButton>
-          )}
-        </FormFooter>
-      </FormPaperGrid>
+            {!disabled && (
+              <LoadingButton loading={loadding} type="submit">
+                Lưu
+              </LoadingButton>
+            )}
+          </FormFooter>
+
+        </FormPaperGrid>
+      }
     </Dialog>
   );
 };
