@@ -4,6 +4,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   IconButton,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -11,6 +12,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 import {
   TableContent,
   TableHeader,
@@ -111,6 +113,10 @@ const TableData = () => {
     }));
   };
 
+  const handleSelectTime = (time: ISelectTime) => {
+    setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
+  };
+
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
       ...state,
@@ -142,15 +148,6 @@ const TableData = () => {
         placeHolder="Tìm kiếm hóa đơn"
         onSearch={handleSearch}
         searchText={filters.searchText}
-        start={filters.startDate}
-        end={filters.lastDate}
-        setStart={(val) =>
-          setFilters({ ...filters, pageIndex: 1, startDate: val })
-        }
-        setEnd={(val) =>
-          setFilters({ ...filters, pageIndex: 1, lastDate: val })
-        }
-        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -164,6 +161,13 @@ const TableData = () => {
 
       <TableContent total={importReceipt.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+          <SelectTime
+            defaultTime={{
+              startDate: filters.startDate,
+              lastDate: filters.lastDate,
+            }}
+            onSelectTime={handleSelectTime}
+          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader

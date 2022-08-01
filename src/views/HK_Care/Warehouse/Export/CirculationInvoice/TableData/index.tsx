@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Paper, Table, TableBody, TableContainer } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
+import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 import {
   TableContent,
   TableHeader,
@@ -84,6 +85,10 @@ const TableData = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
+  const handleSelectTime = (time: ISelectTime) => {
+    setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
+  };
+
   const handleOnSort = (field: string) => {
     setFilters((state) => ({
       ...state,
@@ -120,11 +125,6 @@ const TableData = () => {
         placeHolder="Tìm kiếm hóa đơn"
         onSearch={handleSearch}
         searchText={filters.searchText}
-        start={filters.startDate}
-        end={filters.lastDate}
-        setStart={(val) => setFilters({ ...filters, startDate: val })}
-        setEnd={(val) => setFilters({ ...filters, lastDate: val })}
-        haveFromTo
       >
         <LinkButton
           variant="outlined"
@@ -140,7 +140,14 @@ const TableData = () => {
         total={Object.keys(circulationInvoice).length}
         loading={loading}
       >
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+          <SelectTime
+            defaultTime={{
+              startDate: filters.startDate,
+              lastDate: filters.lastDate,
+            }}
+            onSelectTime={handleSelectTime}
+          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
