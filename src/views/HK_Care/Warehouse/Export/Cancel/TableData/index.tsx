@@ -136,31 +136,32 @@ const TableData = () => {
 
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
-      <TableSearchField
-        title="Danh sách hóa đơn xuất hủy"
-        placeHolder="Tìm kiếm hóa đơn"
-        onSearch={handleSearch}
-        searchText={filters.searchText}
-      >
-        <LinkButton
-          variant="outlined"
-          startIcon={<AddIcon />}
-          sx={{ fontSize: '1rem' }}
-          to="create"
+      <div>
+        <TableSearchField
+          title="Danh sách hóa đơn xuất hủy"
+          placeHolder="Tìm kiếm hóa đơn"
+          onSearch={handleSearch}
+          searchText={filters.searchText}
         >
-          Thêm hóa đơn
-        </LinkButton>
-      </TableSearchField>
-
+          <LinkButton
+            variant="outlined"
+            startIcon={<AddIcon />}
+            sx={{ fontSize: '1rem' }}
+            to="create"
+          >
+            Thêm hóa đơn
+          </LinkButton>
+        </TableSearchField>
+        <SelectTime
+          defaultTime={{
+            startDate: filters.startDate,
+            lastDate: filters.lastDate,
+          }}
+          onSelectTime={handleSelectTime}
+        />
+      </div>
       <TableContent total={exportCancel.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <SelectTime
-            defaultTime={{
-              startDate: filters.startDate,
-              lastDate: filters.lastDate,
-            }}
-            onSelectTime={handleSelectTime}
-          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader

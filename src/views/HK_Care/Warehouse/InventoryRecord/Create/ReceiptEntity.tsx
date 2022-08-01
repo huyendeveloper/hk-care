@@ -3,6 +3,7 @@ import { IconButton, TableCell, TableRow } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
@@ -12,7 +13,7 @@ interface IProps {
   setValue: any;
   arrayName: string;
   control: any;
-  show: boolean
+  show: boolean;
 }
 
 const ReceiptEntity = ({
@@ -22,9 +23,9 @@ const ReceiptEntity = ({
   setValue,
   arrayName,
   control,
-  show
+  show,
 }: IProps) => {
-
+  const { id, v } = useParams();
   const object = `${arrayName}.${index}`;
   const { name, unit, amountOld, priceImport, priceExport } = product;
 
@@ -33,34 +34,39 @@ const ReceiptEntity = ({
     name: `${object}.amountNew`,
   });
 
-  useEffect(() => {
-  }, [amountNew]);
+  useEffect(() => {}, [amountNew]);
 
   return (
     <TableRow hover tabIndex={-1}>
       <TableCell>
         {index + 1}
-        <IconButton
-          sx={{ mr: 0.5, p: 0 }}
-          color="inherit"
-          onClick={() => remove(index)}
-          disabled={show}
-        >
-          <CloseIcon />
-        </IconButton>
+        {v !== '0' && (
+          <IconButton
+            sx={{ mr: 0.5, p: 0 }}
+            color="inherit"
+            onClick={() => remove(index)}
+            disabled={show}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </TableCell>
 
       <TableCell>{name}</TableCell>
       <TableCell>{unit}</TableCell>
       <TableCell>{numberFormat(amountOld)}</TableCell>
       <TableCell sx={{ width: '130px !important' }}>
-        <ControllerNumberInput
-          disabled={show}
-          name={`${object}.amountNew`}
-          setValue={setValue}
-          control={control}
-          defaultValue={amountNew || 0}
-        />
+        {v !== '0' ? (
+          <ControllerNumberInput
+            disabled={show}
+            name={`${object}.amountNew`}
+            setValue={setValue}
+            control={control}
+            defaultValue={amountNew || 0}
+          />
+        ) : (
+          numberFormat(amountNew)
+        )}
       </TableCell>
       <TableCell>{numberFormat(amountOld - amountNew)}</TableCell>
       <TableCell>{numberFormat(priceImport)} </TableCell>

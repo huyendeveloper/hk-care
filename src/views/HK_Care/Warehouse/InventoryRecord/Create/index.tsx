@@ -2,18 +2,35 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { LoadingButton } from '@mui/lab';
 import {
-  Button, Grid, Paper, Stack, Table, TableBody, TableContainer
+  Button,
+  Grid,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableContainer,
 } from '@mui/material';
 import { LinkButton, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import {
-  ControllerMultiFile, ControllerTextarea, FormContent, FormFooter, FormHeader, FormLabel, FormPaperGrid, Selecter
+  ControllerMultiFile,
+  ControllerTextarea,
+  FormContent,
+  FormFooter,
+  FormHeader,
+  FormLabel,
+  FormPaperGrid,
+  Selecter,
 } from 'components/Form';
 import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { IInventoryRecord, IInventoryRecordProduct, IInventoryRecordProductShow } from 'interface';
+import {
+  IInventoryRecord,
+  IInventoryRecordProduct,
+  IInventoryRecordProductShow,
+} from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -109,7 +126,6 @@ const Create = () => {
     name: `items`,
   });
 
-
   useEffect(() => {
     getNameProduct();
     getGroupProduct();
@@ -119,41 +135,47 @@ const Create = () => {
   const _initScreen = () => {
     if (id) {
       setLoading(true);
-      whInventoryService.detailInventoryWH(id).then((data: any) => {
-        var result = data.data;
-        if (result.statusCode === 400) {
-          setNotification({ error: data.data });
-        }
-        else if (result.statusCode === 200 && result.data.length === 0) {
-          setNotification({ error: 'Không có sản phẩm nào!' });
-          setLoading(false);
-          return;
-        }
-        else {
-          setLoading(true);
-          setFiles(result.data.fileAttach === null ? [] : [{ name: result.data.fileAttach[0] }])
-          console.log('data.data', result.data.items);
-          result.data.items.forEach((item: any) => {
-            // @ts-ignore
-            if (!fields.some((e) => e.productId === item.productId)) {
-              if (id) {
-                // @ts-ignore
-                append({ ...item, productId: item.productId });
-              } else {
-                // @ts-ignore
-                append({ ...item, productId: item.productId });
+      whInventoryService
+        .detailInventoryWH(id)
+        .then((data: any) => {
+          var result = data.data;
+          if (result.statusCode === 400) {
+            setNotification({ error: data.data });
+          } else if (result.statusCode === 200 && result.data.length === 0) {
+            setNotification({ error: 'Không có sản phẩm nào!' });
+            setLoading(false);
+            return;
+          } else {
+            setLoading(true);
+            setFiles(
+              result.data.fileAttach === null
+                ? []
+                : [{ name: result.data.fileAttach[0] }]
+            );
+            console.log('data.data', result.data.items);
+            setValue('note', result.data.note);
+            result.data.items.forEach((item: any) => {
+              // @ts-ignore
+              if (!fields.some((e) => e.productId === item.productId)) {
+                if (id) {
+                  // @ts-ignore
+                  append({ ...item, productId: item.productId });
+                } else {
+                  // @ts-ignore
+                  append({ ...item, productId: item.productId });
+                }
               }
-            }
-          });
-          setFilters({ ...filters, sortBy: '' });
+            });
+            setFilters({ ...filters, sortBy: '' });
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
           setLoading(false);
-        }
-      }).catch((err) => {
-        setNotification({ error: 'Có lỗi xảy ra. Vui lòng thử lại!' });
-        setLoading(false);
-      });
+        });
     }
-  }
+  };
 
   const addProduct = async () => {
     setLoadingAdd(true);
@@ -161,13 +183,11 @@ const Create = () => {
       const { data } = await whInventoryService.getwhInventory(detailAdd);
       if (data.statusCode === 400) {
         setNotification({ error: data.data });
-      }
-      else if (data.statusCode === 200 && data.data.length === 0) {
+      } else if (data.statusCode === 200 && data.data.length === 0) {
         setNotification({ error: 'Không có sản phẩm nào!' });
         setLoadingAdd(false);
         return;
-      }
-      else {
+      } else {
         if (data.data == undefined) {
           setNotification({ error: 'Không có sản phẩm nào!' });
         } else {
@@ -211,8 +231,8 @@ const Create = () => {
       .then(({ data }) => {
         setProductList(data.data);
       })
-      .catch((err) => { })
-      .finally(() => { });
+      .catch((err) => {})
+      .finally(() => {});
   };
 
   const getGroupProduct = () => {
@@ -221,8 +241,8 @@ const Create = () => {
       .then(({ data }) => {
         setProductGroupList(data.data);
       })
-      .catch((err) => { })
-      .finally(() => { });
+      .catch((err) => {})
+      .finally(() => {});
   };
 
   const handleChangePage = (pageIndex: number) => {
@@ -243,14 +263,16 @@ const Create = () => {
   };
 
   const onSubmit = async (body: IInventoryRecord) => {
-
     //[vi] Khởi tạo file
     let file = '';
     if (files[0] instanceof File && files !== null && files !== undefined) {
       const { data } = await importReceiptService.getPathFileReceipt(files[0]);
       file = data;
-    }
-    else if (typeof files[0] === 'object' && files !== null && files !== undefined) {
+    } else if (
+      typeof files[0] === 'object' &&
+      files !== null &&
+      files !== undefined
+    ) {
       file = (files[0] as any).name as string;
     }
 
@@ -258,7 +280,8 @@ const Create = () => {
     const UPDATEAD = '1';
     const newPayload = { ...body, fileAttach: [file] };
     if (id === undefined && v === undefined) {
-      whInventoryService.create(newPayload)
+      whInventoryService
+        .create(newPayload)
         .then((rs) => {
           setNotification({
             message: 'Thêm thành công',
@@ -277,7 +300,8 @@ const Create = () => {
 
     //[vi] kiem tra man hinh viewer
     if (id !== undefined && v === UPDATEAD) {
-      whInventoryService.update(newPayload, id)
+      whInventoryService
+        .update(newPayload, id)
         .then((rs) => {
           setLoading(false);
           return navigate('/hk_care/warehouse/inventory_record');
@@ -287,15 +311,24 @@ const Create = () => {
           setLoading(false);
           return;
         });
-    }
-    else {
+    } else {
       setLoading(false);
-      return navigate(`/hk_care/warehouse/inventory_record/create/${id}/1`);
+      return navigate(`/hk_care/warehouse/inventory_record`);
     }
   };
 
+  const pageTitle = useMemo(() => {
+    if (!id) {
+      return 'Danh sách sản phẩm';
+    }
+    if (v === '0') {
+      return 'Chi tiết biên bản kiểm kê';
+    }
+    return 'Chỉnh sửa biên bản kiểm kê';
+  }, [id, v]);
+
   return (
-    <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm bản kiểm kho'}>
+    <PageWrapperFullwidth title={pageTitle}>
       <Stack gap={2}>
         <Stack
           flexDirection="row"
@@ -309,58 +342,60 @@ const Create = () => {
           </Button>
         </Stack>
         <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
-          <FormHeader title={id ? "Chỉnh sửa biên bản kiểm kê" : "Danh sách sản phẩm"} />
+          <FormHeader title={pageTitle} />
           <FormContent>
-            <Grid container spacing={2} mb={2} alignItems="flex-end">
-              <Grid item xs={12} md={5}>
-                <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-                <Selecter
-                  renderValue="id"
-                  options={productList}
-                  renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  placeholder=""
-                  disabled={v === '0'}
-                  onChangeSelect={(value: number | null) =>
-                    setDetailAdd({ ...detailAdd, idProduct: value })
-                  }
-                  defaultValue=""
-                  loading={loading}
-                />
+            {v !== '0' && (
+              <Grid container spacing={2} mb={2} alignItems="flex-end">
+                <Grid item xs={12} md={5}>
+                  <FormLabel title="Tìm kiếm sản phẩm" name="name" />
+                  <Selecter
+                    renderValue="id"
+                    options={productList}
+                    renderLabel={(field) => field.name}
+                    noOptionsText="Không tìm thấy sản phẩm"
+                    placeholder=""
+                    disabled={v === '0'}
+                    onChangeSelect={(value: number | null) =>
+                      setDetailAdd({ ...detailAdd, idProduct: value })
+                    }
+                    defaultValue=""
+                    loading={loading}
+                  />
+                </Grid>
+                <Grid item xs={12} md={5}>
+                  <FormLabel title="Chọn nhóm sản phẩm" name="name" />
+                  <Selecter
+                    renderValue="id"
+                    options={productGroupList}
+                    renderLabel={(field) => field.name}
+                    noOptionsText="Không tìm thấy nhóm sản phẩm"
+                    placeholder=""
+                    disabled={v === '0'}
+                    onChangeSelect={(value: number | null) =>
+                      setDetailAdd({ ...detailAdd, idGroupProduct: value })
+                    }
+                    defaultValue=""
+                    loading={loading}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <LoadingButton
+                    onClick={addProduct}
+                    loading={loadingAdd}
+                    disabled={v === '0'}
+                    loadingPosition="start"
+                    startIcon={<></>}
+                    sx={{ height: '40px', width: '100px', float: 'right' }}
+                  >
+                    Kiểm kê
+                  </LoadingButton>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={5}>
-                <FormLabel title="Chọn nhóm sản phẩm" name="name" />
-                <Selecter
-                  renderValue="id"
-                  options={productGroupList}
-                  renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy nhóm sản phẩm"
-                  placeholder=""
-                  disabled={v === '0'}
-                  onChangeSelect={(value: number | null) =>
-                    setDetailAdd({ ...detailAdd, idGroupProduct: value })
-                  }
-                  defaultValue=""
-                  loading={loading}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <LoadingButton
-                  onClick={addProduct}
-                  loading={loadingAdd}
-                  disabled={v === '0'}
-                  loadingPosition="start"
-                  startIcon={<></>}
-                  sx={{ height: '40px', width: '100px', float: 'right' }}
-                >
-                  Kiểm kê
-                </LoadingButton>
-              </Grid>
-            </Grid>
+            )}
 
             <Grid item xs={12} gap={2}>
               <TableWrapper sx={{ height: 1, mb: 2 }} component={Paper}>
-                <TableContent total={1} noDataText=" " loading={loading}>
+                <TableContent total={10} noDataText=" " loading={loading}>
                   <TableContainer sx={{ p: 1.5, minHeight: '40vh' }}>
                     <Scrollbar>
                       <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -369,7 +404,6 @@ const Create = () => {
                           onSort={handleOnSort}
                           sortDirection={filters.sortDirection}
                           sortBy={filters.sortBy}
-
                         />
                         <TableBody>
                           {[...fields]
@@ -383,8 +417,14 @@ const Create = () => {
                                   show={v === '0'}
                                   product={item}
                                   remove={remove}
-                                  index={((filters.pageIndex - 1) * filters.pageSize) + index}
-                                  key={((filters.pageIndex - 1) * filters.pageSize) + index}
+                                  index={
+                                    (filters.pageIndex - 1) * filters.pageSize +
+                                    index
+                                  }
+                                  key={
+                                    (filters.pageIndex - 1) * filters.pageSize +
+                                    index
+                                  }
                                   setValue={setValue}
                                   control={control}
                                   arrayName="items"
@@ -417,7 +457,15 @@ const Create = () => {
                     </td>
                     <td>
                       {numberFormat(
-                        items === undefined ? 0 : items.reduce((pre: any, cur: any) => pre + cur.priceExport * (cur.amountOld - cur.amountNew), 0)
+                        items === undefined
+                          ? 0
+                          : items.reduce(
+                              (pre: any, cur: any) =>
+                                pre +
+                                cur.priceExport *
+                                  (cur.amountOld - cur.amountNew),
+                              0
+                            )
                       )}
                     </td>
                   </tr>
@@ -450,11 +498,13 @@ const Create = () => {
           </FormContent>
           <FormFooter>
             <LinkButton to="/hk_care/warehouse/inventory_record">
-              Hủy
+              {v !== '0' ? 'Hủy' : 'Quay lại'}
             </LinkButton>
-            <LoadingButton type="submit" loading={loading}>
-              {id ? (v === '0' ? 'Chỉnh sửa' : 'Chốt kiểm kê') : 'Chốt kiểm kê'}
-            </LoadingButton>
+            {v !== '0' && (
+              <LoadingButton type="submit" loading={loading}>
+                {id ? 'Lưu' : 'Chốt kiểm kê'}
+              </LoadingButton>
+            )}
           </FormFooter>
         </FormPaperGrid>
       </Stack>

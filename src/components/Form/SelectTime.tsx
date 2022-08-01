@@ -35,6 +35,8 @@ const SelectTime = ({ defaultTime, onSelectTime }: IProps) => {
         justifyContent: 'flex-end',
         gap: 2,
         mb: 1.5,
+        paddingX: 1.5,
+        height: '40px',
       }}
       onSubmit={handleSubmit(onSubmit)}
     >
