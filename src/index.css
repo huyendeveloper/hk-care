@@ -98,3 +98,65 @@ input[type='number'] {
 .MuiChip-root.MuiChip-filled.Mui-disabled {
   opacity: 1;
 }
+
+.MuiTabs-flexContainer {
+  flex-wrap: wrap;
+}
+
+svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionAsc {
+  opacity: 0.3;
+}
+
+svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeSmall.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionDesc {
+  opacity: 0.3;
+}
+
+.Mui-active .MuiTableSortLabel-icon {
+  opacity: 1 !important;
+}
+
+.print {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.print table {
+  border-collapse: separate;
+  border-spacing: 0px;
+}
+
+.print td {
+  padding: 5px 0;
+}
+
+.print em {
+  font-size: 12px;
+}
+
+.sale__tab {
+  max-width: 600px;
+}
+
+.sale__tab > div {
+  max-width: 600px;
+  overflow: auto !important;
+  margin-bottom: 5px !important;
+}
+
+.sale__tab > div::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sale__tab > div::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+}
+.sale__tab > div::-webkit-scrollbar-thumb {
+  background-color: #dfdfdf;
+  border-radius: 20px;
+}
+
+.sale__tab > div > div {
+  max-width: 600px;
+  display: block !important;
+}

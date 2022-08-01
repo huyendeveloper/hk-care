@@ -18,11 +18,8 @@ import {
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
 import { IReferencePricesMock } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
+import { useEffect, useMemo, useState } from 'react';
 import { FilterParams } from 'types';
 
 const getCells = (): Cells<IReferencePricesMock> => [
@@ -41,9 +38,8 @@ const TableData = () => {
   const [referencePrices, setReferencePrices] = useState<
     IReferencePricesMock[]
   >([]);
-  const { loading } = useSelector((state: RootState) => state.product);
+  const [loading, setLoading] = useState<boolean>(true);
   const cells = useMemo(() => getCells(), []);
-  const setNotification = useNotification();
 
   const fetchData = async () => {
     // @ts-ignore
@@ -51,7 +47,7 @@ const TableData = () => {
 
     // if (error) {
     //   setNotification({
-    //     error: 'Lỗi khi tải danh sách sản phẩm!',
+    //     error: 'Lỗi!',
     //   });
     //   return;
     // }
@@ -141,6 +137,7 @@ const TableData = () => {
     ];
     setReferencePrices(mockReferencePrices);
     setTotalRows(mockReferencePrices.length);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -198,7 +195,7 @@ const TableData = () => {
         searchText={filters.searchText}
       />
       <TableContent total={referencePrices.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -236,7 +233,7 @@ const TableData = () => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>

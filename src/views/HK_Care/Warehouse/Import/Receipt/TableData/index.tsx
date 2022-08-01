@@ -4,30 +4,31 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   IconButton,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IImportReceipt } from 'interface';
-import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllUsage } from 'redux/slices/usage';
-import { RootState } from 'redux/store';
+import { useDispatch } from 'react-redux';
+import { getAllImportReceipt } from 'redux/slices/importReceipt';
 import type { FilterParams } from 'types/common';
+import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 
 const getCells = (): Cells<IImportReceipt> => [
@@ -40,63 +41,52 @@ const getCells = (): Cells<IImportReceipt> => [
     label: 'Mã hóa đơn',
   },
   {
-    id: 'importDate',
+    id: 'creationTime',
     label: 'Ngày nhập',
   },
   {
-    id: 'unitPrice',
+    id: 'moneyToPay',
     label: 'Tiền cần trả',
   },
   {
-    id: 'inDebt',
+    id: 'debts',
     label: 'Công nợ',
   },
   {
-    id: 'unitPrice',
+    id: 'moneyToPay',
     label: 'Thao tác',
   },
 ];
 
 const TableData = () => {
-  const setNotification = useNotification();
   const dispatch = useDispatch();
-  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
+  const setNotification = useNotification();
 
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.usage);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [totalRows, setTotalRows] = useState<number>(0);
+  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
     // @ts-ignore
-    const { payload, error } = await dispatch(getAllUsage(filters));
-
+    const { payload, error } = await dispatch(getAllImportReceipt(filters));
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách dạng dùng!',
+        error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
 
-    // setImportReceipt(payload.importReceipt);
-
-    setImportReceipt([
-      { id: 1, importDate: new Date('9/29/2021'), unitPrice: 78, inDebt: 86 },
-      { id: 2, importDate: new Date('6/16/2021'), unitPrice: 26, inDebt: 3 },
-      { id: 3, importDate: new Date('11/26/2021'), unitPrice: 61, inDebt: 28 },
-      { id: 4, importDate: new Date('3/9/2022'), unitPrice: 63, inDebt: 32 },
-      { id: 5, importDate: new Date('12/9/2021'), unitPrice: 80, inDebt: 60 },
-      { id: 6, importDate: new Date('11/1/2021'), unitPrice: 98, inDebt: 80 },
-      { id: 7, importDate: new Date('12/6/2021'), unitPrice: 66, inDebt: 26 },
-      { id: 8, importDate: new Date('8/4/2021'), unitPrice: 81, inDebt: 1 },
-      { id: 9, importDate: new Date('2/12/2022'), unitPrice: 99, inDebt: 3 },
-      { id: 10, importDate: new Date('6/13/2021'), unitPrice: 17, inDebt: 96 },
-    ]);
+    setImportReceipt(payload.importReceiptList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -121,6 +111,10 @@ const TableData = () => {
       pageIndex: 1,
       pageSize: rowsPerPage,
     }));
+  };
+
+  const handleSelectTime = (time: ISelectTime) => {
+    setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
   };
 
   const handleSearch = (searchText: string) => {
@@ -166,7 +160,14 @@ const TableData = () => {
       </TableSearchField>
 
       <TableContent total={importReceipt.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+          <SelectTime
+            defaultTime={{
+              startDate: filters.startDate,
+              lastDate: filters.lastDate,
+            }}
+            onSelectTime={handleSelectTime}
+          />
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -178,18 +179,16 @@ const TableData = () => {
 
               <TableBody>
                 {importReceipt.map((item, index) => {
-                  const { id, importDate, unitPrice, inDebt } = item;
+                  const { id, code, creationTime, moneyToPay, debts } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell>{id}</TableCell>
-                      <TableCell>
-                        {moment(importDate).format('DD/MM/YYYY HH:MM')}
-                      </TableCell>
-                      <TableCell>{numberFormat(unitPrice)}</TableCell>
-                      <TableCell>{numberFormat(inDebt)}</TableCell>
+                      <TableCell>{code}</TableCell>
+                      <TableCell>{formatDateTime(creationTime)}</TableCell>
+                      <TableCell>{numberFormat(moneyToPay)}</TableCell>
+                      <TableCell>{numberFormat(debts)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>
                   );
@@ -205,7 +204,7 @@ const TableData = () => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>

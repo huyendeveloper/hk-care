@@ -2,6 +2,8 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -24,22 +26,22 @@ import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deleteProductList, getAllProduct } from 'redux/slices/productList';
-import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
-import FormDialog from '../FormDialog';
+import QuotaUpdate from './NormUpdate';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
-  { id: 'productName', label: 'Tên sản phẩm' },
+  { id: 'productName', label: 'Tên SP' },
   { id: 'mesure', label: 'Đơn vị' },
-  { id: 'productGroup', label: 'Nhóm sản phẩm' },
+  { id: 'productGroup', label: 'Nhóm SP' },
   { id: 'stockQuantity', label: 'Hàng tồn' },
   { id: 'importPrice', label: 'Giá nhập' },
   { id: 'price', label: 'Giá bán' },
+  { id: 'norm', label: 'Định mức' },
   { id: 'price', label: 'Thao tác' },
 ];
 
@@ -55,9 +57,9 @@ const TableData = ({ active = 1 }: IProps) => {
   const [productList, setProductList] = useState<IProductList[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.productList);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -66,16 +68,17 @@ const TableData = ({ active = 1 }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
-      });
+      setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
     setProductList(payload.productList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -120,12 +123,13 @@ const TableData = ({ active = 1 }: IProps) => {
 
   const handleDelete = async () => {
     if (!currentID) return;
-
     handleCloseDeleteDialog();
+    setShowBackdrop(true);
     // @ts-ignore
     const { error } = await dispatch(deleteProductList(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa sản phẩm ra khỏi danh sách bán!' });
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -133,12 +137,8 @@ const TableData = ({ active = 1 }: IProps) => {
       severity: 'success',
     });
 
-    setProductList(productList.filter((x) => x.productId !== currentID));
-  };
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
     fetchData();
+    setShowBackdrop(false);
   };
 
   const renderAction = (row: IProductList) => {
@@ -171,7 +171,7 @@ const TableData = ({ active = 1 }: IProps) => {
           <LinkButton
             variant="outlined"
             startIcon={<AddIcon />}
-            to="/hk_care/product/list/create"
+            to="create"
             sx={{ fontSize: '1rem' }}
           >
             Đăng ký sản phẩm
@@ -180,7 +180,7 @@ const TableData = ({ active = 1 }: IProps) => {
       </TableSearchField>
 
       <TableContent total={productList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -193,16 +193,17 @@ const TableData = ({ active = 1 }: IProps) => {
               <TableBody>
                 {productList.map((item, index) => {
                   const {
-                    productId,
+                    id,
                     productName,
                     productGroup,
                     importPrice,
                     price,
                     mesure,
                     stockQuantity,
+                    norm,
                   } = item;
                   return (
-                    <TableRow hover tabIndex={-1} key={productId}>
+                    <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
@@ -212,7 +213,14 @@ const TableData = ({ active = 1 }: IProps) => {
                       <TableCell>{stockQuantity}</TableCell>
                       <TableCell>{numberFormat(importPrice)}</TableCell>
                       <TableCell>{numberFormat(price)}</TableCell>
-
+                      <TableCell sx={{ width: '120px' }}>
+                        <QuotaUpdate
+                          norm={norm}
+                          productId={id}
+                          showBackdrop={showBackdrop}
+                          setShowBackdrop={setShowBackdrop}
+                        />
+                      </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>
                     </TableRow>
                   );
@@ -228,7 +236,7 @@ const TableData = ({ active = 1 }: IProps) => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
 
@@ -241,13 +249,13 @@ const TableData = ({ active = 1 }: IProps) => {
         handleDelete={handleDelete}
         spanContent=" ra khỏi danh sách bán"
       />
-
-      <FormDialog
-        // @ts-ignore
-        currentID={currentID}
-        open={openFormDialog}
-        handleClose={handleCloseUpdateDialog}
-      />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

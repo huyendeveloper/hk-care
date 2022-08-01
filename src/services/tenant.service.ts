@@ -2,7 +2,7 @@ import axiosClient from 'api';
 import { baseURL } from 'config';
 
 class TenantService {
-  getAll() {
+  getTenants() {
     return axiosClient.get(`${baseURL}/GetTenants`);
   }
 }

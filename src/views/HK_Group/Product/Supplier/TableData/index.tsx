@@ -5,7 +5,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
@@ -13,7 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 import { LinkIconButton, Scrollbar } from 'components/common';
 import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
@@ -22,20 +24,19 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { ISupplier } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   changeStatus,
   deleteSupplier,
-  getAllSupplier
+  getAllSupplier,
 } from 'redux/slices/supplier';
-import { RootState } from 'redux/store';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 import FormDialogSupplier from '../FormDialog';
@@ -45,22 +46,23 @@ const getCells = (): Cells<ISupplier> => [
   { id: 'name', label: 'Tên nhà cung cấp' },
   { id: 'address', label: 'Địa chỉ' },
   { id: 'nameContact', label: 'Người liên hệ' },
-  { id: 'telephoneNumber', label: 'Số điện thoại' },
+  { id: 'telephoneNumber', label: 'Điện thoại' },
   { id: 'active', label: 'Trạng thái' },
   { id: 'active', label: 'Thao tác' },
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
-  const { loading } = useSelector((state: RootState) => state.supplier);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const dispatch = useDispatch();
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
@@ -70,17 +72,18 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllSupplier(filters));
 
     if (error) {
-      setNotification({
-        error: 'Lỗi khi tải danh sách nhà cung cấp!',
-      });
+      setNotification({ error: 'Lỗi!' });
+      setLoading(false);
       return;
     }
 
     setSupplierList(payload.supplierList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
@@ -142,14 +145,12 @@ const TableData = () => {
     setOpenUnBlockDialog(false);
   };
 
-  const handleCloseFormDialog = (updated: boolean | undefined) => {
+  const handleCloseFormDialog = () => {
     setOpenFormDialog(false);
-    if (updated) {
-      fetchData();
-    }
   };
 
   const handleBlock = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseBlockDialog();
     const { error } = await dispatch(
@@ -157,7 +158,8 @@ const TableData = () => {
       changeStatus({ id: currentID, status: 2 })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi vô hiệu hóa nhà cung cấp này!' });
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -166,9 +168,11 @@ const TableData = () => {
     });
 
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleUnBlock = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseUnBlockDialog();
     const { error } = await dispatch(
@@ -176,9 +180,8 @@ const TableData = () => {
       changeStatus({ id: currentID, status: 1 })
     );
     if (error) {
-      setNotification({
-        error: 'Lỗi khi kích hoạt hoạt động nhà cung cấp này!',
-      });
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -187,6 +190,7 @@ const TableData = () => {
     });
 
     fetchData();
+    setShowBackdrop(false);
   };
 
   const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
@@ -199,12 +203,14 @@ const TableData = () => {
   };
 
   const handleDelete = async () => {
+    setShowBackdrop(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
     // @ts-ignore
     const { error } = await dispatch(deleteSupplier(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi khi xóa nhà cung cấp!' });
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -212,7 +218,8 @@ const TableData = () => {
       severity: 'success',
     });
 
-    setSupplierList(supplierList.filter((x) => x.id !== currentID));
+    fetchData();
+    setShowBackdrop(false);
   };
 
   const renderAction = (row: ISupplier) => {
@@ -265,7 +272,7 @@ const TableData = () => {
       </TableSearchField>
 
       <TableContent total={supplierList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -292,7 +299,6 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{name}</TableCell>
-                      {/* @ts-ignore */}
                       <Tooltip title={address} placement="bottom">
                         <TableCell
                           sx={{
@@ -330,7 +336,7 @@ const TableData = () => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
 
@@ -359,6 +365,7 @@ const TableData = () => {
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
+        loading={showBackdrop}
       />
 
       <FormDialogSupplier
@@ -366,7 +373,16 @@ const TableData = () => {
         data={supplierList.find((x) => x.id === currentID)}
         open={openFormDialog}
         handleClose={handleCloseFormDialog}
+        fetchData={fetchData}
       />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

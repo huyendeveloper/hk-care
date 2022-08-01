@@ -13,11 +13,10 @@ import {
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IUsage } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { createUsage, updateUsage } from 'redux/slices/usage';
-import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 interface Props {
@@ -25,14 +24,28 @@ interface Props {
   handleClose: (updated?: boolean) => void;
   currentID?: number | null;
   data?: IUsage;
-  disable?: boolean;
+  disable: boolean;
+  fetchData: () => void;
 }
+
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
 
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên dạng dùng.')
-    .trim('Vui lòng nhập tên dạng dùng.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên dạng dùng.')
+    .min(2, 'Tên dạng dùng ít nhất 2 ký tự.')
     .max(100, 'Tên dạng dùng không quá 100 ký tự.')
     .strict(true)
     .default(''),
@@ -44,13 +57,14 @@ const FormDialog = ({
   handleClose,
   currentID,
   data,
-  disable = false,
+  disable,
+  fetchData,
 }: Props) => {
-  const { loading } = useSelector((state: RootState) => state.usage);
-  const setNotification = useNotification();
-  const dispatch = useDispatch();
   const [disabled, setDisabled] = useState<boolean>(disable);
-  const { control, handleSubmit, setValue, reset } = useForm<IUsage>({
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const { control, handleSubmit, reset } = useForm<IUsage>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
@@ -60,43 +74,59 @@ const FormDialog = ({
     setDisabled(disable);
   }, [disable, open]);
 
-  const onSubmit = async (data: IUsage) => {
-    if (data.id) {
-      // @ts-ignore
-      const { error, payload } = await dispatch(updateUsage(data));
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật dạng dùng!',
-        });
-        return;
-      }
+  const handleUpdate = async (data: IUsage) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(updateUsage(data));
+    if (error) {
       setNotification({
-        message: 'Cập nhật thành công',
-        severity: 'success',
+        error: payload.response.data || 'Lỗi!',
       });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Cập nhật thành công',
+      severity: 'success',
+    });
+  };
+
+  const handleAdd = async (data: IUsage) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(createUsage(data));
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({ message: 'Thêm thành công', severity: 'success' });
+  };
+
+  const onSubmit = async (data: IUsage) => {
+    setShowBackdrop(true);
+    if (data.id) {
+      await handleUpdate(data);
     } else {
-      // @ts-ignore
-      const { error, payload } = await dispatch(createUsage(data));
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi khi thêm dạng dùng!',
-        });
-        return;
-      }
-      setNotification({ message: 'Thêm thành công', severity: 'success' });
+      await handleAdd(data);
     }
 
+    fetchData();
     reset();
-    handleClose(true);
+    handleClose();
+    setShowBackdrop(false);
   };
 
   useEffect(() => {
-    reset();
     if (currentID) {
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('description', data?.description || '');
+      reset({
+        id: currentID,
+        name: data?.name || '',
+        description: data?.description || '',
+      });
+      return;
     }
+    reset({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentID, open]);
 
@@ -120,8 +150,8 @@ const FormDialog = ({
               </Grid>
               <Grid item xs={12}>
                 <ControllerTextField
-                  name="name"
                   disabled={disabled}
+                  name="name"
                   control={control}
                 />
               </Grid>
@@ -132,8 +162,8 @@ const FormDialog = ({
                 <ControllerTextarea
                   maxRows={5}
                   minRows={5}
-                  name="description"
                   disabled={disabled}
+                  name="description"
                   control={control}
                 />
               </Grid>
@@ -143,7 +173,7 @@ const FormDialog = ({
 
         <FormFooter>
           <Button variant="outlined" onClick={() => handleClose()}>
-            {disabled ? 'Quay lại' : 'Hủy'}
+            {disabled ? 'Đóng' : 'Hủy'}
           </Button>
           {disabled && (
             <Button onClick={() => setDisabled(false)}>
@@ -151,7 +181,7 @@ const FormDialog = ({
             </Button>
           )}
           {!disabled && (
-            <LoadingButton loading={loading} type="submit">
+            <LoadingButton loading={showBackdrop} type="submit">
               Lưu
             </LoadingButton>
           )}

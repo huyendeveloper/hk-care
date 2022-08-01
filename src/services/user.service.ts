@@ -2,7 +2,7 @@ import axiosClient from 'api';
 import { connectURL } from 'config';
 
 class UserService {
-  getRoles() {
+  getRoleCurrent() {
     return axiosClient.get(`${connectURL}/api/identity/roles/GetRoleCurrent`);
   }
 }

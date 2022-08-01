@@ -7,12 +7,15 @@ import Typography from '@mui/material/Typography';
 interface Props extends BoxProps {
   title: string;
   description?: string;
+  hidden?: boolean;
 }
 
 const FormHeader = (props: Props) => {
-  const { title, description, children, ...rest } = props;
+  const { title, description, children, hidden, ...rest } = props;
 
-  return (
+  return hidden ? (
+    <></>
+  ) : (
     <Box sx={{ mb: 2 }} {...rest}>
       <Typography
         color="text.secondary"

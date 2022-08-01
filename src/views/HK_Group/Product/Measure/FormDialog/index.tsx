@@ -13,11 +13,10 @@ import {
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IMeasure } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { createMeasure, updateMeasure } from 'redux/slices/measure';
-import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 interface Props {
@@ -26,74 +25,111 @@ interface Props {
   currentID?: number | null;
   data?: IMeasure;
   disable: boolean;
+  fetchData: () => void;
 }
+
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
 
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên đơn vị đo lường.')
-    .trim('Vui lòng nhập tên đơn vị đo lường.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên đơn vị đo lường.')
+    .min(2, 'Tên đơn vị đo lường ít nhất 2 ký tự.')
     .max(100, 'Tên đơn vị đo lường không quá 100 ký tự.')
     .strict(true)
     .default(''),
   description: yup.string().strict(true).default(''),
 });
 
-const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
+const FormDialog = ({
+  open,
+  handleClose,
+  currentID,
+  data,
+  disable,
+  fetchData,
+}: Props) => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const { loading } = useSelector((state: RootState) => state.measure);
   const [disabled, setDisabled] = useState<boolean>(disable);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
-  const { control, handleSubmit, setValue, reset } = useForm<IMeasure>({
+  const { control, handleSubmit, reset } = useForm<IMeasure>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (data: IMeasure) => {
-    if (data.id) {
-      // @ts-ignore
-      const { error, payload } = await dispatch(updateMeasure(data));
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi khi cập nhật đơn vị đo lường!',
-        });
-        return;
-      }
-      setNotification({
-        message: 'Cập nhật thành công',
-        severity: 'success',
-      });
-    } else {
-      // @ts-ignore
-      const { error, payload } = await dispatch(createMeasure(data));
-      if (error) {
-        setNotification({
-          error: payload.response.data || 'Lỗi khi thêm đơn vị đo lường!',
-        });
-        return;
-      }
-      setNotification({ message: 'Thêm thành công', severity: 'success' });
-    }
-
-    reset();
-    handleClose(true);
-  };
-
-  useEffect(() => {
-    reset();
-    if (currentID) {
-      setValue('id', currentID);
-      setValue('name', data?.name || '');
-      setValue('description', data?.description || '');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID, open]);
-
   useEffect(() => {
     setDisabled(disable);
   }, [disable, open]);
+
+  const handleUpdate = async (data: IMeasure) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(updateMeasure(data));
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Cập nhật thành công',
+      severity: 'success',
+    });
+  };
+
+  const handleAdd = async (data: IMeasure) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(createMeasure(data));
+    if (error) {
+      setNotification({
+        error: payload.response.data || 'Lỗi!',
+      });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({ message: 'Thêm thành công', severity: 'success' });
+  };
+
+  const onSubmit = async (data: IMeasure) => {
+    setShowBackdrop(true);
+    if (data.id) {
+      await handleUpdate(data);
+    } else {
+      await handleAdd(data);
+    }
+
+    fetchData();
+    reset();
+    handleClose();
+    setShowBackdrop(false);
+  };
+
+  useEffect(() => {
+    if (currentID) {
+      reset({
+        id: currentID,
+        name: data?.name || '',
+        description: data?.description || '',
+      });
+      return;
+    }
+    reset({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} onClose={() => handleClose()}>
@@ -138,7 +174,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
 
         <FormFooter>
           <Button variant="outlined" onClick={() => handleClose()}>
-            {disabled ? 'Quay lại' : 'Hủy'}
+            {disabled ? 'Đóng' : 'Hủy'}
           </Button>
           {disabled && (
             <Button onClick={() => setDisabled(false)}>
@@ -146,7 +182,7 @@ const FormDialog = ({ open, handleClose, currentID, data, disable }: Props) => {
             </Button>
           )}
           {!disabled && (
-            <LoadingButton loading={loading} type="submit">
+            <LoadingButton loading={showBackdrop} type="submit">
               Lưu
             </LoadingButton>
           )}

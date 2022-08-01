@@ -13,7 +13,7 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid,
+  FormPaperGrid
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { connectURL } from 'config';
@@ -25,9 +25,9 @@ import {
   IProductGroup,
   ISupplier,
   ITreatmentGroup,
-  IUsage,
+  IUsage
 } from 'interface';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -39,13 +39,24 @@ import supplierService from 'services/supplier.service';
 import treatmentGroupService from 'services/treatmentGroup.service';
 import usageService from 'services/usage.service';
 import * as yup from 'yup';
-import FormDialog from '../FormDialog';
+
+yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
+  return this.test(`test-trim`, errorMessage, function (value) {
+    const { path, createError } = this;
+
+    return (
+      (value && value.trim() !== '') ||
+      createError({ path, message: errorMessage })
+    );
+  });
+});
 
 const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên sản phẩm.')
-    .trim('Vui lòng nhập tên sản phẩm.'),
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên sản phẩm.'),
   productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
   treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
   usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
@@ -54,21 +65,23 @@ const validationSchema = yup.object().shape({
   dosage: yup
     .string()
     .required('Vui lòng nhập hàm lượng.')
-    .trim('Vui lòng nhập hàm lượng.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập hàm lượng.')
     .default('Null'),
   routeOfUse: yup
     .string()
     .required('Vui lòng nhập liều dùng.')
-    .trim('Vui lòng nhập liều dùng.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập liều dùng.')
     .default('Theo chỉ định'),
   dateManufacture: yupDate,
 });
 
 const DetailsForm = () => {
-  const { id: crudId } = useParams();
-  const [product, setProduct] = useState<IProduct>();
-  const [taskQueue, setTaskQueue] = useState<boolean>(true);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const setNotification = useNotification();
+  const [productDetail, setProductDetail] = useState(null);
   const [image, setImage] = useState<Blob | null | string | undefined>();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [treatmentGroupList, setTreatmentGroupList] = useState<
@@ -78,14 +91,15 @@ const DetailsForm = () => {
   const [productGroupList, setProductGroupList] = useState<IProductGroup[]>([]);
   const [measureList, setMeasureList] = useState<IMeasure[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
-  const dispatch = useDispatch();
-  const setNotification = useNotification();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const {
     control,
     setValue,
     getValues,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IProduct>({
     mode: 'onChange',
@@ -93,55 +107,90 @@ const DetailsForm = () => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  const fetchData = async () => {
-    if (!crudId) return;
+  useEffect(() => {
+    if (!productDetail) return;
 
-    const { data } = await productService.get(Number(crudId));
+    const {
+      id,
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
+      usageO,
+      productGroupO,
+      treamentGroupO,
+      amountSecond,
+      amountThird,
+      mesureLevelFisrt,
+      mesureLevelSecond,
+      mesureLevelThird,
+      suppliers,
+      productImage,
+    } = productDetail;
 
-    setValue('id', data?.id);
-    setValue('name', data?.name);
-    data?.numberRegister && setValue('numberRegister', data?.numberRegister);
-    data?.lotNumber && setValue('lotNumber', data?.lotNumber);
-    setValue('producer', data?.producer);
-    data?.dateManufacture && setValue('dateManufacture', data?.dateManufacture);
-    data?.outOfDate && setValue('outOfDate', data?.outOfDate);
-    setValue('importPrice', data?.importPrice);
-    setValue('price', data?.price);
-    setValue('packRule', data?.packRule);
-    setValue('content', data?.content);
-    setValue('dosage', data?.dosage);
-    setValue('routeOfUse', data?.routeOfUse);
-    setValue('description', data?.description);
-    setValue('hidden', data?.hidden);
-    setValue('usageId', data?.usageO.id);
-    setValue('usageName', data?.usageO.name);
-    setValue('productGroupId', data?.productGroupO.id);
-    setValue('productGroupName', data?.productGroupO.name);
-    setValue('treamentGroupId', data?.treamentGroupO.id);
-    setValue('treamentGroupName', data?.treamentGroupO.name);
-    setValue('productImage', data?.productImage);
-    data?.productImage && setImage(`${connectURL}/${data?.productImage}`);
-    setValue('amountSecond', data?.amountSecond);
-    data?.amountThird && setValue('amountThird', data?.amountThird);
-    // setSupplierList(data?.suppliers);
-    setValue(
-      'productsSupplier',
+    reset({
+      id,
+      name,
+      numberRegister,
+      lotNumber,
+      producer,
+      dateManufacture,
+      outOfDate,
+      importPrice,
+      price,
+      packRule,
+      content,
+      dosage,
+      routeOfUse,
+      description,
+      hidden,
       // @ts-ignore
-      data?.suppliers.map((x) => x.id)
-    );
-    setValue('mesureLevelFisrt', data?.mesureLevelFisrt.id);
-    setValue('mesureLevelFisrtName', data?.mesureLevelFisrt.name);
-    setValue('mesureLevelSecond', data?.mesureLevelSecond.id);
-    setValue('mesureLevelSecondName', data?.mesureLevelSecond.name);
-    setValue('mesureLevelThird', data?.mesureLevelThird.id);
-    setValue('mesureLevelThirdName', data?.mesureLevelThird.name);
-    setProduct(data);
-    setTaskQueue(false);
+      usageId: usageO.id || null,
+      // @ts-ignore
+      productGroupId: productGroupO.id || null,
+      // @ts-ignore
+      treamentGroupId: treamentGroupO.id || null,
+      productImage,
+      amountSecond,
+      amountThird,
+      // @ts-ignore
+      mesureLevelFisrt: mesureLevelFisrt.id || null,
+      // @ts-ignore
+      mesureLevelSecond: mesureLevelSecond.id || null,
+      // @ts-ignore
+      mesureLevelThird: mesureLevelThird.id || null,
+      // @ts-ignore
+      productsSupplier: suppliers.map((x) => x.id),
+    });
+    productImage && setImage(`${connectURL}/${productImage}`);
+  }, [productDetail, reset]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    if (!id) return;
+
+    const { data } = await productService.get(Number(id));
+    if (!data) {
+      setLoading(false);
+      return;
+    }
+    setProductDetail(data);
+    setLoading(false);
   };
 
   const fetchProductGroupList = () => {
     productGroupService
-      .getAllProductGroupp()
+      .getAllProductGroup()
       .then(({ data }) => {
         setProductGroupList(data.items);
       })
@@ -197,24 +246,17 @@ const DetailsForm = () => {
     fetchMeasureList();
     fetchSupplierList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [crudId]);
-
-  if (taskQueue) {
-    return <LoadingScreen />;
-  }
-
-  const handleCloseUpdateDialog = () => {
-    setOpenFormDialog(false);
-    fetchData();
-  };
+  }, [id]);
 
   const onSubmit = async (payload: IProduct) => {
+    setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
       updateProduct({ ...payload, image })
     );
     if (error) {
-      setNotification({ error: 'Lỗi khi cập nhật sản phẩm!' });
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
       return;
     }
     setNotification({
@@ -223,7 +265,12 @@ const DetailsForm = () => {
     });
 
     setDisabled(true);
+    setShowBackdrop(false);
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <PageWrapper title="Chi tiết sản phẩm">
@@ -260,7 +307,6 @@ const DetailsForm = () => {
               <Grid item xs={12} md={6}>
                 <FormLabel title="Số đăng ký" name="numberRegister" />
                 <ControllerTextField
-                  type="number"
                   name="numberRegister"
                   control={control}
                   disabled={disabled}
@@ -286,7 +332,6 @@ const DetailsForm = () => {
               <Grid item xs={12} md={6}>
                 <FormLabel title="Số lô" name="lotNumber" />
                 <ControllerTextField
-                  type="number"
                   name="lotNumber"
                   control={control}
                   disabled={disabled}
@@ -394,18 +439,22 @@ const DetailsForm = () => {
                 <FormLabel title="Giá nhập" name="importPrice" />
                 <ControllerNumberInput
                   name="importPrice"
-                  value={product?.importPrice}
+                  // @ts-ignore
+                  defaultValue={productDetail?.importPrice}
                   setValue={setValue}
                   disabled={disabled}
+                  control={control}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Giá bán" name="price" />
                 <ControllerNumberInput
                   name="price"
-                  value={product?.price}
+                  // @ts-ignore
+                  defaultValue={productDetail?.price}
                   setValue={setValue}
                   disabled={disabled}
+                  control={control}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -484,7 +533,11 @@ const DetailsForm = () => {
             Quay lại danh sách sản phẩm
           </LinkButton>
 
-          {!disabled && <LoadingButton type="submit">Lưu</LoadingButton>}
+          {!disabled && (
+            <LoadingButton loading={showBackdrop} type="submit">
+              Lưu
+            </LoadingButton>
+          )}
 
           {disabled && (
             <Button variant="contained" onClick={() => setDisabled(false)}>
@@ -493,14 +546,6 @@ const DetailsForm = () => {
           )}
         </FormFooter>
       </FormPaperGrid>
-
-      <FormDialog
-        dataUpdate={product}
-        // @ts-ignore
-        currentID={product?.id}
-        open={openFormDialog}
-        handleClose={handleCloseUpdateDialog}
-      />
     </PageWrapper>
   );
 };

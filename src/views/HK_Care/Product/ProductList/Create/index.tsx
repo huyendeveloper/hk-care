@@ -5,29 +5,27 @@ import {
   FormContent,
   FormFooter,
   FormHeader,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { registProductList } from 'redux/slices/productList';
 import ProductListTableData from './ProductListTableData';
 import ProductTableData from './ProductTableData';
 
 const Create = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const setNotification = useNotification();
-  const [registerList, setRegisterList] = useState<IProductList[]>([]);
-  const [unregisterList, setUnregisterList] = useState<IProductList[]>([]);
   const [rerender, setRerender] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [registerList, setRegisterList] = useState<IProductList[]>([]);
 
   const handleRegist = (item: IProductList) => {
     setRegisterList([...registerList, item]);
-  };
-
-  const handleUnregist = (item: IProductList) => {
-    setUnregisterList([...unregisterList, item]);
   };
 
   const handleCancelRegist = (id: number) => {
@@ -42,19 +40,22 @@ const Create = () => {
       });
       return;
     }
-
+    setLoading(true);
     if (registerList.length > 0) {
       const { error } = await dispatch(
         // @ts-ignore
         registProductList(registerList)
       );
       if (error) {
-        setNotification({ error: 'Lỗi khi đăng ký sản phẩm!' });
+        setNotification({ error: 'Lỗi!' });
+        setLoading(false);
         return;
       }
       setNotification({ message: 'Đăng ký thành công', severity: 'success' });
       setRerender((pre) => pre + 1);
       setRegisterList([]);
+      setLoading(false);
+      return navigate('/hk_care/product/list');
     }
   };
 
@@ -68,13 +69,11 @@ const Create = () => {
               <ProductTableData
                 handleRegist={handleRegist}
                 registerList={registerList}
-                handleCancelRegist={handleCancelRegist}
                 rerender={rerender}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <ProductListTableData
-                handleUnregist={handleUnregist}
                 registerList={registerList}
                 handleCancelRegist={handleCancelRegist}
               />
@@ -83,7 +82,9 @@ const Create = () => {
         </FormContent>
         <FormFooter>
           <LinkButton to="/hk_care/product/list">Quay lại</LinkButton>
-          <LoadingButton onClick={handleSubmit}>Lưu</LoadingButton>
+          <LoadingButton loading={loading} onClick={handleSubmit}>
+            Lưu
+          </LoadingButton>
         </FormFooter>
       </FormPaperGrid>
     </PageWrapper>

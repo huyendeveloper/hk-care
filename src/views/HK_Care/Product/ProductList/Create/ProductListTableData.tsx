@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import {
@@ -14,14 +14,12 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { IProductList } from 'interface';
 import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
 
 const getCells = (): Cells<IProductList> => [
@@ -31,18 +29,12 @@ const getCells = (): Cells<IProductList> => [
 ];
 
 interface IProps {
-  handleUnregist: (item: IProductList) => void;
   handleCancelRegist: (id: number) => void;
   registerList: IProductList[];
 }
 
-const ProductListTableData = ({
-  handleUnregist,
-  registerList,
-  handleCancelRegist,
-}: IProps) => {
+const ProductListTableData = ({ registerList, handleCancelRegist }: IProps) => {
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const { loading } = useSelector((state: RootState) => state.productList);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -92,8 +84,19 @@ const ProductListTableData = ({
         searchText={filters.searchText}
       />
 
-      <TableContent total={registerList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+      <TableContent
+        total={
+          registerList
+            .filter((item) =>
+              item.productName
+                .toLocaleLowerCase()
+                .includes(filters.searchText.toLowerCase())
+            )
+            .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10).length
+        }
+        loading={false}
+      >
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -143,7 +146,7 @@ const ProductListTableData = ({
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>

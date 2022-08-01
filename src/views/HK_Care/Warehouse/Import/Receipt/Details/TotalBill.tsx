@@ -1,88 +1,58 @@
-import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import React from 'react';
-import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
-interface IProps {
-  control: any;
-  setValue: any;
+interface ImportReceipt {
+  toTalMoney: number;
+  vat: number;
+  discountValue: number;
+  moneyToPay: number;
+  paid: number;
+  debts: number;
+  description: string;
+  pathFile: string;
 }
 
-const TotalBill = ({ control, setValue }: IProps) => {
-  const productList = useWatch({ control, name: 'productList' });
-  const vat = useWatch({ control, name: 'vat' }) || 0;
-  const discount = useWatch({ control, name: 'discount' }) || 0;
-  const paid = useWatch({ control, name: 'paid' }) || 0;
+interface IProps {
+  importReceipt: ImportReceipt | undefined;
+}
 
-  const bill = productList
-    ? productList.reduce(
-        // @ts-ignore
-        (prev, cur) =>
-          prev +
-          (Number(cur?.amount) || 0) * (Number(cur?.importPrice) || 0) -
-          (Number(cur?.discount) || 0),
-        0
-      )
-    : 0;
-
-  const moneyToPay = bill + bill * (vat / 100) - bill * (discount / 100);
-
-  const debts = moneyToPay - paid;
-
+const TotalBill = ({ importReceipt }: IProps) => {
   return (
-    <table>
-      <tr>
-        <td>Tổng tiền:</td>
-        <td>{numberFormat(bill)}</td>
-      </tr>
-      <tr>
-        <td>Thuế VAT (%)</td>
-        <td>
-          <ControllerNumberInput
-            name="vat"
-            variant="standard"
-            setValue={setValue}
-            type="percent"
-            disabled
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>Chiết khấu (%):</td>
-        <td>
-          <ControllerNumberInput
-            name="discount"
-            variant="standard"
-            setValue={setValue}
-            type="percent"
-            disabled
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>Tiền cần trả:</td>
-        <td>{numberFormat(moneyToPay)}</td>
-      </tr>
-      <tr>
-        <td style={{ paddingRight: '20px' }}>
-          <b>Đã thanh toán</b>
-        </td>
-        <td>
-          <ControllerNumberInput
-            name="paid"
-            variant="standard"
-            setValue={setValue}
-            disabled
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <b>Công nợ</b>
-        </td>
-        <td>{numberFormat(debts)}</td>
-      </tr>
-    </table>
+    <>
+      {importReceipt && (
+        <table style={{ float: 'right' }}>
+          <tbody>
+            <tr>
+              <td>Tổng tiền:</td>
+              <td>{numberFormat(importReceipt.toTalMoney)}</td>
+            </tr>
+            <tr>
+              <td>Thuế VAT (%)</td>
+              <td>{importReceipt.vat}%</td>
+            </tr>
+            <tr>
+              <td>Chiết khấu (%):</td>
+              <td>{importReceipt.discountValue}%</td>
+            </tr>
+            <tr>
+              <td>Tiền cần trả:</td>
+              <td>{numberFormat(importReceipt.moneyToPay)}</td>
+            </tr>
+            <tr>
+              <td style={{ paddingRight: '20px' }}>
+                <b>Đã thanh toán</b>
+              </td>
+              <td>{numberFormat(importReceipt.paid)}</td>
+            </tr>
+            <tr>
+              <td>
+                <b>Công nợ</b>
+              </td>
+              <td>{numberFormat(importReceipt.debts)}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+    </>
   );
 };
 

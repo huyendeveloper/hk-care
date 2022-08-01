@@ -1,5 +1,6 @@
 import addMinutes from 'date-fns/addMinutes';
 import compareDesc from 'date-fns/compareDesc';
+import endOfDay from 'date-fns/endOfDay';
 import format from 'date-fns/format';
 import getDate from 'date-fns/getDate';
 import getHours from 'date-fns/getHours';
@@ -7,18 +8,23 @@ import getMinutes from 'date-fns/getMinutes';
 import getMonth from 'date-fns/getMonth';
 import getSeconds from 'date-fns/getSeconds';
 import getYear from 'date-fns/getYear';
+import isAfter from 'date-fns/isAfter';
 import isFuture from 'date-fns/isFuture';
 import isValid from 'date-fns/isValid';
 import isWeekend from 'date-fns/isWeekend';
 import set from 'date-fns/set';
 import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
-import isAfter from 'date-fns/isAfter';
 import subMinutes from 'date-fns/subMinutes';
-import endOfDay from 'date-fns/endOfDay';
+import moment from 'moment';
 class DateFns {
   public formatDateTime(date: Date, pattern: string) {
     return format(date, pattern);
+  }
+
+  public formatDate(date: Date, pattern?: string) {
+    if (!date) return '';
+    return moment(date).format(pattern || 'DD/MM/yyyy');
   }
 
   public format(

@@ -7,11 +7,14 @@ import LocalStorage from 'utils/LocalStorage';
 
 class SupplierService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/supplier/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
+    return axiosClient.get(`${baseURL}/supplier/search-all`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllSupplier() {
@@ -25,7 +28,7 @@ class SupplierService {
   create(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
 
-    params.append('name', payload.name);
+    params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
     params.append('telephoneNumber', payload.telephoneNumber);
@@ -56,7 +59,7 @@ class SupplierService {
 
   update(payload: ISupplier, files: File[] | object[]) {
     const params = new FormData();
-    params.append('name', payload.name);
+    params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
     params.append('telephoneNumber', payload.telephoneNumber);
@@ -66,7 +69,6 @@ class SupplierService {
 
     if (files.length > 0) {
       files.forEach((item) => {
-        // @ts-ignore
         if (item) {
           // @ts-ignore
           if (item.type) {
@@ -96,18 +98,17 @@ class SupplierService {
     });
   }
 
-  delete(id: number | null) {
+  delete(id: number) {
     return axiosClient.delete(`${baseURL}/supplier/${id}`);
   }
 
-  changeStatus(id: number | null, status: 2 | 1) {
-    return axiosClient.post(
-      `${baseURL}/supplier/ChangeStatus?supplierId=${id}&status=${status}`
-    );
-  }
-
-  getFile(filePath: string) {
-    return axiosClient.get(`${connectURL}/${filePath}`);
+  changeStatus(id: number, status: 2 | 1) {
+    return axiosClient.post(`${baseURL}/supplier/ChangeStatus`, null, {
+      params: {
+        supplierId: id,
+        status,
+      },
+    });
   }
 }
 

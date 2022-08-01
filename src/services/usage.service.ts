@@ -5,19 +5,18 @@ import { FilterParams } from 'types';
 
 class UsageService {
   getAll({ pageIndex, pageSize, sortBy, searchText }: FilterParams) {
-    return axiosClient.get(
-      `${baseURL}/usage/search-all?Keyword=${searchText}&Sorting=${sortBy}&SkipCount=${
-        (pageIndex - 1) * pageSize
-      }&MaxResultCount=${pageSize}`
-    );
+    return axiosClient.get(`${baseURL}/usage/search-all`, {
+      params: {
+        Keyword: searchText,
+        Sorting: sortBy,
+        SkipCount: (pageIndex - 1) * pageSize,
+        MaxResultCount: pageSize,
+      },
+    });
   }
 
   getAllUsage() {
     return axiosClient.get(`${baseURL}/usage/search-all`);
-  }
-
-  get(id: number) {
-    return axiosClient.get(`${baseURL}/usage/${id}`);
   }
 
   create(payload: IUsage) {

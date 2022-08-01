@@ -3,10 +3,8 @@ import Box from '@mui/material/Box';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { useDebounce } from 'react-use';
 
 export interface Label extends FieldValues {
   name: string;
@@ -27,8 +25,10 @@ interface Props<T, O extends FieldValues[]>
   forcePopupIcon?: boolean;
   noOptionsText?: string;
   handleChangeInput?: (value: string) => void;
-  defaultValue?: string;
   loading?: boolean;
+  disableClearable?: boolean;
+  moreInfor?: keyof O[number] & string;
+  startAdornment?: any;
 }
 
 const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
@@ -48,27 +48,19 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     noOptionsText,
     getOptionDisabled,
     handleChangeInput,
-    defaultValue,
     loading = false,
+    moreInfor,
+    startAdornment,
+    disableClearable = false,
     ...rest
   } = props;
-
-  const [valueInput, setValueInput] = useState<string>('');
-
   const labels = options.reduce((acc: Record<number, Label>, option) => {
     const id = renderValue ? option[renderValue] : option.id;
+    const desc = moreInfor ? option[moreInfor] : '';
     const caption = sublabel ? sublabel(option) : null;
-    acc[id] = { id, name: renderLabel(option), caption };
+    acc[id] = { id, name: renderLabel(option), caption, desc };
     return acc;
   }, {});
-
-  useDebounce(
-    () => {
-      handleChangeInput && handleChangeInput(valueInput);
-    },
-    1500,
-    [valueInput]
-  );
 
   return (
     <Controller
@@ -80,35 +72,42 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           options={options.map((option) => {
             return renderValue ? option[renderValue] : option.id;
           })}
-          getOptionLabel={(option) => {
-            return labels[option]?.name || defaultValue || '';
-          }}
+          getOptionLabel={(option) => labels[option]?.name || ''}
           loading={loading}
           noOptionsText={noOptionsText}
           getOptionDisabled={getOptionDisabled}
           multiple={false}
+          disableClearable={disableClearable}
           renderInput={(params) => {
             // @ts-ignore
-            params.inputProps.value = params.inputProps.value || defaultValue;
+            // params.inputProps.value = params.inputProps.value | defaultLabel;
             return (
               <TextField
                 error={Boolean(error)}
                 helperText={error?.message && error.message}
                 placeholder={placeholder}
-                onChange={(e) => {
-                  setValueInput(e.target.value);
-                }}
                 {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  // @ts-ignore
+                  startAdornment: startAdornment || null,
+                }}
                 {...rest}
               />
             );
           }}
           renderOption={(props, option: number) => {
-            const { name, caption } = labels[option];
+            const { name, caption, desc } = labels[option];
             return (
               <Box component="li" {...props} key={option}>
                 <Box>
-                  {name || defaultValue}
+                  {name || ''}
+                  {moreInfor && (
+                    <>
+                      <br />
+                      {desc}
+                    </>
+                  )}
                   {caption && (
                     <Typography variant="caption" display="block">
                       {caption}

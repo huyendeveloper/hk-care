@@ -1,7 +1,7 @@
 import { PageWrapper } from 'components/common';
 import TableData from './TableData';
 
-const MeasureGroup = () => {
+const Measure = () => {
   return (
     <PageWrapper title="Đơn vị đo lường">
       <TableData />
@@ -9,4 +9,4 @@ const MeasureGroup = () => {
   );
 };
 
-export default MeasureGroup;
+export default Measure;

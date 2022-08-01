@@ -1,8 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalBaseStyles from 'components/common/GlobalBaseStyles';
-import SplashScreen from 'components/common/SplashScreen';
 import { NotificationProvider } from 'contexts/NotificationContext';
-import { createContext } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import './App.css';

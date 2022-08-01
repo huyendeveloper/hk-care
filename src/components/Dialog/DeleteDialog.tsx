@@ -18,6 +18,9 @@ interface Props {
   handleDelete: () => void;
   tableName: string;
   spanContent?: string;
+  message?: string;
+  type?: string;
+  loading?: boolean;
 }
 
 const DeleteDialog = (props: Props) => {
@@ -28,6 +31,9 @@ const DeleteDialog = (props: Props) => {
     handleDelete,
     tableName,
     spanContent = '',
+    message,
+    type = 'Xóa',
+    loading,
   } = props;
 
   return (
@@ -42,7 +48,9 @@ const DeleteDialog = (props: Props) => {
         }}
       >
         <DeleteIcon sx={{ fontSize: 70, color: 'text.secondary' }} />
-        <Typography variant="h6">Xóa {tableName}</Typography>
+        <Typography variant="h6">
+          {type} {tableName}
+        </Typography>
       </Box>
       <Divider />
       <DialogContent>
@@ -51,8 +59,8 @@ const DeleteDialog = (props: Props) => {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Bạn có chắc chắn bạn muốn xóa {tableName} {<strong>{name}</strong>}
-          {spanContent}?
+          {message ||
+            `Bạn có chắc chắn bạn muốn ${type.toLocaleLowerCase()} ${tableName} ${name}${spanContent}?`}
         </Typography>
       </DialogContent>
       <Divider />
@@ -62,8 +70,8 @@ const DeleteDialog = (props: Props) => {
             Hủy
           </Button>
 
-          <LoadingButton color="error" onClick={handleDelete}>
-            Xóa
+          <LoadingButton color="error" loading={loading} onClick={handleDelete}>
+            {type}
           </LoadingButton>
         </Stack>
       </Box>

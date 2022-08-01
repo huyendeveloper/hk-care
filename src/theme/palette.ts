@@ -45,7 +45,7 @@ const palette: ThemeOptions = {
       light: '#5BE584',
       main: '#00AB55',
       dark: '#007B55',
-    },
+    }, 
   },
 };
 

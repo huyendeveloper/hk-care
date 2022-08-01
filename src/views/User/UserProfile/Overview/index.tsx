@@ -14,7 +14,6 @@ import EntitySelecter from 'components/Form/EntitySelecter';
 import FormGroup from 'components/Form/FormGroup';
 import FormInputAdornment from 'components/Form/FormInputAdornment';
 import FormLabel from 'components/Form/FormLabel';
-import useAuth from 'hooks/useAuth';
 import { mockRoleOptions } from 'mock-axios';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -65,7 +64,6 @@ interface FormData {
 const Overview = () => {
   const [openEditProfileDialog, setOpenEditProfileDialog] =
     useState<boolean>(false);
-  const { user: userInfo, onForceUpdate } = useAuth();
 
   const { control, getValues, reset } = useForm<FormData>({
     mode: 'onChange',
@@ -99,7 +97,7 @@ const Overview = () => {
             <Typography>Profile details</Typography>
           </Box>
           <Divider sx={{ my: 2 }} />
-          {userInfo && (
+          {/* {userInfo && (
             <Grid
               container
               alignItems="flex-start"
@@ -210,7 +208,7 @@ const Overview = () => {
                 onForceUpdate={onForceUpdate}
               />
             </Grid>
-          )}
+          )} */}
           <Divider sx={{ my: 2 }} />
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
             <Stack direction="row" spacing={1}>

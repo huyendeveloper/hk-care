@@ -38,7 +38,7 @@ const ControllerImageField = ({
   const handleChange = () => {
     // @ts-ignore
     const file = inputRef?.current?.files[0];
-    if (file && file.type.substr(0, 5) === 'image') {
+    if (file && file.type && file.type.substr(0, 5) === 'image') {
       setImage(file);
     } else {
       setNotification({
@@ -77,7 +77,6 @@ const ControllerImageField = ({
               onMouseOut={() => setEnable(false)}
             />
             <AddPhotoAlternateIcon
-              // className={`preview-image-icon ${disabled ? 'disabled' : ''}`}
               sx={{
                 position: 'absolute',
                 top: 'calc((100% - 35px) / 2)',

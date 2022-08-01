@@ -78,7 +78,7 @@ const getSections = (): SectionItem[] => [
       },
       {
         title: 'Quản trị người dùng',
-        path: '/404',
+        path: '/hk_group/users',
         roles: ['hkl1', 'hkl2'],
       },
     ],
@@ -88,21 +88,9 @@ const getSections = (): SectionItem[] => [
     roles: ['hkl2_1', 'hkl2_1_1', 'hkl2_1_2', 'hkl2_1_3', 'hkl2_1_4'],
     children: [
       {
-        title: 'Quản lý sản phẩm',
-        path: '/404',
+        title: 'Danh sách sản phẩm',
+        path: '/hk_care/product/list',
         roles: ['hkl2_1_1'],
-        children: [
-          {
-            title: 'Danh sách sản phẩm',
-            path: '/hk_care/product/list',
-            roles: ['hkl2_1_1'],
-          },
-          {
-            title: 'Định mức lưu trữ',
-            path: '/404',
-            roles: ['hkl2_1_1'],
-          },
-        ],
       },
       {
         title: 'Quản lý kho',
@@ -111,34 +99,34 @@ const getSections = (): SectionItem[] => [
         children: [
           {
             title: 'Nhập kho',
-            path: '/404',
+            path: '/hk_care/warehouse/import/receipt',
             roles: ['hkl2_1_2'],
-            children: [
-              {
-                title: 'Hoá đơn nhập kho',
-                path: '/hk_care/warehouse/import/receipt',
-                roles: ['hkl2_1_2'],
-              },
-              {
-                title: 'Biên bản nhập kho',
-                path: '/404',
-                roles: ['hkl2_1_2'],
-              },
-            ],
           },
           {
             title: 'Xuất kho',
             path: '/404',
             roles: ['hkl2_1_2'],
+            children: [
+              {
+                title: 'Xuất hủy',
+                path: '/hk_care/warehouse/export/cancel',
+                roles: ['hkl2_1_2'],
+              },
+              {
+                title: 'Xuất luân chuyển',
+                path: '/hk_care/warehouse/export/circulation_invoice',
+                roles: ['hkl2_1_2'],
+              },
+            ],
           },
           {
-            title: 'Lập dự trù nhập kho',
-            path: '/404',
+            title: 'Yêu cầu nhập hàng',
+            path: '/hk_care/warehouse/request',
             roles: ['hkl2_1_2'],
           },
           {
             title: 'Biên bản kiểm kê kho',
-            path: '/404',
+            path: '/hk_care/warehouse/inventory_record',
             roles: ['hkl2_1_2'],
           },
         ],
@@ -149,13 +137,13 @@ const getSections = (): SectionItem[] => [
         roles: ['hkl2_1_3'],
         children: [
           {
-            title: 'Hóa đơn bán hàng',
-            path: '/404',
+            title: 'Bán hàng',
+            path: '/hk_care/sales/order/create',
             roles: ['hkl2_1_3'],
           },
           {
-            title: 'Danh sách khách hàng',
-            path: '/404',
+            title: 'Danh sách hóa đơn',
+            path: '/hk_care/sales/order',
             roles: ['hkl2_1_3'],
           },
         ],
@@ -163,23 +151,28 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Quản lý vận hành',
         path: '/404',
-        roles: ['hkl2_1_4', 'hkl2_1_1', 'hkl2_1'],
+        roles: ['hkl2_1_4', 'hkl2_1'],
         children: [
           {
             title: 'Danh sách nhân viên',
-            path: '/404',
-            roles: ['hkl2_1_3', 'hkl2_1_1', 'hkl2_1_4', 'hkl2_1'],
+            path: '/hk_care/operate/staff',
+            roles: ['hkl2_1_3', 'hkl2_1_4', 'hkl2_1'],
+          },
+          {
+            title: 'Phân quyền',
+            path: '/hk_care/operate/roles',
+            roles: ['hkl2_1'],
           },
         ],
       },
       {
-        title: 'Báo cáo/Thống kê (Tại điểm bán)',
+        title: 'Báo cáo',
         path: '/404',
         roles: ['hkl2_1'],
         children: [
           {
             title: 'Báo cáo doanh thu nhà thuốc',
-            path: '/404',
+            path: '/hk_care/sales_statistical/sales_report',
             roles: ['hkl2_1'],
           },
         ],
@@ -192,19 +185,19 @@ const getSections = (): SectionItem[] => [
     children: [
       {
         title: 'Tổng hợp yêu cầu nhập',
-        path: '/404',
+        path: '/hk_trading/request',
         roles: ['hkl4'],
       },
-      {
-        title: 'Kế hoạch nhập kho',
-        path: '/404',
-        roles: ['hkl4'],
-      },
-      {
-        title: 'Kế hoạch phân phối',
-        path: '/404',
-        roles: ['hkl4'],
-      },
+      // {
+      //   title: 'Kế hoạch nhập kho',
+      //   path: '/404',
+      //   roles: ['hkl4'],
+      // },
+      // {
+      //   title: 'Kế hoạch phân phối',
+      //   path: '/404',
+      //   roles: ['hkl4'],
+      // },
     ],
   },
 ];

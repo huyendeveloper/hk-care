@@ -4,6 +4,10 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import SearchField from './SearchField';
 import Typography from '@mui/material/Typography';
+import { TextField } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { DatePicker } from '@mui/lab';
+import DateFns from 'utils/DateFns';
 
 interface Props extends BoxProps {
   placeHolder: string;
@@ -11,6 +15,11 @@ interface Props extends BoxProps {
   searchText: string;
   title?: string;
   headerTitle?: string;
+  haveFromTo?: boolean;
+  start?: Date | null;
+  end?: Date | null;
+  setStart?: (date: Date | null) => void;
+  setEnd?: (date: Date | null) => void;
 }
 
 const TableSearchField = (props: Props) => {
@@ -21,8 +30,15 @@ const TableSearchField = (props: Props) => {
     onSearch,
     children,
     headerTitle,
+    haveFromTo,
+    onDragStart,
+    start,
+    end,
+    setStart,
+    setEnd,
     ...rest
   } = props;
+
   return (
     <Wrapper {...rest}>
       {headerTitle && (
@@ -34,6 +50,7 @@ const TableSearchField = (props: Props) => {
           {headerTitle}
         </Typography>
       )}
+
       <SearchField
         title={title}
         placeHolder={placeHolder}
@@ -46,6 +63,52 @@ const TableSearchField = (props: Props) => {
           </Stack>
         </Box>
       </SearchField>
+      {haveFromTo && (
+        <Stack
+          flexDirection="row"
+          gap={1}
+          alignItems="center"
+          justifyContent="flex-end"
+          sx={{ mt: 2 }}
+        >
+          <DatePicker
+            // @ts-ignore
+            value={start}
+            onChange={(newValue) => {
+              setStart && setStart(newValue || null);
+            }}
+            inputFormat="dd/MM/yyyy"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                inputProps={{
+                  ...params.inputProps,
+                  placeholder: 'Từ',
+                }}
+              />
+            )}
+          />
+          <RemoveIcon />
+
+          <DatePicker
+            // @ts-ignore
+            value={end}
+            onChange={(newValue) => {
+              setEnd && setEnd(newValue || null);
+            }}
+            inputFormat="dd/MM/yyyy"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                inputProps={{
+                  ...params.inputProps,
+                  placeholder: 'Đến',
+                }}
+              />
+            )}
+          />
+        </Stack>
+      )}
     </Wrapper>
   );
 };

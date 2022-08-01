@@ -1,5 +1,4 @@
-import type { FC } from 'react';
-import { Fragment } from 'react';
+import { FC, Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { RootState } from 'redux/store';

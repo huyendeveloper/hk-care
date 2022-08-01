@@ -20,11 +20,9 @@ import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IProductList } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getAllProductList } from 'redux/slices/productList';
-import { RootState } from 'redux/store';
 import type { FilterParams } from 'types/common';
-import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 
 const getCells = (): Cells<IProductList> => [
   { id: 'productId', label: 'STT' },
@@ -35,22 +33,16 @@ const getCells = (): Cells<IProductList> => [
 interface IProps {
   handleRegist: (item: IProductList) => void;
   registerList: IProductList[];
-  handleCancelRegist: (id: number) => void;
   rerender: number;
 }
 
-const ProductTableData = ({
-  handleRegist,
-  registerList,
-  handleCancelRegist,
-  rerender,
-}: IProps) => {
+const ProductTableData = ({ handleRegist, registerList, rerender }: IProps) => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
 
   const [productList, setProductList] = useState<IProductList[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const { loading } = useSelector((state: RootState) => state.product);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
   });
@@ -63,15 +55,18 @@ const ProductTableData = ({
 
     if (error) {
       setNotification({
-        error: 'Lỗi khi tải danh sách sản phẩm!',
+        error: 'Lỗi!',
       });
+      setLoading(false);
       return;
     }
     setProductList(payload.productList);
     setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, rerender]);
@@ -124,7 +119,7 @@ const ProductTableData = ({
       />
 
       <TableContent total={productList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
               <TableHeader
@@ -158,7 +153,7 @@ const ProductTableData = ({
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
     </TableWrapper>
