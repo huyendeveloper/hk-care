@@ -25,7 +25,9 @@ interface IProps {
 }
 
 const OrderDetail = ({ control, setValue, getValues }: IProps) => {
-  const [files, setFiles] = useState<File[] | object[]>([]);
+  const [files, setFiles] = useState<File[] | object[]>(
+    getValues('images') || []
+  );
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [previewImages, setPreviewImages] = useState<boolean>(false);
 
@@ -80,9 +82,15 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     if (files.length === 0) {
       return;
     }
-    setShowBackdrop(true);
+    setPreviewImages(true);
+  };
 
-    await files.forEach(async (file, index, array) => {
+  // @ts-ignore
+  const handleChangeFiles = async (newValue) => {
+    setShowBackdrop(true);
+    setFiles(newValue);
+    // @ts-ignore
+    await newValue.forEach(async (file, index, array) => {
       // @ts-ignore
       if (file?.type) {
         const { data } = await importReceiptService.getPathFileReceipt(file);
@@ -103,9 +111,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     const fileList = files.filter((item) => Boolean(item.type));
     if (fileList.length === 0) {
       setShowBackdrop(false);
-      setPreviewImages(true);
+      setValue('images', files);
     }
-    console.log('fileList', fileList);
   }, [files, showBackdrop]);
 
   return (
@@ -161,12 +168,13 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       {orderType === 2 && (
         <ControllerMultiImages
           files={files}
-          setFiles={setFiles}
+          setFiles={(newValue) => {
+            handleChangeFiles(newValue);
+          }}
           message="Tài liệu đính kèm chỉ cho phép file ảnh."
           handleView={handleView}
         />
       )}
-
       <Stack flexDirection="row" justifyContent="space-between">
         <div>
           Tổng tiền: (<b>{orderDetailDtos?.length || 0}</b> sản phẩm)
@@ -218,7 +226,6 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
         </div>
       </Stack>
       <b>Ghi chú</b>
-
       <ControllerTextarea
         maxRows={5}
         minRows={5}
@@ -229,9 +236,8 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       <MapDialog
         open={previewImages}
         onClose={() => setPreviewImages(false)}
-        images={files}
+        images={files || []}
       />
-
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showBackdrop}
