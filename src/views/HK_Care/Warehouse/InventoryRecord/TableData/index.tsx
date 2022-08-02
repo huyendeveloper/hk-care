@@ -97,6 +97,12 @@ const TableData = () => {
 
     //setInventoryRecord(payload.inventoryRecord);
   };
+  
+  useEffect(() => {
+    setLoading(true);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLoading(true);
