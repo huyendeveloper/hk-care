@@ -56,15 +56,15 @@ interface ISelect {
 
 const getCells = (): Cells<IInventoryRecordProductShow> => [
   { id: 'id', label: 'STT' },
-  { id: 'name', label: 'Tên SP' },
-  { id: 'unit', label: 'Đ.Vị' },
+  { id: 'name', label: 'Tên sản phẩm' },
+  { id: 'unit', label: 'Đơn Vị' },
   {
     id: 'amountOld',
     label: (
       <>
         Tồn
         <br />
-        TM
+        Trên máy
       </>
     ),
   },
@@ -74,15 +74,15 @@ const getCells = (): Cells<IInventoryRecordProductShow> => [
       <>
         Tồn
         <br />
-        TT
+        Thực tế
       </>
     ),
   },
-  { id: 'quantityDifference', label: 'C.L' },
+  { id: 'quantityDifference', label: 'Chênh lệnh' },
   { id: 'priceImport', label: 'Giá nhập' },
   { id: 'moneyDifference', label: 'Tiền lệch' },
   { id: 'priceExport', label: 'Giá bán' },
-  { id: 'estimatedRevenue', label: 'D.T.dự tính' },
+  { id: 'estimatedRevenue', label: 'Doanh thu dự tính' },
 ];
 
 const validationSchema = yup.object().shape({});
