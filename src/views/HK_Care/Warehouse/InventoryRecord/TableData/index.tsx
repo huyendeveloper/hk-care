@@ -212,14 +212,14 @@ const TableData = () => {
     return (
       <div style={{ display: 'flex' }}>
         <div onClick={handleOpenViewDialog(row.codeInventory)}>
-          <LinkIconButton to={`create/${row.codeInventory}/0`}>
+          <LinkIconButton to={`view/${row.codeInventory}/0`}>
             <IconButton>
               <VisibilityIcon />
             </IconButton>
           </LinkIconButton>
         </div>
         <div onClick={handleOpenUpdateDialog(row.codeInventory)}>
-          <LinkIconButton to={`create/${row.codeInventory}/1`}>
+          <LinkIconButton to={`update/${row.codeInventory}/1`}>
             <IconButton>
               <EditIcon />
             </IconButton>

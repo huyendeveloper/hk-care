@@ -118,7 +118,11 @@ const HKCareRoutes: RouteObject = {
       children: [{ index: true, element: <CreateInventoryRecord /> }],
     },
     {
-      path: 'warehouse/inventory_record/create/:id/:v',
+      path: 'warehouse/inventory_record/update/:id/:v',
+      children: [{ index: true, element: <CreateInventoryRecord /> }],
+    },
+    {
+      path: 'warehouse/inventory_record/view/:id/:v',
       children: [{ index: true, element: <CreateInventoryRecord /> }],
     },
     {

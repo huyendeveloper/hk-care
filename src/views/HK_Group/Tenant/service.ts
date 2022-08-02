@@ -32,89 +32,79 @@ class TenantService {
   }
 
   public async create(input: SalePointDto | undefined) {
-    try {
-      const params = new FormData();
-      input?.name && params.append('name', input.name.toString());
-      input?.address && params.append('address', input.address.toString());
-      input?.hotline && params.append('hotline', input.hotline.toString());
-      input?.isActived && params.append('isActived', input.isActived.toString());
-      input?.nameContact &&
-        params.append('nameContact', input.nameContact.toString());
-      input?.phone && params.append('phone', input.phone.toString());
-      input?.description &&
-        params.append('description', input.description.toString());
+    const params = new FormData();
+    input?.name && params.append('name', input.name.toString());
+    input?.address && params.append('address', input.address.toString());
+    input?.hotline && params.append('hotline', input.hotline.toString());
+    input?.isActived && params.append('isActived', input.isActived.toString());
+    input?.nameContact &&
+      params.append('nameContact', input.nameContact.toString());
+    input?.phone && params.append('phone', input.phone.toString());
+    input?.description &&
+      params.append('description', input.description.toString());
 
-      if (input?.attachments) {
-        input?.attachments.forEach((m, index) => {
-          if (m.file) {
-            params.append(`attachments[${index}].file`, m.file);
-            params.append(`attachments[${index}].url`, '');
-          } else {
-            params.append(`attachments[${index}].file`, '');
-            params.append(`attachments[${index}].url`, m.url);
-          }
-        });
-      } else {
-        params.append(`attachments`, ''.toString());
-      }
-
-      const token = LocalStorage.get('accessToken');
-
-      return axios({
-        method: 'post',
-        url: `${baseURL}/SalePoint/Create`,
-        data: params,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
+    if (input?.attachments) {
+      input?.attachments.forEach((m, index) => {
+        if (m.file) {
+          params.append(`attachments[${index}].file`, m.file);
+          params.append(`attachments[${index}].url`, '');
+        } else {
+          params.append(`attachments[${index}].file`, '');
+          params.append(`attachments[${index}].url`, m.url);
+        }
       });
-
-    } catch (error: any) {
-      return error.response;
+    } else {
+      params.append(`attachments`, ''.toString());
     }
+
+    const token = LocalStorage.get('accessToken');
+
+    return axios({
+      method: 'post',
+      url: `${baseURL}/SalePoint/Create`,
+      data: params,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   public async update(id: string | undefined, input: SalePointDto | undefined) {
-    
-    try {
-      const params = new FormData();
-      input?.name && params.append('name', input.name.toString());
-      input?.address && params.append('address', input.address.toString());
-      input?.hotline && params.append('hotline', input.hotline.toString());
-      input?.isActived && params.append('isActived', input.isActived.toString());
-      input?.nameContact &&
-        params.append('nameContact', input.nameContact.toString());
-      input?.phone && params.append('phone', input.phone.toString());
-      input?.description &&
-        params.append('description', input.description.toString());
+    const params = new FormData();
+    input?.name && params.append('name', input.name.toString());
+    input?.address && params.append('address', input.address.toString());
+    input?.hotline && params.append('hotline', input.hotline.toString());
+    input?.isActived && params.append('isActived', input.isActived.toString());
+    input?.nameContact &&
+      params.append('nameContact', input.nameContact.toString());
+    input?.phone && params.append('phone', input.phone.toString());
+    input?.description &&
+      params.append('description', input.description.toString());
 
-      if (input?.attachments) {
-        input?.attachments.forEach((m, index) => {
-          if (m.file) {
-            params.append(`attachments[${index}].file`, m.file);
-            params.append(`attachments[${index}].url`, '');
-          } else {
-            params.append(`attachments[${index}].file`, '');
-            params.append(`attachments[${index}].url`, m.url);
-          }
-        });
-      }
-
-      const token = LocalStorage.get('accessToken');
-
-      return axios({
-        method: 'put',
-        url: `${baseURL}/SalePoint/Update/${id}`,
-        data: params,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
+    if (input?.attachments) {
+      input?.attachments.forEach((m, index) => {
+        if (m.file) {
+          params.append(`attachments[${index}].file`, m.file);
+          params.append(`attachments[${index}].url`, '');
+        } else {
+          params.append(`attachments[${index}].file`, '');
+          params.append(`attachments[${index}].url`, m.url);
+        }
       });
-    } catch (error: any) {
-      return error.response;
     }
+
+    const token = LocalStorage.get('accessToken');
+
+    return axios({
+      method: 'put',
+      url: `${baseURL}/SalePoint/Update/${id}`,
+      data: params,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   public async search(
