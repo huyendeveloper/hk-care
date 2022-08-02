@@ -39,24 +39,23 @@ const validationSchema = yup.object().shape({
   name: yup
     .string()
     .required('Vui lòng nhập tên điểm bán.')
-    // @ts-ignore
-    .trimCustom('Vui lòng nhập tên điểm bán.')
     .max(150, 'Tên điểm bán không quá 150 ký tự.')
-    .matches(/^HK\s+.*$/, 'Điểm bán không đúng định dạng.')
-    .strict(true)
-    .default(''),
+    .matches(/^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/, 'Điểm bán không đúng định dạng.')
+    .strict(true).default('John Doe'),
   hotline: yup
     .string()
+    .max(15, "")
     .required('Vui lòng nhập hotline.')
-    .strict(true)
-    .default(''),
+    .matches(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9]{10,15})+$/, "Số điện thoại không đúng định dạng.")
+    .strict(true),
   address: yup
     .string()
-    .required('Vui lòng nhập địa chỉ.')
-    .max(150, 'Địa chỉ không quá 150 ký tự.')
-    .default(''),
-  isActived: yup.boolean().default(true),
+    .matches(/^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/, 'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.')
+    .max(150, 'Địa chỉ không quá 150 ký tự.'),
+
+  status: yup.boolean().default(true),
 });
+
 
 const FormDialog = ({
   open,
@@ -155,7 +154,7 @@ const FormDialog = ({
         }
       } catch (error: any) {
         setNotification({
-          message: "Tên điểm bán đã tồn tại hoặc Đã sảy ra lỗi nội bộ trong quá trình sử lý. Vui lòng kiểm tra lại thông tin",
+          message: error.response.data.toString().replace(',', '\n') ,
           severity: 'error',
         });
         setloadding(false);
@@ -163,7 +162,6 @@ const FormDialog = ({
     } else {
       try {
         const data = await service.create(tenant);
-        console.log('data', data);
         setloadding(false);
         if (data.status >= 500) {
           setNotification({
@@ -181,7 +179,7 @@ const FormDialog = ({
         }
       } catch (error: any) {
         setNotification({
-          message: "Tên điểm bán đã tồn tại hoặc Đã sảy ra lỗi nội bộ trong quá trình sử lý. Vui lòng kiểm tra lại thông tin",
+          message: error.response.data.toString().replace(',', '\n') ,
           severity: 'error',
         });
         setloadding(false);
@@ -349,7 +347,7 @@ const FormDialog = ({
 
           <FormFooter>
             <Button variant="outlined" onClick={() => handleClose()}>
-              {disabled ? 'Đóng' : 'Hủy'}
+              {disabled ? 'Quay lại' : 'Hủy'}
             </Button>
             {disabled && currentID && (
               <Button onClick={() => setDisabled(false)}>

@@ -246,7 +246,6 @@ const Create = () => {
   };
 
   const handleChangePage = (pageIndex: number) => {
-    console.log('pageIndex :>> ', pageIndex);
     setFilters((state) => ({
       ...state,
       pageIndex,
@@ -254,7 +253,6 @@ const Create = () => {
   };
 
   const handleChangeRowsPerPage = (rowsPerPage: number) => {
-    console.log('pageSize :>> ', rowsPerPage);
     setFilters((state) => ({
       ...state,
       pageIndex: 1,
@@ -287,7 +285,6 @@ const Create = () => {
             message: 'Thêm thành công',
             severity: 'success',
           });
-
           setLoading(false);
           return navigate('/hk_care/warehouse/inventory_record');
         })
@@ -304,6 +301,10 @@ const Create = () => {
         .update(newPayload, id)
         .then((rs) => {
           setLoading(false);
+          setNotification({
+            message: 'Sửa thành công',
+            severity: 'success',
+          });
           return navigate('/hk_care/warehouse/inventory_record');
         })
         .catch((err) => {
