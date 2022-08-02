@@ -1,5 +1,3 @@
-import { number } from "yup";
-
 export interface ITenant {
   id: string;
   name: string;
@@ -217,6 +215,7 @@ export interface ISalesOrder {
   description: string;
   orderDetailDtos: OrderDetailDtos[];
   discountValue: number;
+  images: { name: string; url: string }[];
 }
 
 export interface OrderSales {
@@ -344,8 +343,8 @@ export interface IInventoryRecordProduct {
 export interface IInventoryRecordProductShow extends IInventoryRecordProduct {
   id: number;
   quantityDifference: number;
-  moneyDifference : number;
-  estimatedRevenue:number;
+  moneyDifference: number;
+  estimatedRevenue: number;
 }
 
 export interface InventoryItemDto {

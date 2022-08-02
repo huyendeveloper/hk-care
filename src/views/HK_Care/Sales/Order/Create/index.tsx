@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { TabContext, TabPanel } from '@mui/lab';
+import { LoadingScreen } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import { useNotification } from 'hooks';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -27,6 +28,7 @@ interface IForm {
   giveMoney: number;
   description: string;
   moneyToPay: number;
+  images: { name: string; url: string }[];
   orderDetailDtos: {
     productId: number;
     productName: string;
@@ -53,6 +55,7 @@ const Create = () => {
   const [ids, setIds] = useState<number[]>([1]);
   const { orderSales } = useSelector((state: RootState) => state.salesOrder);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(id ? true : false);
 
   const { control, setValue, getValues, handleSubmit, reset } = useForm<IForm>({
     mode: 'onChange',
@@ -70,6 +73,7 @@ const Create = () => {
     setValue('orderType', orderSale?.orderType || 1);
     setValue('moneyToPay', orderSale?.moneyToPay || 0);
     setValue('orderDetailDtos', orderSale?.orderDetailDtos || []);
+    setValue('images', orderSale?.images || []);
   };
 
   const handleAddTab = async () => {
@@ -118,8 +122,14 @@ const Create = () => {
       });
       return;
     }
-    const { disCount, orderDetailDtos, description, giveMoney, orderType } =
-      payload.saleOrder;
+    const {
+      disCount,
+      orderDetailDtos,
+      description,
+      giveMoney,
+      orderType,
+      images,
+    } = payload.saleOrder;
 
     reset({
       disCount,
@@ -127,7 +137,9 @@ const Create = () => {
       giveMoney,
       description,
       orderType,
+      images,
     });
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -165,6 +177,10 @@ const Create = () => {
     setValue('orderType', orderSale?.orderType || 1);
     setValue('orderDetailDtos', orderSale?.orderDetailDtos || []);
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Fragment>

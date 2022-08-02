@@ -11,6 +11,7 @@ interface OrderSales {
   orderId?: number;
   moneyToPay: number;
   orderType: number;
+  images: { name: string; url: string }[];
   orderDetailDtos: {
     productId: number;
     productName: string;
@@ -45,6 +46,7 @@ const initialState: IInitialState = {
       description: '',
       orderDetailDtos: [],
       moneyToPay: 0,
+      images: [],
     },
   ],
 };

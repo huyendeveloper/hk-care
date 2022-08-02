@@ -152,7 +152,6 @@ const Create = () => {
                 ? []
                 : [{ name: result.data.fileAttach[0] }]
             );
-            console.log('data.data', result.data.items);
             setValue('note', result.data.note);
             result.data.items.forEach((item: any) => {
               // @ts-ignore
