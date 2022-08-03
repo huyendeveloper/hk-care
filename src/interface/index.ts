@@ -207,7 +207,7 @@ export interface ISalesOrder {
   pay: number;
   code: string;
   customerName: string;
-  orderType: string;
+  orderType: number;
   userName: string;
   giveMoney: number;
   orderId: number;

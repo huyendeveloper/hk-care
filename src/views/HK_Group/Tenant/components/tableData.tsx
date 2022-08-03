@@ -155,11 +155,11 @@ const TableData = () => {
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
         </IconButton>
-        {!row.isActived === TableActive.Active && (
+        {/* {!row.isActived === TableActive.Active && (
           <IconButton onClick={handleOpenDeleteDialog(row.id)}>
             <DeleteIcon />
           </IconButton>
-        )}
+        )} */}
       </>
     );
   };
@@ -195,15 +195,14 @@ const TableData = () => {
 
               <TableBody>
                 {tenantList.map((item: any, index: number) => {
-                  const { id, name, address, hotline, isActived, display } = item;
+                  const { id, name, address, hotline, isActived, display } =
+                    item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
-                      <TableCell>
-                        {name}
-                      </TableCell>
+                      <TableCell>{name}</TableCell>
 
                       {/* <Tooltip  title={display}>
                         <TableCell>
