@@ -6,17 +6,6 @@ interface IInitialState {}
 
 const initialState: IInitialState = {};
 
-// export const updateWhInventory = createAsyncThunk(
-//   'whInventory/update',
-//   async (payload: IWhInventory, { rejectWithValue }) => {
-//     try {
-//       await whInventoryService.update(payload);
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
-
 export const createWhInventory = createAsyncThunk(
   'whInventory/create',
   async (payload: IInventoryRecord, { rejectWithValue }) => {

@@ -32,7 +32,6 @@ const SalutationSelecter = <T extends FieldValues>(props: Props<T>) => {
           disabled={disabled}
           forcePopupIcon={forcePopupIcon}
           getOptionLabel={(option) => option || 'Not available'}
-          // noOptionsText={t('languageFirst')}
           renderInput={(params) => (
             <TextField
               error={Boolean(error)}

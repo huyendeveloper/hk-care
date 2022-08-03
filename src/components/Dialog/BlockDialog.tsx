@@ -13,7 +13,7 @@ import {
 interface Props {
   open: boolean;
   onClose: () => void;
-  id: number | null;
+  id: number | string | null;
   name?: string;
   handleBlock: () => void;
   tableName: string;

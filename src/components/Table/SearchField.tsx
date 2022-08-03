@@ -46,7 +46,7 @@ const SearchField = (props: Props) => {
         onSearch(value);
       }
     },
-    1500, //auto search each 1500 ms
+    1500,
     [value]
   );
 

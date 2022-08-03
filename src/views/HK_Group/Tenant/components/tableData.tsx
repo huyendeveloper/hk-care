@@ -1,34 +1,38 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
-  Tooltip,
+  TableRow
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
-import { DeleteDialog } from 'components/Dialog';
+import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { changeStatus } from 'redux/slices/tenant';
 import { FilterParams } from 'types';
 import { SalePointOutDto } from '../dto/salePointDto';
-import { IsDelete, TableActive, TableDelete } from '../enum/IsStatus';
+import { TableActive } from '../enum/IsStatus';
 import service from '../service';
 import FormDialog from './formDialog';
 
@@ -42,40 +46,20 @@ const getCells = (): Cells<SalePointOutDto> => [
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [disableView, setDisableView] = useState<boolean>(false);
   const [currentID, setCurrentID] = useState<string | null>(null);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [tenantList, setTenantList] = useState<SalePointOutDto[]>([]);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
+  const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  const fetchData = async () => {
-    const data = async () => await service.search(filters);
-    data()
-      .then((rel) => {
-        setTenantList(rel.items);
-        setTotalRows(rel.totalCount);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setTenantList([]);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchData();
-  }, [filters]);
 
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
@@ -106,24 +90,6 @@ const TableData = () => {
     }));
   };
 
-  const handleDelete = async () => {
-    if (!currentID) return;
-
-    const data = await service.delete(currentID);
-    handleCloseDeleteDialog();
-    if (data.status !== 200) {
-      setNotification({ message: data, severity: 'error' });
-    } else {
-      setNotification({ message: data, severity: 'success' });
-    }
-    setTenantList(tenantList.filter((x) => x.id !== currentID));
-  };
-
-  const handleOpenDeleteDialog = (id: string) => () => {
-    setCurrentID(id);
-    setOpenDeleteDialog(true);
-  };
-
   const handleOpenUpdateDialog = (id: string) => () => {
     setCurrentID(id);
     setOpenFormDialog(true);
@@ -146,6 +112,86 @@ const TableData = () => {
     setOpenFormDialog(false);
   };
 
+  const handleOpenUnBlockDialog = (id: string) => () => {
+    setCurrentID(id);
+    setOpenUnBlockDialog(true);
+  };
+
+  const handleOpenBlockDialog = (id: string) => () => {
+    setCurrentID(id);
+    setOpenBlockDialog(true);
+  };
+
+  const handleCloseBlockDialog = () => {
+    setOpenBlockDialog(false);
+  };
+
+  const handleCloseUnBlockDialog = () => {
+    setOpenUnBlockDialog(false);
+  };
+
+  const handleBlock = async () => {
+    if (!currentID) return;
+    handleCloseBlockDialog();
+    setShowBackdrop(true);
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Vô hiệu hóa thành công!',
+      severity: 'success',
+    });
+    fetchData();
+    setShowBackdrop(false);
+  };
+
+  const handleUnBlock = async () => {
+    if (!currentID) return;
+    handleCloseUnBlockDialog();
+    setShowBackdrop(true);
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatus({ id: currentID })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Kích hoạt thành công!',
+      severity: 'success',
+    });
+    fetchData();
+    setShowBackdrop(false);
+  };
+
+  const fetchData = async () => {
+    const data = async () => await service.search(filters);
+    data()
+      .then((rel) => {
+        setTenantList(rel.items);
+        setTotalRows(rel.totalCount);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setTenantList([]);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
   const renderAction = (row: SalePointOutDto) => {
     return (
       <>
@@ -155,11 +201,16 @@ const TableData = () => {
         <IconButton onClick={handleOpenUpdateDialog(row.id)}>
           <EditIcon />
         </IconButton>
-        {/* {!row.isActived === TableActive.Active && (
-          <IconButton onClick={handleOpenDeleteDialog(row.id)}>
-            <DeleteIcon />
+
+        {row.isActived ? (
+          <IconButton onClick={handleOpenBlockDialog(row.id)}>
+            <BlockIcon />
           </IconButton>
-        )} */}
+        ) : (
+          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+            <CheckIcon />
+          </IconButton>
+        )}
       </>
     );
   };
@@ -195,20 +246,13 @@ const TableData = () => {
 
               <TableBody>
                 {tenantList.map((item: any, index: number) => {
-                  const { id, name, address, hotline, isActived, display } =
-                    item;
+                  const { id, name, address, hotline, isActived } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{name}</TableCell>
-
-                      {/* <Tooltip  title={display}>
-                        <TableCell>
-                          {name}
-                        </TableCell>
-                      </Tooltip> */}
 
                       <TableCell>{address}</TableCell>
                       <TableCell>{hotline}</TableCell>
@@ -246,14 +290,31 @@ const TableData = () => {
         fetchTable={fetchData}
       />
 
-      <DeleteDialog
+      <BlockDialog
         id={currentID}
         tableName="điểm bán"
         name={tenantList.find((x) => x.id === currentID)?.name}
-        onClose={handleCloseDeleteDialog}
-        open={openDeleteDialog}
-        handleDelete={handleDelete}
+        onClose={handleCloseBlockDialog}
+        open={openBlockDialog}
+        handleBlock={handleBlock}
       />
+
+      <UnBlockDialog
+        id={currentID}
+        tableName="điểm bán"
+        name={tenantList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseUnBlockDialog}
+        open={openUnBlockDialog}
+        handleUnBlock={handleUnBlock}
+      />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

@@ -84,12 +84,10 @@ const EditProfileDialog = (props: Props) => {
     defaultValues: validationSchema.getDefault(),
   });
 
-  // reset logo
   useEffect(() => {
     setLogo(null);
   }, [open]);
 
-  //call api or pass profile data to EditComponent
   useEffect(() => {
     reset({
       roleId: 1,
@@ -101,7 +99,7 @@ const EditProfileDialog = (props: Props) => {
   }, [reset]);
 
   const onSubmit = async (data: FormData) => {
-    //upload image: depend Backend (use base64)
+    // upload image: depend Backend (use base64)
   };
 
   const handleDropCover = async ([file]: File[]) => {
@@ -240,7 +238,7 @@ const EditProfileDialog = (props: Props) => {
         image={logo}
         open={openCropImage}
         onClose={closeCropImage}
-        onCancel={cancelCropImage} //don't save crop image
+        onCancel={cancelCropImage}
         onSave={saveLogoCrop}
       />
     </Dialog>

@@ -55,7 +55,6 @@ const NormUpdate = ({
       message: payload.message,
       severity: 'success',
     });
-    // fetchData();
     setShowBackdrop(false);
     setEditing(false);
   };

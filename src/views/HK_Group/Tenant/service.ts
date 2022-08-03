@@ -4,7 +4,11 @@ import { baseURL } from 'config';
 import { FilterParams } from 'types/common';
 import LocalStorage from 'utils/LocalStorage';
 import { PagedResultDto } from './dto/pagedResultDto';
-import { SalePointDto, SalePointOutDto } from './dto/salePointDto';
+import {
+  AttachmentsFile,
+  SalePointDto,
+  SalePointOutDto,
+} from './dto/salePointDto';
 
 class TenantService {
   public async upload(file: any) {
@@ -44,12 +48,9 @@ class TenantService {
       params.append('description', input.description.toString());
 
     if (input?.attachments) {
-      input?.attachments.forEach((m, index) => {
-        if (m.file) {
-          params.append(`attachments[${index}].file`, m.file);
-          params.append(`attachments[${index}].url`, '');
-        } else {
-          params.append(`attachments[${index}].file`, '');
+      input?.attachments.forEach((m: AttachmentsFile, index) => {
+        if (m) {
+          params.append(`attachments[${index}].name`, m.name);
           params.append(`attachments[${index}].url`, m.url);
         }
       });
@@ -84,11 +85,8 @@ class TenantService {
 
     if (input?.attachments) {
       input?.attachments.forEach((m, index) => {
-        if (m.file) {
-          params.append(`attachments[${index}].file`, m.file);
-          params.append(`attachments[${index}].url`, '');
-        } else {
-          params.append(`attachments[${index}].file`, '');
+        if (m) {
+          params.append(`attachments[${index}].name`, m.name);
           params.append(`attachments[${index}].url`, m.url);
         }
       });

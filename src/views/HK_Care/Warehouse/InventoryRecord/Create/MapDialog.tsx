@@ -6,7 +6,7 @@ import {
   Divider,
   Grid,
   Stack,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 
 interface Props {
@@ -65,9 +65,9 @@ const MapDialog = (props: Props) => {
   const { open, onClose } = props;
 
   return (
-    <Dialog open={open} maxWidth="sm" fullWidth onClose={onClose} scroll="body">
+    <Dialog open={open} maxWidth="md" fullWidth onClose={onClose} scroll="body">
       <DialogContent sx={{ pt: '40px', pb: '40px' }}>
-        <Grid container>
+        <Grid container sx={{ width: '100%' }}>
           <Grid item xs={3}>
             <LeftCabinet
               cabinetNumber={1}
@@ -99,25 +99,44 @@ const MapDialog = (props: Props) => {
                 }}
                 mt={3}
               >
-                <Button variant="outlined">Kệ 1</Button>
-                <Button variant="outlined">Kệ 2</Button>
-                <Button variant="outlined">Kệ 3</Button>
-                <Button variant="outlined">Kệ 1</Button>
-                <Button variant="outlined">Kệ 2</Button>
-                <Button variant="outlined">Kệ 3</Button>
-                <Button variant="outlined">Kệ 1</Button>
-                <Button variant="outlined">Kệ 2</Button>
-                <Button variant="outlined">Kệ 3</Button>
+                <Stack flexDirection="row" gap="8px">
+                  <Button variant="outlined">Kệ 1</Button>
+                  <Button variant="outlined">Kệ 2</Button>
+                  <Button variant="outlined">Kệ 3</Button>
+                </Stack>
+                <Stack flexDirection="row" gap="8px">
+                  <Button variant="outlined">Kệ 1</Button>
+                  <Button variant="outlined">Kệ 2</Button>
+                  <Button variant="outlined">Kệ 3</Button>
+                </Stack>
+                <Stack flexDirection="row" gap="8px">
+                  <Button variant="outlined">Kệ 1</Button>
+                  <Button variant="outlined">Kệ 2</Button>
+                  <Button variant="outlined">Kệ 3</Button>
+                </Stack>
               </Grid>
               <Grid item xs={1}></Grid>
             </Grid>
-            <Grid item xs={12} sx={{ display: 'flex' }} mt={3}>
+            <Grid
+              item
+              xs={12}
+              sx={{ display: 'flex', justifyContent: 'center' }}
+              mt={3}
+            >
               <BottomCabinet cabinetNumber={4} />
               <BottomCabinet cabinetNumber={5} />
               <BottomCabinet cabinetNumber={6} />
             </Grid>
           </Grid>
-          <Grid item xs={3}>
+          <Grid
+            item
+            xs={3}
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+            }}
+          >
             <RightCabinet cabinetNumber={11} tooltip="Thuốc điều trị Covid" />
             <RightCabinet cabinetNumber={10} />
             <RightCabinet cabinetNumber={9} />

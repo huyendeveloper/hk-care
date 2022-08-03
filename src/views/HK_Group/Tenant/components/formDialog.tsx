@@ -1,9 +1,15 @@
-//#region
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Button, Dialog, Grid, Skeleton } from '@mui/material';
 import {
-  ControllerMultiFile,
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  Grid,
+  Skeleton,
+} from '@mui/material';
+import {
   ControllerTextarea,
   ControllerTextField,
   FormContent,
@@ -13,17 +19,15 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import ControllerSwitch from 'components/Form/ControllerSwitch';
+import ControllerMultiPdfs from 'components/Form/ControllerMultiPdfs';
 import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { useEffect, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import service from '../service';
+import { useForm } from 'react-hook-form';
+import importReceiptService from 'services/importReceipt.service';
 import * as yup from 'yup';
 import { AttachmentsFile, SalePointDto } from '../dto/salePointDto';
-import ControllerMultiPdfs from 'components/Form/ControllerMultiPdfs';
-import importReceiptService from 'services/importReceipt.service';
-//#endregion
+import service from '../service';
 
 interface Props {
   open: boolean;
@@ -51,6 +55,7 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập tên điểm bán.')
     .max(150, 'Tên điểm bán không quá 150 ký tự.')
     .matches(
+      // eslint-disable-next-line no-useless-escape
       /^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
       'Điểm bán không đúng định dạng.'
     )
@@ -68,6 +73,7 @@ const validationSchema = yup.object().shape({
   address: yup
     .string()
     .matches(
+      // eslint-disable-next-line no-useless-escape
       /^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
       'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.'
     )
@@ -98,8 +104,6 @@ const FormDialog = ({
     setDisabled(disable);
   }, [disable, open]);
 
-  const status = useWatch({ control, name: 'isActived' });
-
   const [loadding, setloadding] = useState<boolean>(false);
   const [loaddingInit, setloaddingInit] = useState<boolean>(false);
 
@@ -112,12 +116,8 @@ const FormDialog = ({
         reset(rel);
         setloaddingInit(false);
         setloadding(false);
-        // eslint-disable-next-line no-labels
-        var fileName = rel.attachments.map((m) => {
-          return { name: m.url };
-        });
-        if (fileName.length) {
-          setFiles(fileName);
+        if (rel.attachments) {
+          setFiles(rel.attachments);
         } else {
           setFiles([]);
         }
@@ -142,19 +142,20 @@ const FormDialog = ({
 
   const onSubmit = async (tenant: SalePointDto) => {
     setloadding(true);
-    var filesConvert: AttachmentsFile[] = [];
-    files.forEach((m: File | object | any) => {
-      if (m instanceof File && m !== null && m !== undefined) {
-        filesConvert = [...filesConvert, { url: '', file: m }];
-      } else if (typeof m === 'object' && m !== null && m !== undefined) {
-        filesConvert = [
-          ...filesConvert,
-          { url: m.name as string, file: undefined },
-        ];
-      }
-    });
+    // var filesConvert: AttachmentsFile[] = [];
+    // files.forEach((m: File | object | any) => {
+    //   if (m instanceof File && m !== null && m !== undefined) {
+    //     filesConvert = [...filesConvert, { url: '', file: m }];
+    //   } else if (typeof m === 'object' && m !== null && m !== undefined) {
+    //     filesConvert = [
+    //       ...filesConvert,
+    //       { url: m.name as string, file: undefined },
+    //     ];
+    //   }
+    // });
 
-    tenant.attachments = filesConvert;
+    // @ts-ignore
+    tenant.attachments = files;
     if (currentID) {
       try {
         const data = await service.update(currentID, tenant);
@@ -229,8 +230,16 @@ const FormDialog = ({
   };
 
   useEffect(() => {
-    console.log('files', files);
-  }, [files]);
+    if (!showBackdrop) return;
+    // @ts-ignore
+    const fileList = files.filter((item) => Boolean(item.type));
+    if (fileList.length === 0) {
+      setShowBackdrop(false);
+      // @ts-ignore
+      setValue('attachments', files);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, showBackdrop]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -351,43 +360,18 @@ const FormDialog = ({
                   <Box sx={{ mb: 'auto' }}>
                     <Grid item xs={12}>
                       <FormLabel
-                        title="Trạng thái hoạt động"
-                        name="bussinessLicense"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <ControllerSwitch
-                        name="isActived"
-                        label={status ? 'Hoạt động' : 'Không hoạt động'}
-                        control={control}
-                        disabled={disabled}
-                      />
-                    </Grid>
-                  </Box>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ mb: 'auto' }}>
-                    <Grid item xs={12}>
-                      <FormLabel
                         title="Tài liệu đính kèm"
                         name="bussinessLicense"
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      {/* <ControllerMultiFile
-                        files={files}
-                        max={6}
-                        setFiles={setFiles}
-                        viewOnly={disabled}
-                      /> */}
-
                       <ControllerMultiPdfs
                         files={files}
                         setFiles={(newValue) => {
                           handleChangeFiles(newValue);
                         }}
-                        message="Tài liệu đính kèm chỉ cho phép file ảnh."
+                        message="Tài liệu đính kèm chỉ cho phép file pdf."
+                        disabled={disabled}
                       />
                     </Grid>
                   </Box>
@@ -416,6 +400,13 @@ const FormDialog = ({
           </FormFooter>
         </FormPaperGrid>
       )}
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Dialog>
   );
 };

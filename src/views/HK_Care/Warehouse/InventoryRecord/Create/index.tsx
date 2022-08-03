@@ -260,7 +260,6 @@ const Create = () => {
   };
 
   const onSubmit = async (body: IInventoryRecord) => {
-    //[vi] Khởi tạo file
     let file = '';
     if (files[0] instanceof File && files !== null && files !== undefined) {
       const { data } = await importReceiptService.getPathFileReceipt(files[0]);
@@ -294,7 +293,6 @@ const Create = () => {
         });
     }
 
-    //[vi] kiem tra man hinh viewer
     if (id !== undefined && v === UPDATEAD) {
       whInventoryService
         .update(newPayload, id)

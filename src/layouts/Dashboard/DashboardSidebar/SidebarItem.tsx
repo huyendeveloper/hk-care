@@ -46,7 +46,6 @@ const SidebarItem: FC<Props> = (props) => {
     paddingLeft = 40 + 8 * depth;
   }
 
-  // Branch
   if (children) {
     return (
       <ListItem
@@ -86,7 +85,6 @@ const SidebarItem: FC<Props> = (props) => {
     );
   }
 
-  // Leaf
   return (
     <ListItem disableGutters disablePadding sx={{ display: 'flex' }}>
       <Button

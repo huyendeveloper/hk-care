@@ -1,6 +1,5 @@
 import type { ThemeOptions } from '@mui/material';
 
-// Transpora palette
 const transpora = {
   100: '#FEFBD3',
   200: '#FEF7A8',
@@ -14,9 +13,6 @@ const transpora = {
 };
 
 const palette: ThemeOptions = {
-  // typography: {
-  //   fontFamily: ['"Montserrat"', 'sans-serif'].join(','),
-  // },
   components: {
     MuiAvatar: {
       styleOverrides: {
@@ -45,7 +41,7 @@ const palette: ThemeOptions = {
       light: '#5BE584',
       main: '#00AB55',
       dark: '#007B55',
-    }, 
+    },
   },
 };
 

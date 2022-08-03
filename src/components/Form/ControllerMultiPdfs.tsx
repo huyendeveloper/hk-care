@@ -1,6 +1,7 @@
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Stack } from '@mui/material';
+import { connectURL } from 'config';
 import { useNotification } from 'hooks';
 
 interface IProps {
@@ -8,6 +9,8 @@ interface IProps {
   setFiles: (files: File[] | object[]) => void;
   accept?: string;
   message?: string;
+  max?: number;
+  disabled?: boolean;
 }
 
 const ControllerMultiPdfs = ({
@@ -15,13 +18,22 @@ const ControllerMultiPdfs = ({
   setFiles,
   accept = 'application/pdf',
   message = 'File không đúng định dạng',
+  max = 6,
+  disabled = false,
 }: IProps) => {
   const setNotification = useNotification();
 
   const handleChangeFile = (e: any) => {
     const fileList = e?.target.files;
+    if (fileList.length > max) {
+      setNotification({
+        message: `Có thể chọn tối đa ${max} file.`,
+        severity: 'warning',
+      });
+      return;
+    }
     let newFiles = [];
-    for (let i = 0; i < fileList.length; i++) {
+    for (let i = 0; i < max; i++) {
       if (fileList[i]) {
         if (fileList[i].type === 'application/pdf') {
           newFiles.push(fileList[i]);
@@ -34,6 +46,13 @@ const ControllerMultiPdfs = ({
       }
     }
     setFiles(newFiles);
+  };
+
+  const handleView = () => {
+    // @ts-ignore
+    files.forEach(({ url }) => {
+      window.open(connectURL + `/${url}`, '_blank');
+    });
   };
 
   return (
@@ -62,16 +81,21 @@ const ControllerMultiPdfs = ({
               e.target.value = '';
             }}
             multiple
-            max={6}
             hidden
+            disabled={disabled}
           />
         </Button>
         {files.length > 0 && (
-          <Stack justifyContent="center" style={{ cursor: 'pointer' }}>
+          <Stack
+            pr={disabled ? 1 : 0}
+            justifyContent="center"
+            style={{ cursor: 'pointer' }}
+            onClick={handleView}
+          >
             <VisibilityIcon />
           </Stack>
         )}
-        {files.length > 0 && (
+        {files.length > 0 && !disabled && (
           <Stack
             pr={1}
             justifyContent="center"

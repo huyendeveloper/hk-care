@@ -163,7 +163,8 @@ const TableData = () => {
                   return (
                     <ExpandRow
                       key={key}
-                      groupName={key} // @ts-ignore
+                      groupName={key}
+                      // @ts-ignore
                       list={circulationInvoice[key]}
                       filters={filters}
                     />

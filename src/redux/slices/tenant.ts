@@ -23,6 +23,18 @@ export const getTenants = createAsyncThunk('tenant/getTenants', async () => {
   }
 });
 
+export const changeStatus = createAsyncThunk(
+  'tenant/changeStatus',
+  async (params: { id: number }, { rejectWithValue }) => {
+    const { id } = params;
+    try {
+      await tenantService.changeStatus(id);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const tenantSlice = createSlice({
   name: 'tenant',
   initialState,

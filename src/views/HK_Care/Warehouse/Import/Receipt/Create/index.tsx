@@ -347,7 +347,8 @@ const CreateForm = () => {
       name: productSelected.productName,
       measure: productSelected.mesureNameLevelFirst,
       amount: 0,
-      discount: 0, // @ts-ignore
+      discount: 0,
+      // @ts-ignore
       dateManufacture: productSelected?.dateManufacture || null,
       expiryDate: productSelected.outOfDate || null,
     });

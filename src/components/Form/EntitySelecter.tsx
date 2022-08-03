@@ -80,7 +80,6 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
           disableClearable={disableClearable}
           renderInput={(params) => {
             // @ts-ignore
-            // params.inputProps.value = params.inputProps.value | defaultLabel;
             return (
               <TextField
                 error={Boolean(error)}

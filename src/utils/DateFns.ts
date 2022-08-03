@@ -95,13 +95,11 @@ class DateFns {
     return dates.every((date) => date instanceof Date && isValid(date));
   }
 
-  //not on dateFns
   public getFirstDayOfMonth() {
     const date = new Date();
     return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
-  //not on dateFns
   public get30DayPriorCurrent() {
     const today = new Date();
     return new Date(new Date().setDate(today.getDate() - 30));

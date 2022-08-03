@@ -181,7 +181,7 @@ const TableData = () => {
                     customerName,
                     orderType,
                     userName,
-                    giveMoney,
+                    totalMoney,
                     code,
                   } = item;
                   return (
@@ -194,7 +194,7 @@ const TableData = () => {
                       <TableCell>{customerName}</TableCell>
                       <TableCell>{orderType}</TableCell>
                       <TableCell>{userName}</TableCell>
-                      <TableCell>{numberFormat(giveMoney)}</TableCell>
+                      <TableCell>{numberFormat(totalMoney)}</TableCell>
                       <TableCell>{renderAction(item)}</TableCell>
                     </TableRow>
                   );

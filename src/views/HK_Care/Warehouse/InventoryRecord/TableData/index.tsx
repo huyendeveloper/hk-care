@@ -75,6 +75,12 @@ const TableData = () => {
   const [currentID, setCurrentID] = useState<number | string | null>(null);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [disableView, setDisableView] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [urlDowload, seturlDowload] = useState<string>();
+  const [contentDowload, setcontentDowload] = useState<string>();
+  const [idDowLoad, setidDowLoad] = useState<string>();
 
   const cells = useMemo(() => getCells(), []);
 
@@ -86,7 +92,7 @@ const TableData = () => {
           setNotification({ error: data.data });
           setInventoryRecord([]);
         } else {
-          setInventoryRecord(data.data);
+          setInventoryRecord(data.items);
           setTotalRows(data.totalCount);
         }
       })
@@ -97,7 +103,7 @@ const TableData = () => {
 
     //setInventoryRecord(payload.inventoryRecord);
   };
-  
+
   useEffect(() => {
     setLoading(true);
     fetchData();
@@ -151,12 +157,6 @@ const TableData = () => {
     setOpenFormDialog(true);
   };
 
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const [urlDowload, seturlDowload] = useState<string>();
-  const [contentDowload, setcontentDowload] = useState<string>();
-  const [idDowLoad, setidDowLoad] = useState<string>();
   const _onclickDowload = (id: string) => () => {
     if (id) {
       setcontentDowload(' Đang xử lý. Vui lòng chờ!');

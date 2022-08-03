@@ -21,7 +21,6 @@ class Axios {
       headers,
     });
 
-    // Request interceptor
     httpInstance.interceptors.request.use(
       (config: AxiosRequestConfig) => {
         const accessToken = LocalStorage.get('accessToken');
@@ -41,7 +40,6 @@ class Axios {
       }
     );
 
-    // Response interceptor
     httpInstance.interceptors.response.use(
       (response: AxiosResponse) => response.data,
       (error: AxiosError) => Promise.reject(error)
@@ -78,7 +76,5 @@ class Axios {
 }
 
 const { HttpClient } = new Axios();
-
-// export const mock = new MockAdapter(HttpClient, { delayResponse: 1000 });
 
 export default HttpClient;

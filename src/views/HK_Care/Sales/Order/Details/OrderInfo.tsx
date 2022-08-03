@@ -11,7 +11,7 @@ import { ISalesOrder } from 'interface';
 import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import MapDialog from '../Create/MapDialog';
 
 interface IProps {
@@ -19,7 +19,8 @@ interface IProps {
 }
 
 const OrderInfo = ({ order }: IProps) => {
-  const [files, setFiles] = useState<File[] | object[]>(order?.images || []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const files = useMemo(() => order?.images || [], []);
   const [previewImages, setPreviewImages] = useState<boolean>(false);
 
   return (

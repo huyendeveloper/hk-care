@@ -210,6 +210,7 @@ export interface ISalesOrder {
   orderType: number;
   userName: string;
   giveMoney: number;
+  totalMoney: number;
   orderId: number;
   disCount: number;
   description: string;

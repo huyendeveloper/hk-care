@@ -77,7 +77,6 @@ const routes: RouteObject[] = [
     ],
   },
 
-  //every route not defined
   {
     path: "*",
     element: <MainLayout />,

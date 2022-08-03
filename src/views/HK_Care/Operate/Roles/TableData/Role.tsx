@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import {
   Checkbox,
@@ -8,8 +9,7 @@ import {
   TextField,
 } from '@mui/material';
 import { IRole } from 'interface';
-import AddIcon from '@mui/icons-material/Add';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface IProps {
   role: IRole;
@@ -32,12 +32,6 @@ const Role = ({ role, index, handleOpenDeleteDialog, addItem }: IProps) => {
     const value = e.target.checked;
     setRoleDetail({ ...roleDetail, [e.target.name]: value });
   };
-
-  useEffect(() => {
-    if (roleDetail.roleName) {
-      console.log('roleDetail :>> ', roleDetail);
-    }
-  }, [roleDetail]);
 
   const renderAction = () => {
     return (

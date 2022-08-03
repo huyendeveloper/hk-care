@@ -30,7 +30,6 @@ const DashboardNavbar: FC<Props> = (props) => {
   const dispatch = useDispatch();
   const mounted = useMounted();
   const { onToggleMobileSidebar, openDrawer } = props;
-  // const { logout } = useAuth();
   const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
 
   const handleOpenLogoutDialog = () => {

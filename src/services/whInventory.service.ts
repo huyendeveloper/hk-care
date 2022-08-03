@@ -1,10 +1,7 @@
 import axiosClient from 'api';
-import { baseURL, connectURL } from 'config';
-import { IInventoryRecord, InventoryItemDto } from 'interface';
+import { baseURL } from 'config';
+import { IInventoryRecord } from 'interface';
 import { FilterParams } from 'types/common';
-import fileDownload from 'js-file-download';
-import axios from 'axios';
-import LocalStorage from 'utils/LocalStorage';
 
 interface IDetailAdd {
   idProduct: number | null;
@@ -42,14 +39,21 @@ class WhInventoryService {
       ...payload,
     });
   }
-  searchInventoryWH({ searchText, sortBy, pageIndex, pageSize, startDate, lastDate }: FilterParams) {
+  searchInventoryWH({
+    searchText,
+    sortBy,
+    pageIndex,
+    pageSize,
+    startDate,
+    lastDate,
+  }: FilterParams) {
     return axiosClient.get(`${baseURL}/whInventory/searchInventoryWH`, {
       params: {
         Keyword: searchText,
         SkipCount: (pageIndex - 1) * pageSize,
         MaxResultCount: pageSize,
         From: startDate,
-        To: lastDate
+        To: lastDate,
       },
     });
   }
@@ -59,45 +63,10 @@ class WhInventoryService {
   }
 
   public async dowLoadFile(id: string) {
-    // const token = LocalStorage.get('accessToken');
-    // return axios.get(`https://localhost:44328/files/PDF/KKH-29072022-151705.pdf`, {
-    //   responseType: 'blob',
-
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-Requested-With': 'XMLHttpRequest',
-    //     Authorization: `Bearer ${token}`,
-    //   }
-    // })
-    //   .then((res2) => {
-    //     console.log('res2', res2.data);
-    //     fileDownload(res2.data, `${id + '.pdf'}`)
-    //   });
-    return axiosClient.get(`${baseURL}/whInventory/exportPDFInventoryWH`, { params: { key: id } });
-    //.then(re => {
-    // return axios.get(`https://localhost:44328/files/PDF/KKH-29072022-151705.pdf`, {
-    //   responseType: 'blob',
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   }
-    // })
-    //   .then((res2) => {
-    //     console.log('res2', res2.data);
-    //     fileDownload(res2.data, `${id + '.pdf'}`)
-    //   });
-    //});
+    return axiosClient.get(`${baseURL}/whInventory/exportPDFInventoryWH`, {
+      params: { key: id },
+    });
   }
-
-  // public getDataFile(url: any, id: string) {
-  //   axios.get(`${connectURL}/${url}`, {
-  //     responseType: 'blob',
-  //   })
-  //     .then((res2) => {
-  //       console.log('res2', res2.data);
-  //       fileDownload(res2.data, `${id + '.pdf'}`)
-  //     });
-  // }
-
 }
 
 export default new WhInventoryService();
