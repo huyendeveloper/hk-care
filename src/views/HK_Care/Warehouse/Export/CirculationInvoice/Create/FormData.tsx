@@ -314,8 +314,8 @@ const FormData = ({ defaultValue }: IProps) => {
                             <TableBody>
                               {[...fields]
                                 .splice(
-                                  (filters.pageIndex - 1) * 10,
-                                  filters.pageIndex * 10
+                                  (filters.pageIndex - 1) * filters.pageSize,
+                                  filters.pageIndex * filters.pageSize
                                 )
                                 .map((item, index) => (
                                   <ReceiptEntity

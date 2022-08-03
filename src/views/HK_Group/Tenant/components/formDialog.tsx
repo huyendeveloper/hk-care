@@ -3,7 +3,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid, Skeleton } from '@mui/material';
 import {
-  ControllerMultiFile, ControllerTextarea, ControllerTextField, FormContent, FormFooter, FormGroup, FormHeader, FormLabel, FormPaperGrid,
+  ControllerMultiFile,
+  ControllerTextarea,
+  ControllerTextField,
+  FormContent,
+  FormFooter,
+  FormGroup,
+  FormHeader,
+  FormLabel,
+  FormPaperGrid,
 } from 'components/Form';
 import ControllerSwitch from 'components/Form/ControllerSwitch';
 import { typeStringNumber } from 'constants/typeInput';
@@ -13,6 +21,8 @@ import { useForm, useWatch } from 'react-hook-form';
 import service from '../service';
 import * as yup from 'yup';
 import { AttachmentsFile, SalePointDto } from '../dto/salePointDto';
+import ControllerMultiPdfs from 'components/Form/ControllerMultiPdfs';
+import importReceiptService from 'services/importReceipt.service';
 //#endregion
 
 interface Props {
@@ -40,22 +50,31 @@ const validationSchema = yup.object().shape({
     .string()
     .required('Vui lòng nhập tên điểm bán.')
     .max(150, 'Tên điểm bán không quá 150 ký tự.')
-    .matches(/^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/, 'Điểm bán không đúng định dạng.')
-    .strict(true).default('John Doe'),
+    .matches(
+      /^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
+      'Điểm bán không đúng định dạng.'
+    )
+    .strict(true)
+    .default('John Doe'),
   hotline: yup
     .string()
-    .max(15, "")
+    .max(15, '')
     .required('Vui lòng nhập hotline.')
-    .matches(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9]{10,15})+$/, "Số điện thoại không đúng định dạng.")
+    .matches(
+      /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9]{10,15})+$/,
+      'Số điện thoại không đúng định dạng.'
+    )
     .strict(true),
   address: yup
     .string()
-    .matches(/^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/, 'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.')
+    .matches(
+      /^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
+      'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.'
+    )
     .max(150, 'Địa chỉ không quá 150 ký tự.'),
 
   status: yup.boolean().default(true),
 });
-
 
 const FormDialog = ({
   open,
@@ -67,6 +86,7 @@ const FormDialog = ({
   const setNotification = useNotification();
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const { control, handleSubmit, setValue, reset } = useForm<SalePointDto>({
     mode: 'onChange',
@@ -100,10 +120,11 @@ const FormDialog = ({
           setFiles(fileName);
         } else {
           setFiles([]);
-        };
-
+        }
       })
-      .catch((error) => { setloaddingInit(false); });
+      .catch((error) => {
+        setloaddingInit(false);
+      });
   };
 
   useEffect(() => {
@@ -154,7 +175,7 @@ const FormDialog = ({
         }
       } catch (error: any) {
         setNotification({
-          message: error.response.data.toString().replace(',', '\n') ,
+          message: error.response.data.toString().replace(',', '\n'),
           severity: 'error',
         });
         setloadding(false);
@@ -179,7 +200,7 @@ const FormDialog = ({
         }
       } catch (error: any) {
         setNotification({
-          message: error.response.data.toString().replace(',', '\n') ,
+          message: error.response.data.toString().replace(',', '\n'),
           severity: 'error',
         });
         setloadding(false);
@@ -187,23 +208,47 @@ const FormDialog = ({
     }
   };
 
+  // @ts-ignore
+  const handleChangeFiles = async (newValue) => {
+    setShowBackdrop(true);
+    setFiles(newValue);
+    // @ts-ignore
+    await newValue.forEach(async (file, index, array) => {
+      // @ts-ignore
+      if (file?.type) {
+        const { data } = await importReceiptService.getPathFileReceipt(file);
+        // @ts-ignore
+        setFiles((prev) => {
+          const newFile = [...prev];
+          // @ts-ignore
+          newFile[index] = { name: file?.name, url: data };
+          return newFile;
+        });
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log('files', files);
+  }, [files]);
+
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
-      {loaddingInit ?
+      {loaddingInit ? (
         <Box sx={{ width: '100%', padding: '20px 10px' }}>
           <Skeleton />
           <Skeleton animation="wave" />
           <Skeleton animation={false} />
         </Box>
-        :
+      ) : (
         <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
           <FormHeader
             title={
               disabled
                 ? 'Xem thông tin điểm bán'
                 : currentID
-                  ? 'Chỉnh sửa thông tin điểm bán'
-                  : 'Thêm mới điểm bán'
+                ? 'Chỉnh sửa thông tin điểm bán'
+                : 'Thêm mới điểm bán'
             }
           />
           <FormContent>
@@ -330,11 +375,19 @@ const FormDialog = ({
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <ControllerMultiFile
+                      {/* <ControllerMultiFile
                         files={files}
                         max={6}
                         setFiles={setFiles}
                         viewOnly={disabled}
+                      /> */}
+
+                      <ControllerMultiPdfs
+                        files={files}
+                        setFiles={(newValue) => {
+                          handleChangeFiles(newValue);
+                        }}
+                        message="Tài liệu đính kèm chỉ cho phép file ảnh."
                       />
                     </Grid>
                   </Box>
@@ -361,9 +414,8 @@ const FormDialog = ({
               </LoadingButton>
             )}
           </FormFooter>
-
         </FormPaperGrid>
-      }
+      )}
     </Dialog>
   );
 };

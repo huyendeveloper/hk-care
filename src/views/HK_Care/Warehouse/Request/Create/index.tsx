@@ -259,13 +259,16 @@ const Create = () => {
                           <TableBody>
                             {[...fields]
                               .splice(
-                                (filters.pageIndex - 1) * 10,
-                                filters.pageIndex * 10
+                                (filters.pageIndex - 1) * filters.pageSize,
+                                filters.pageIndex * filters.pageSize
                               )
                               .map((item, index) => (
                                 <ProductEntity
                                   key={index}
-                                  index={(filters.pageIndex - 1) * 10 + index}
+                                  index={
+                                    (filters.pageIndex - 1) * filters.pageSize +
+                                    index
+                                  }
                                   item={item}
                                   remove={remove}
                                   getValues={getValues}

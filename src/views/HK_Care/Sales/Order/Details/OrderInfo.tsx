@@ -1,5 +1,6 @@
 import {
   Grid,
+  IconButton,
   Paper,
   Stack,
   TextareaAutosize,
@@ -9,12 +10,18 @@ import { TableWrapper } from 'components/Table';
 import { ISalesOrder } from 'interface';
 import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import { useState } from 'react';
+import MapDialog from '../Create/MapDialog';
 
 interface IProps {
   order: ISalesOrder | null;
 }
 
 const OrderInfo = ({ order }: IProps) => {
+  const [files, setFiles] = useState<File[] | object[]>(order?.images || []);
+  const [previewImages, setPreviewImages] = useState<boolean>(false);
+
   return (
     <Grid container spacing={2}>
       <Grid
@@ -151,7 +158,11 @@ const OrderInfo = ({ order }: IProps) => {
           <table>
             <tr>
               <td>Loại hóa đơn:</td>
-              <td>Khách bán lẻ</td>
+              <td>
+                {order?.orderType === 1
+                  ? 'Khách bán lẻ'
+                  : 'Bán theo đơn bác sĩ'}
+              </td>
             </tr>
             <tr>
               <td>Bán bởi:</td>
@@ -161,6 +172,16 @@ const OrderInfo = ({ order }: IProps) => {
               <td>Ngày bán:</td>
               <td>{formatDateTime(order?.saleDate)}</td>
             </tr>
+            {order?.orderType === 2 && files.length > 0 && (
+              <tr>
+                <td>Hình ảnh chi tiết:</td>
+                <td>
+                  <IconButton onClick={() => setPreviewImages(true)}>
+                    <RemoveRedEyeIcon />
+                  </IconButton>
+                </td>
+              </tr>
+            )}
           </table>
           <hr />
           <Typography variant="h5">Ghi chú</Typography>
@@ -172,6 +193,11 @@ const OrderInfo = ({ order }: IProps) => {
           />
         </TableWrapper>
       </Grid>
+      <MapDialog
+        open={previewImages}
+        onClose={() => setPreviewImages(false)}
+        images={files || []}
+      />
     </Grid>
   );
 };

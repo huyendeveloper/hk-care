@@ -92,7 +92,10 @@ const ProductListTableData = ({ registerList, handleCancelRegist }: IProps) => {
                 .toLocaleLowerCase()
                 .includes(filters.searchText.toLowerCase())
             )
-            .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10).length
+            .splice(
+              (filters.pageIndex - 1) * filters.pageSize,
+              filters.pageIndex * filters.pageSize
+            ).length
         }
         loading={false}
       >
@@ -113,7 +116,10 @@ const ProductListTableData = ({ registerList, handleCancelRegist }: IProps) => {
                       .toLocaleLowerCase()
                       .includes(filters.searchText.toLowerCase())
                   )
-                  .splice((filters.pageIndex - 1) * 10, filters.pageIndex * 10)
+                  .splice(
+                    (filters.pageIndex - 1) * filters.pageSize,
+                    filters.pageIndex * filters.pageSize
+                  )
                   .map((item, index) => {
                     const { productId, productName } = item;
                     return (
