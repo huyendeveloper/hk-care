@@ -35,7 +35,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createWhInventory } from 'redux/slices/whInventory';
+import { createWhInventory, updateWhInventory } from 'redux/slices/whInventory';
 import importReceiptService from 'services/importReceipt.service';
 import whInventoryService from 'services/whInventory.service';
 import { FilterParams } from 'types';
@@ -100,6 +100,7 @@ const Create = () => {
   const [openMapDialog, setOpenMapDialog] = useState<boolean>(false);
   const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const [detailAdd, setDetailAdd] = useState<IDetailAdd>({
     idProduct: null,
@@ -259,6 +260,34 @@ const Create = () => {
     }));
   };
 
+  const handleAdd = async (data: IInventoryRecord) => {
+    // @ts-ignore
+    const { error, payload } = await dispatch(createWhInventory(data));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoading(false);
+      return;
+    }
+    setNotification({ message: 'Thêm thành công', severity: 'success' });
+  };
+
+  const handleUpdate = async (data: IInventoryRecord, id: string) => {
+    const { error, payload } = await dispatch(
+      // @ts-ignore
+      updateWhInventory({ ...data, code: id })
+    );
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoading(false);
+      return;
+    }
+    setNotification({ message: 'Cập nhật thành công', severity: 'success' });
+  };
+
   const onSubmit = async (body: IInventoryRecord) => {
     let file = '';
     if (files[0] instanceof File && files !== null && files !== undefined) {
@@ -276,43 +305,13 @@ const Create = () => {
     const UPDATEAD = '1';
     const newPayload = { ...body, fileAttach: [file] };
     if (id === undefined && v === undefined) {
-      whInventoryService
-        .create(newPayload)
-        .then((rs) => {
-          setNotification({
-            message: 'Thêm thành công',
-            severity: 'success',
-          });
-          setLoading(false);
-          return navigate('/hk_care/warehouse/inventory_record');
-        })
-        .catch((err) => {
-          setNotification({ error: 'Lỗi!' });
-          setLoading(false);
-          return;
-        });
+      await handleAdd(newPayload);
     }
 
     if (id !== undefined && v === UPDATEAD) {
-      whInventoryService
-        .update(newPayload, id)
-        .then((rs) => {
-          setLoading(false);
-          setNotification({
-            message: 'Sửa thành công',
-            severity: 'success',
-          });
-          return navigate('/hk_care/warehouse/inventory_record');
-        })
-        .catch((err) => {
-          setNotification({ error: 'Lỗi!' });
-          setLoading(false);
-          return;
-        });
-    } else {
-      setLoading(false);
-      return navigate(`/hk_care/warehouse/inventory_record`);
+      await handleUpdate(newPayload, id);
     }
+    return navigate('/hk_care/warehouse/inventory_record');
   };
 
   const pageTitle = useMemo(() => {
