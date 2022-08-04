@@ -18,6 +18,18 @@ export const createWhInventory = createAsyncThunk(
   }
 );
 
+export const updateWhInventory = createAsyncThunk(
+  'whInventory/update',
+  async (payload: IInventoryRecord, { rejectWithValue }) => {
+    try {
+      const { data } = await whInventoryService.update(payload);
+      return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const whInventorySlice = createSlice({
   name: 'whInventory',
   initialState,

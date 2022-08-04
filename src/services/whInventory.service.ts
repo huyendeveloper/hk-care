@@ -34,10 +34,11 @@ class WhInventoryService {
     });
   }
 
-  update(payload: IInventoryRecord, codeInventory: string) {
-    return axiosClient.post(`${baseURL}/whInventory/update/${codeInventory}`, {
-      ...payload,
-    });
+  update(payload: IInventoryRecord) {
+    return axiosClient.post(
+      `${baseURL}/whInventory/update/${payload.code}`,
+      payload
+    );
   }
   searchInventoryWH({
     searchText,
