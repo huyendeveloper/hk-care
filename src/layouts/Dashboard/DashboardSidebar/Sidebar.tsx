@@ -78,8 +78,20 @@ const getSections = (): SectionItem[] => [
       },
       {
         title: 'Quản trị người dùng',
-        path: '/hk_group/users',
+        path: '/404',
         roles: ['hkl1', 'hkl2'],
+        children: [
+          {
+            title: 'Danh sách người dùng',
+            path: '/hk_group/users',
+            roles: ['hkl1', 'hkl2'],
+          },
+          {
+            title: 'Phân quyền',
+            path: '/hk_care/operate/roles',
+            roles: ['hkl1', 'hkl2'],
+          },
+        ],
       },
     ],
   },

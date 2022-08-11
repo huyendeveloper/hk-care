@@ -18,12 +18,17 @@ const DashboardLayout: FC = () => {
     setOpenMobileSidebar(!openMobileSidebar);
   };
 
+  const handleCloseSidebar = () => {
+    setOpenDrawer(false);
+  };
+
   const handleCloseMobileSidebar = () => {
     setOpenMobileSidebar(false);
   };
 
   return (
-    <DashboardLayoutRoot>
+    // @ts-ignore
+    <DashboardLayoutRoot openDrawer={openDrawer}>
       <DashboardNavbar
         onToggleMobileSidebar={handleToggleMobileSidebar}
         onToggleDrawer={handleToggleDrawer}
@@ -33,7 +38,9 @@ const DashboardLayout: FC = () => {
         <Outlet />
       </DashboardLayoutContent>
       <DashboardSidebar
+        handleCloseSidebar={handleCloseSidebar}
         onCloseMobileSidebar={handleCloseMobileSidebar}
+        openDrawer={openDrawer}
         openMobileSidebar={openMobileSidebar}
       />
       <DashboardFooter />
@@ -41,16 +48,20 @@ const DashboardLayout: FC = () => {
   );
 };
 
-const DashboardLayoutRoot = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: '1 1 auto',
-  maxWidth: '100%',
-  paddingTop: 64,
-  [theme.breakpoints.up('lg')]: {
-    paddingLeft: 280,
-  },
-}));
+const DashboardLayoutRoot = styled('div')((prop) => {
+  // @ts-ignore
+  const { theme, openDrawer } = prop;
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: '1 1 auto',
+    maxWidth: '100%',
+    paddingTop: 64,
+    [theme.breakpoints.up('lg')]: {
+      paddingLeft: openDrawer ? 280 : 0,
+    },
+  };
+});
 
 const DashboardLayoutContent = styled('main')({
   display: 'flex',

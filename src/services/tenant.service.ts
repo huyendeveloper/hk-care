@@ -9,6 +9,10 @@ class TenantService {
   changeStatus(id: number | null) {
     return axiosClient.put(`${baseURL}/salepoint/changestatus/${id}`);
   }
+
+  getTenantIsActives() {
+    return axiosClient.get(`${baseURL}/exportWH/GetTenantIsActives`);
+  }
 }
 
 export default new TenantService();

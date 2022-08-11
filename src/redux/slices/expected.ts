@@ -73,6 +73,29 @@ export const getExpected = createAsyncThunk(
   }
 );
 
+export const getImportRequestList = createAsyncThunk(
+  'expected/getImportRequestList',
+  async (filters: FilterParams, { rejectWithValue }) => {
+    try {
+      const { data } = await expectedService.getImportRequestList(filters);
+
+      if (data) {
+        const requestImportList = data.items;
+        const totalCount = data.totalCount;
+
+        return {
+          requestImportList,
+          totalCount,
+        };
+      }
+
+      return rejectWithValue('Get data fail');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const expectedSlice = createSlice({
   name: 'expected',
   initialState,

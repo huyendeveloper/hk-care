@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { Selecter } from 'components/Form';
-import { TableContent, TableWrapper } from 'components/Table';
+import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IImportReceipt, IStaff } from 'interface';
@@ -32,6 +32,7 @@ const TableData = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [staffChoosed, setStaffChoosed] = useState<number | null>(null);
   const [staffList, setStaffList] = useState<IStaff[]>([]);
+  const [totalRows, setTotalRows] = useState<number>(0);
 
   useEffect(() => {
     setStaffList([{ id: 1, name: 'Nhân viên bán hàng' }]);
@@ -53,6 +54,7 @@ const TableData = () => {
     }
 
     setImportReceipt(payload.importReceiptList);
+    setTotalRows(payload.totalCount);
     setLoading(false);
   };
 
@@ -61,6 +63,21 @@ const TableData = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
+
+  const handleChangePage = (pageIndex: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex,
+    }));
+  };
+
+  const handleChangeRowsPerPage = (rowsPerPage: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex: 1,
+      pageSize: rowsPerPage,
+    }));
+  };
 
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
@@ -102,6 +119,7 @@ const TableData = () => {
               )}
             />
           </Grid>
+          <h2 style={{ margin: 0 }}>-</h2>
           <Grid item xs={3}>
             <DatePicker
               // @ts-ignore
@@ -146,6 +164,14 @@ const TableData = () => {
             </Table>
           </Scrollbar>
         </TableContainer>
+        <TablePagination
+          pageIndex={filters.pageIndex}
+          totalPages={totalRows}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          rowsPerPage={filters.pageSize}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+        />
       </TableContent>
     </TableWrapper>
   );

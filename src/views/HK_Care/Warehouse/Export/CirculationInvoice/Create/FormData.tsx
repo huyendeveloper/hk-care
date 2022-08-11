@@ -145,7 +145,7 @@ const FormData = ({ defaultValue }: IProps) => {
 
   const fetchTenants = async () => {
     try {
-      const { data } = await tenantService.getTenants();
+      const { data } = await tenantService.getTenantIsActives();
       setTenantList(
         data.filter(
           (item: ITenant) => item.name !== LocalStorage.get('tennant')
@@ -288,6 +288,14 @@ const FormData = ({ defaultValue }: IProps) => {
                           return;
                         }
                         const item = productList.find((x) => x.id === value);
+                        // @ts-ignore
+                        if (item.amount === 0) {
+                          setNotification({
+                            message: 'Sản phẩm này hiện tại hết hàng',
+                            severity: 'warning',
+                          });
+                          return;
+                        }
                         item && addItem(item);
                       }}
                       defaultValue=""

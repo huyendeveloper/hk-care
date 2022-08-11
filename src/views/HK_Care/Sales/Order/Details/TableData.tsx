@@ -227,7 +227,7 @@ const TableData = ({ orderDetailDtos }: IProps) => {
             </Table>
           </Scrollbar>
           <Stack flexDirection="row" sx={{ mt: 3 }} justifyContent="flex-end">
-            <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>
+            <LinkButton to="/hk_care/sales/order">Quay lại</LinkButton>
           </Stack>
         </TableContainer>
       </TableContent>

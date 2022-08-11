@@ -1,5 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
@@ -15,7 +16,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
-import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
+import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TableHeader,
@@ -29,7 +30,7 @@ import { useNotification } from 'hooks';
 import { IStaff } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { changeStatus, deleteProduct } from 'redux/slices/product';
+import { getAllStaff, changeStatus } from 'redux/slices/staff';
 import { ClickEventCurrying } from 'types';
 import type { FilterParams } from 'types/common';
 
@@ -50,11 +51,9 @@ const TableData = () => {
   const [staffList, setStaffList] = useState<IStaff[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>({
     ...defaultFilters,
   });
@@ -62,89 +61,14 @@ const TableData = () => {
   const cells = useMemo(() => getCells(), []);
 
   const fetchData = async () => {
-    const payload = {
-      staffList: [
-        {
-          id: 1,
-          name: 'Robin',
-          roleName: 'Construction Manager',
-          phone: '990-885-5285',
-          active: true,
-        },
-        {
-          id: 2,
-          name: 'Kelsey',
-          roleName: 'Construction Worker',
-          phone: '868-762-7860',
-          active: true,
-        },
-        {
-          id: 3,
-          name: 'Melinde',
-          roleName: 'Estimator',
-          phone: '155-768-2115',
-          active: true,
-        },
-        {
-          id: 4,
-          name: 'Loraine',
-          roleName: 'Construction Worker',
-          phone: '961-799-9531',
-          active: false,
-        },
-        {
-          id: 5,
-          name: 'Chantal',
-          roleName: 'Construction Foreman',
-          phone: '995-621-9786',
-          active: true,
-        },
-        {
-          id: 6,
-          name: 'Welby',
-          roleName: 'Electrician',
-          phone: '851-828-7907',
-          active: true,
-        },
-        {
-          id: 7,
-          name: 'Christel',
-          roleName: 'Construction Worker',
-          phone: '451-372-5746',
-          active: false,
-        },
-        {
-          id: 8,
-          name: 'Raquel',
-          roleName: 'Construction Foreman',
-          phone: '365-959-1171',
-          active: true,
-        },
-        {
-          id: 9,
-          name: 'Shepperd',
-          roleName: 'Engineer',
-          phone: '189-360-7997',
-          active: true,
-        },
-        {
-          id: 10,
-          name: 'Karyn',
-          roleName: 'Construction Foreman',
-          phone: '147-743-1083',
-          active: false,
-        },
-      ],
-      totalCount: 15,
-    };
     // @ts-ignore
-    // const { payload, error } = await dispatch(getAllProduct(filters));
+    const { payload, error } = await dispatch(getAllStaff(filters));
 
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   setLoading(false);
-    //   return;
-    // }
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setLoading(false);
+      return;
+    }
     setStaffList(payload.staffList);
     setTotalRows(payload.totalCount);
     setLoading(false);
@@ -178,45 +102,11 @@ const TableData = () => {
     }));
   };
 
-  const handleDelete = async () => {
-    if (!currentID) return;
-    handleCloseDeleteDialog();
-    setShowBackdrop(true);
-    // @ts-ignore
-    const { error } = await dispatch(deleteProduct(currentID));
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      setShowBackdrop(false);
-      return;
-    }
-    setNotification({
-      message: 'Xóa thành công!',
-      severity: 'success',
-    });
-
-    fetchData();
-    setShowBackdrop(false);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
       ...state,
       searchText,
     }));
-  };
-
-  const handleOpenCreateDialog = () => {
-    setCurrentID(null);
-    setOpenFormDialog(true);
-  };
-
-  const handleOpenUpdateDialog: ClickEventCurrying = (id) => () => {
-    setCurrentID(id);
-    setOpenFormDialog(true);
   };
 
   const handleCloseBlockDialog = () => {
@@ -233,7 +123,7 @@ const TableData = () => {
     setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
-      changeStatus({ id: currentID, status: true })
+      changeStatus({ id: currentID })
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
@@ -254,7 +144,7 @@ const TableData = () => {
     setShowBackdrop(true);
     const { error } = await dispatch(
       // @ts-ignore
-      changeStatus({ id: currentID, status: false })
+      changeStatus({ id: currentID })
     );
     if (error) {
       setNotification({ error: 'Lỗi!' });
@@ -270,9 +160,14 @@ const TableData = () => {
     setShowBackdrop(false);
   };
 
-  const handleOpenDeleteDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenBlockDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
-    setOpenDeleteDialog(true);
+    setOpenBlockDialog(true);
+  };
+
+  const handleOpenUnBlockDialog: ClickEventCurrying = (id) => () => {
+    setCurrentID(id);
+    setOpenUnBlockDialog(true);
   };
 
   const renderAction = (row: IStaff) => {
@@ -290,9 +185,13 @@ const TableData = () => {
           </IconButton>
         </LinkIconButton>
 
-        {!row.active && (
-          <IconButton onClick={handleOpenDeleteDialog(row.id)}>
-            <DeleteIcon />
+        {row.status !== 1 ? (
+          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+            <CheckIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleOpenBlockDialog(row.id)}>
+            <BlockIcon />
           </IconButton>
         )}
       </>
@@ -330,7 +229,7 @@ const TableData = () => {
 
               <TableBody>
                 {staffList.map((item, index) => {
-                  const { id, name, roleName, phone, active } = item;
+                  const { id, name, roleName, phoneNumber, status } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
@@ -338,9 +237,9 @@ const TableData = () => {
                       </TableCell>
                       <TableCell>{name}</TableCell>
                       <TableCell>{roleName}</TableCell>
-                      <TableCell>{phone}</TableCell>
+                      <TableCell>{phoneNumber}</TableCell>
                       <TableCell>
-                        {active ? (
+                        {status === 1 ? (
                           <Button>Đang làm việc</Button>
                         ) : (
                           <Button color="error">Đã nghỉ làm</Button>
@@ -381,15 +280,6 @@ const TableData = () => {
         onClose={handleCloseUnBlockDialog}
         open={openUnBlockDialog}
         handleUnBlock={handleUnBlock}
-      />
-
-      <DeleteDialog
-        id={currentID}
-        tableName="nhân viên"
-        name={staffList.find((x) => x.id === currentID)?.name}
-        onClose={handleCloseDeleteDialog}
-        open={openDeleteDialog}
-        handleDelete={handleDelete}
       />
 
       <Backdrop

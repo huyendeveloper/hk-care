@@ -1,12 +1,23 @@
 import DownloadIcon from '@mui/icons-material/Download';
 import { LoadingButton } from '@mui/lab';
-import { Paper, Table, TableBody, TableContainer } from '@mui/material';
+import { Paper, Stack, Table, TableBody, TableContainer } from '@mui/material';
 import { Scrollbar } from 'components/common';
-import { TableContent, TableSearchField, TableWrapper } from 'components/Table';
+import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
+import {
+  TableContent,
+  TablePagination,
+  TableSearchField,
+  TableWrapper,
+} from 'components/Table';
+import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { IRequestImport, IUser } from 'interface';
+import 'index.css';
+import { IRequestImport } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getImportRequestList } from 'redux/slices/expected';
+import expectedService from 'services/expected.service';
 import { FilterParams } from 'types';
 import TableHeader, { Cells } from '../components/TableHeader';
 import ExpandRow from './ExpandRow';
@@ -15,19 +26,26 @@ const getCells = (): Cells<IRequestImport> => [
   { id: 'id', label: 'STT' },
   { id: 'id', label: 'Điểm bán' },
   { id: 'id', label: 'Số lượng' },
-  { id: 'expectedDate', label: 'Ngày yêu cầu' },
+  { id: 'requestDate', label: 'Ngày yêu cầu' },
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [currentID, setCurrentID] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [requestImport, setRequestImport] = useState<object>([]);
+  const [open, setOpen] = useState(false);
+  const [contentDowload, setcontentDowload] = useState<string>();
 
   const cells = useMemo(() => getCells(), []);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
@@ -37,19 +55,16 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    const payload = {
-      requestImportList: [
-        {
-          id: 1,
-          code: 'RQ01',
-          requestDate: new Date('2022/12/15'),
-          productName: 'Thuốc ho',
-          tenant: 'Hà Nội',
-          quantity: 40,
-        },
-      ],
-      totalCount: 130,
-    };
+    //@ts-ignore
+    const { payload, error } = await dispatch(getImportRequestList(filters));
+
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoading(false);
+      return;
+    }
     const requestImportList = [
       ...(payload.requestImportList as IRequestImport[]),
     ].reduce((group, product) => {
@@ -81,23 +96,94 @@ const TableData = () => {
     }));
   };
 
+  const handleSelectTime = (time: ISelectTime) => {
+    setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
+  };
+
+  const handleChangePage = (pageIndex: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex,
+    }));
+  };
+
+  const handleChangeRowsPerPage = (rowsPerPage: number) => {
+    setFilters((state) => ({
+      ...state,
+      pageIndex: 1,
+      pageSize: rowsPerPage,
+    }));
+  };
+
+  const handleDownload = () => {
+    setcontentDowload('Đang xử lý. Vui lòng chờ!');
+    handleOpen();
+
+    return expectedService
+      .dowLoadFile(filters)
+      .then((re: any) => {
+        setcontentDowload('Kiểm tra dữ liệu và tải xuống!');
+        setTimeout(() => {
+          const url = `${connectURL}/` + re.data;
+          //download_file(url);
+          var save = document.createElement('a');
+          save.href = url;
+          save.target = '_blank';
+          var filename = url.substring(url.lastIndexOf('/') + 1);
+          save.download = filename;
+          if (
+            navigator.userAgent.toLowerCase().match(/(ipad|iphone|safari)/) &&
+            navigator.userAgent.search('Chrome') < 0
+          ) {
+            document.location = save.href;
+            // window event not working here
+          } else {
+            var evt = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: false,
+            });
+            save.dispatchEvent(evt);
+            (window.URL || window.webkitURL).revokeObjectURL(save.href);
+          }
+          handleClose();
+        }, 5000);
+      })
+      .catch((err) => {
+        setNotification({ error: 'xử lý file lỗi!' });
+        handleClose();
+      });
+  };
+
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
-      <TableSearchField
-        title="Danh sách yêu cầu nhập"
-        placeHolder="Tìm kiếm sản phẩm"
-        onSearch={handleSearch}
-        searchText={filters.searchText}
-      >
-        <LoadingButton
-          loadingPosition="start"
-          startIcon={<DownloadIcon />}
-          sx={{ height: '40px', width: '100px' }}
-          variant="outlined"
-        >
-          PDF
-        </LoadingButton>
-      </TableSearchField>
+      <div>
+        <TableSearchField
+          title="Danh sách yêu cầu nhập"
+          placeHolder="Tìm kiếm sản phẩm, điểm bán"
+          onSearch={handleSearch}
+          searchText={filters.searchText}
+        ></TableSearchField>
+        <SelectTime
+          defaultTime={{
+            startDate: filters.startDate,
+            lastDate: filters.lastDate,
+          }}
+          onSelectTime={handleSelectTime}
+        />
+        <Stack alignItems="flex-end" paddingX={1.5}>
+          <LoadingButton
+            loadingPosition="start"
+            startIcon={<DownloadIcon />}
+            sx={{ height: '40px', width: '100px' }}
+            variant="outlined"
+            onClick={handleDownload}
+            loading={open}
+          >
+            PDF
+          </LoadingButton>
+        </Stack>
+      </div>
       <TableContent total={Object.keys(requestImport).length} loading={loading}>
         <TableContainer sx={{ p: 1.5 }}>
           <Scrollbar>
@@ -126,6 +212,14 @@ const TableData = () => {
             </Table>
           </Scrollbar>
         </TableContainer>
+        <TablePagination
+          pageIndex={filters.pageIndex}
+          totalPages={totalRows}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          rowsPerPage={filters.pageSize}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+        />
       </TableContent>
     </TableWrapper>
   );

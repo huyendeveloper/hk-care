@@ -318,6 +318,8 @@ export interface IRequestImport {
   tenant?: string;
   quantity?: number;
   expectedDetails?: IProductRequestImport[];
+  measureName?: string;
+  requestDate?: Date;
 }
 
 export interface INorm {
@@ -391,12 +393,14 @@ export interface IStaff {
   name: string;
   roleId?: string;
   roleName?: string;
-  phone?: string;
-  active?: boolean;
-  identityCard?: string;
+  phoneNumber?: string;
+  active?: number;
+  idCard?: string;
   email?: string;
-  username?: string;
+  userName?: string;
   password?: string;
+  status?:number
+  namePathSalePointEmployeeStorageDtos?: { name: string; url: string }[];
 }
 
 export interface ISalesReport {
