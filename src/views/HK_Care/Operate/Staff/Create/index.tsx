@@ -1,6 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Divider, FormGroup, Grid } from '@mui/material';
+import {
+  Backdrop,
+  CircularProgress,
+  Divider,
+  FormGroup,
+  Grid,
+} from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useLocation, useParams } from 'react-router-dom';
@@ -8,8 +14,6 @@ import * as yup from 'yup';
 
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
-  ControllerMultiFile,
-  ControllerSwitch,
   ControllerTextField,
   EntityMultipleSelecter,
   FormContent,
@@ -18,8 +22,13 @@ import {
   FormLabel,
   FormPaperGrid,
 } from 'components/Form';
-import { yupDate, yupOnlyNumber } from 'constants/typeInput';
+import ControllerMultiFiles from 'components/Form/ControllerMultiFiles';
+import { typeStringNumber } from 'constants/typeInput';
+import { useNotification } from 'hooks';
 import { IStaff, ISupplier } from 'interface';
+import { useDispatch } from 'react-redux';
+import { createStaff, getStaff } from 'redux/slices/staff';
+import importReceiptService from 'services/importReceipt.service';
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
   return this.test(`test-trim`, errorMessage, function (value) {
@@ -32,39 +41,52 @@ yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
   });
 });
 
+const randexp = require('randexp').randexp;
+
 const validationSchema = yup.object().shape({
   name: yup
     .string()
-    .required('Vui lòng nhập tên sản phẩm.')
+    .required('Vui lòng nhập họ và tên.')
     // @ts-ignore
-    .trimCustom('Vui lòng nhập tên sản phẩm.'),
-  productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
-  treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
-  usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
-  mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
-  outOfDate: yupDate,
-  dosage: yup
+    .trimCustom('Vui lòng nhập họ và tên.'),
+  idCard: yup.string().required('Vui lòng nhập số CMND/CCCD.'),
+  phoneNumber: yup
     .string()
-    .required('Vui lòng nhập hàm lượng.')
+    .required('Vui lòng nhập số điện thoại.')
     // @ts-ignore
-    .trimCustom('Vui lòng nhập hàm lượng.')
-    .default('Null'),
-  routeOfUse: yup
+    .trimCustom('Vui lòng nhập số điện thoại.')
+    .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .strict(true)
+    .default(''),
+  // roleId: yup.string().required('Vui lòng chọn vai trò.'),
+  userName: yup
     .string()
-    .required('Vui lòng nhập liều dùng.')
+    .required('Vui lòng nhập tên đăng nhập.')
     // @ts-ignore
-    .trimCustom('Vui lòng nhập liều dùng.')
-    .default('Theo chỉ định'),
-  dateManufacture: yupDate,
+    .trimCustom('Vui lòng nhập tên đăng nhập.'),
+  password: yup
+    .string()
+    .required('Vui lòng nhập mật khẩu.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập mật khẩu.')
+    .default(
+      randexp(
+        /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+      )
+    ),
 });
 
 const Create = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const location = useLocation();
+  const setNotification = useNotification();
   const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [loadingFetchData, setLoadingFetchData] = useState<boolean>(false);
 
   const isUpdate = useMemo(
     () => location.pathname.includes('/update'),
@@ -81,24 +103,82 @@ const Create = () => {
 
   const active = useWatch({ control, name: 'active' });
 
-  const onSubmit = async (payload: IStaff) => {
-    // setShowBackdrop(true);
-    // const { error } = await dispatch(
-    //   // @ts-ignore
-    //   updateProduct({ ...payload, image })
-    // );
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   setShowBackdrop(false);
-    //   return;
-    // }
-    // setNotification({
-    //   message: 'Cập nhật thành công',
-    //   severity: 'success',
-    // });
-    // setDisabled(true);
-    // setShowBackdrop(false);
+  // @ts-ignore
+  const handleChangeFiles = async (newValue) => {
+    setShowBackdrop(true);
+    setFiles(newValue);
+    // @ts-ignore
+    await newValue.forEach(async (file, index, array) => {
+      // @ts-ignore
+      if (file?.type) {
+        const { data } = await importReceiptService.getPathFileReceipt(file);
+        // @ts-ignore
+        setFiles((prev) => {
+          const newFile = [...prev];
+          // @ts-ignore
+          newFile[index] = { name: file?.name, url: data };
+          return newFile;
+        });
+      }
+    });
   };
+
+  useEffect(() => {
+    if (!showBackdrop) return;
+    // @ts-ignore
+    const fileList = files.filter((item) => Boolean(item.type));
+    if (fileList.length === 0) {
+      setShowBackdrop(false);
+      // @ts-ignore
+      // setValue('attachments', files);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, showBackdrop]);
+
+  const onSubmit = async (payload: IStaff) => {
+    setLoading(true);
+    // @ts-ignore
+    const { error } = await dispatch(
+      // @ts-ignore
+      createStaff({
+        ...payload, // @ts-ignore
+        namePathSalePointEmployeeStorageDtos: files,
+      })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setLoading(false);
+      return;
+    }
+    setNotification({
+      message: 'Thêm thành công',
+      severity: 'success',
+    });
+    setLoading(false);
+  };
+
+  const fetchDataUpdate = async () => {
+    setLoadingFetchData(true);
+    // @ts-ignore
+    const { payload, error } = await dispatch(getStaff(id));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoadingFetchData(false);
+      return;
+    }
+
+    reset(payload.staff);
+    setFiles(payload.staff.files);
+    setLoadingFetchData(false);
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchDataUpdate();
+    }
+  }, []);
 
   if (loading) {
     return <LoadingScreen />;
@@ -136,17 +216,28 @@ const Create = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel required title="Số CMND/CCCD" name="identityCard" />
+                <FormLabel required title="Số CMND/CCCD" name="idCard" />
+                {/* <ControllerTextField
+                  name="idCard"
+                  control={control}
+                  disabled={!isUpdate && Boolean(id)}
+                /> */}
                 <ControllerTextField
-                  name="identityCard"
+                  inputProps={typeStringNumber((value) =>
+                    setValue('idCard', value)
+                  )}
+                  name="idCard"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel required title="Số điện thoại" name="phone" />
+                <FormLabel required title="Số điện thoại" name="phoneNumber" />
                 <ControllerTextField
-                  name="phone"
+                  inputProps={typeStringNumber((value) =>
+                    setValue('phoneNumber', value)
+                  )}
+                  name="phoneNumber"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                 />
@@ -160,27 +251,37 @@ const Create = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormLabel title="Vai trò" name="roleId" />
+                <FormLabel title="Vai trò" required name="roleId" />
                 <EntityMultipleSelecter
                   name="roleId"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                   options={supplierList}
                   renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy nhà cung cấp"
+                  noOptionsText="Không tìm thấy vai trò"
                   placeholder=""
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="File đính kèm" name="roleId" />
                 <Grid container gap={1} gridTemplateRows={'auto 1fr auto'}>
-                  <ControllerMultiFile
+                  {/* <ControllerMultiFile
                     files={files}
                     setFiles={setFiles}
                     max={7}
                     accept="image/*,application/pdf"
                     message="Tài liệu đính kèm chỉ cho phép file pdf và ảnh."
                     viewOnly={!isUpdate && Boolean(id)}
+                  /> */}
+
+                  <ControllerMultiFiles
+                    files={files}
+                    setFiles={(newValue) => {
+                      handleChangeFiles(newValue);
+                    }}
+                    message="Tài liệu đính kèm chỉ cho phép file pdf và ảnh."
+                    disabled={!isUpdate && Boolean(id)}
+                    max={7}
                   />
                 </Grid>
               </Grid>
@@ -188,9 +289,9 @@ const Create = () => {
                 <Divider />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel required title="Tên đăng nhập" name="username" />
+                <FormLabel required title="Tên đăng nhập" name="userName" />
                 <ControllerTextField
-                  name="username"
+                  name="userName"
                   helperText={
                     <>
                       HK [Dia chi diem ban] - Ho va ten
@@ -203,18 +304,9 @@ const Create = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel title="Mật khẩu" name="password" />
+                <FormLabel title="Mật khẩu" required name="password" />
                 <ControllerTextField
                   name="password"
-                  control={control}
-                  disabled={!isUpdate && Boolean(id)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormLabel title="Trạng thái" name="active" />
-                <ControllerSwitch
-                  name="active"
-                  label={active ? 'Đang làm việc' : 'Đã nghỉ làm'}
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                 />
@@ -229,7 +321,7 @@ const Create = () => {
           </LinkButton>
 
           {isUpdate || !Boolean(id) ? (
-            <LoadingButton loading={showBackdrop} type="submit">
+            <LoadingButton loading={loading} type="submit">
               Lưu
             </LoadingButton>
           ) : (
@@ -239,6 +331,13 @@ const Create = () => {
           )}
         </FormFooter>
       </FormPaperGrid>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </PageWrapper>
   );
 };

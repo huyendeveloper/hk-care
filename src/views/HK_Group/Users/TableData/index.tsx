@@ -1,5 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
@@ -13,7 +14,6 @@ import {
   TableRow,
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
-import { DeleteDialog } from 'components/Dialog';
 import {
   TableContent,
   TablePagination,
@@ -25,9 +25,10 @@ import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IUser } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllUser } from 'redux/slices/user';
 import { RootState } from 'redux/store';
-import { FilterParams } from 'types';
+import { ClickEventCurrying, FilterParams } from 'types';
 
 const getCells = (): Cells<IUser> => [
   { id: 'id', label: 'STT' },
@@ -49,15 +50,16 @@ const getCellsAdminCare = (): Cells<IUser> => [
 ];
 
 const TableData = () => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [currentID, setCurrentID] = useState<number | null>(null);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [userList, setUserList] = useState<IUser[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [disableView, setDisableView] = useState<boolean>(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
+  const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { userRoles } = useSelector((state: RootState) => state.auth);
 
@@ -66,82 +68,90 @@ const TableData = () => {
     [userRoles]
   );
 
-  const fetchData = () => {
-    setUserList([
-      {
-        id: 1,
-        name: 'Jeth',
-        phone: '7034887175',
-        role: 'Electrician',
-        tenant: 'Gigashots',
-        status: false,
-      },
-      {
-        id: 2,
-        name: 'Edie',
-        phone: '4611020964',
-        role: 'Construction Expeditor',
-        tenant: 'Skyble',
-        status: false,
-      },
-      {
-        id: 3,
-        name: 'Nell',
-        phone: '6794000846',
-        role: 'Project Manager',
-        tenant: 'Realbuzz',
-        status: true,
-      },
-      {
-        id: 4,
-        name: 'Emelia',
-        phone: '4652709644',
-        role: 'Subcontractor',
-        tenant: 'Eidel',
-        status: false,
-      },
-      {
-        id: 5,
-        name: 'Edwin',
-        phone: '3126986142',
-        role: 'Construction Worker',
-        tenant: 'Bluejam',
-        status: false,
-      },
-      {
-        id: 6,
-        name: 'Nalani',
-        phone: '8209306276',
-        role: 'Construction Worker',
-        tenant: 'Nlounge',
-        status: true,
-      },
-      {
-        id: 7,
-        name: 'Nikkie',
-        phone: '9837242081',
-        role: 'Surveyor',
-        tenant: 'Yamia',
-        status: true,
-      },
-    ]);
-    setTotalRows(33);
+  const fetchData = async () => {
+    // setUserList([
+    //   {
+    //     id: 1,
+    //     name: 'Jeth',
+    //     phone: '7034887175',
+    //     role: 'Electrician',
+    //     tenant: 'Gigashots',
+    //     status: false,
+    //   },
+    //   {
+    //     id: 2,
+    //     name: 'Edie',
+    //     phone: '4611020964',
+    //     role: 'Construction Expeditor',
+    //     tenant: 'Skyble',
+    //     status: false,
+    //   },
+    //   {
+    //     id: 3,
+    //     name: 'Nell',
+    //     phone: '6794000846',
+    //     role: 'Project Manager',
+    //     tenant: 'Realbuzz',
+    //     status: true,
+    //   },
+    //   {
+    //     id: 4,
+    //     name: 'Emelia',
+    //     phone: '4652709644',
+    //     role: 'Subcontractor',
+    //     tenant: 'Eidel',
+    //     status: false,
+    //   },
+    //   {
+    //     id: 5,
+    //     name: 'Edwin',
+    //     phone: '3126986142',
+    //     role: 'Construction Worker',
+    //     tenant: 'Bluejam',
+    //     status: false,
+    //   },
+    //   {
+    //     id: 6,
+    //     name: 'Nalani',
+    //     phone: '8209306276',
+    //     role: 'Construction Worker',
+    //     tenant: 'Nlounge',
+    //     status: true,
+    //   },
+    //   {
+    //     id: 7,
+    //     name: 'Nikkie',
+    //     phone: '9837242081',
+    //     role: 'Surveyor',
+    //     tenant: 'Yamia',
+    //     status: true,
+    //   },
+    // ]);
+    // setTotalRows(33);
+    // @ts-ignore
+    const { payload, error } = await dispatch(getAllUser(filters));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoading(false);
+      return;
+    }
+    setUserList(payload.userList);
+    setTotalRows(payload.totalCount);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
-  }, []);
+  }, [filters]);
 
   const handleSearch = (searchText: string) => {
     setFilters((state) => ({
       ...state,
       searchText,
     }));
-  };
-
-  const handleOpenCreateDialog = () => {
-    setCurrentID(null);
-    setOpenFormDialog(true);
   };
 
   const handleOnSort = (field: string) => {
@@ -166,51 +176,21 @@ const TableData = () => {
     }));
   };
 
-  const handleOpenDeleteDialog = (id: number) => () => {
+  const handleOpenBlockDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
-    setOpenDeleteDialog(true);
+    setOpenBlockDialog(true);
   };
 
-  const handleOpenUpdateDialog = (id: number) => () => {
+  const handleOpenUnBlockDialog: ClickEventCurrying = (id) => () => {
     setCurrentID(id);
-    setOpenFormDialog(true);
-    setDisableView(false);
-  };
-
-  const handleOpenViewDialog = (id: number) => () => {
-    setCurrentID(id);
-    setDisableView(true);
-    setOpenFormDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  const handleDelete = async () => {
-    if (!currentID) return;
-    handleCloseDeleteDialog();
-    setShowBackdrop(true);
-    // @ts-ignore
-    const { error } = await dispatch(deleteUsage(currentID));
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      setShowBackdrop(false);
-      return;
-    }
-    setNotification({
-      message: 'Xóa thành công!',
-      severity: 'success',
-    });
-    fetchData();
-    setShowBackdrop(false);
+    setOpenUnBlockDialog(true);
   };
 
   const renderAction = (row: IUser) => {
     return (
       <>
         <LinkIconButton to={`${row.id}`}>
-          <IconButton onClick={handleOpenViewDialog(row.id)}>
+          <IconButton>
             <VisibilityIcon />
           </IconButton>
         </LinkIconButton>
@@ -219,9 +199,14 @@ const TableData = () => {
             <EditIcon />
           </IconButton>
         </LinkIconButton>
-        {!row.status && (
-          <IconButton onClick={handleOpenDeleteDialog(row.id)}>
-            <DeleteIcon />
+
+        {!row.status ? (
+          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+            <CheckIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleOpenBlockDialog(row.id)}>
+            <BlockIcon />
           </IconButton>
         )}
       </>
@@ -293,15 +278,6 @@ const TableData = () => {
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
           rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-
-        <DeleteDialog
-          id={currentID}
-          tableName="người dùng"
-          name={userList.find((x) => x.id === currentID)?.name}
-          onClose={handleCloseDeleteDialog}
-          open={openDeleteDialog}
-          handleDelete={handleDelete}
         />
       </TableContent>
     </TableWrapper>

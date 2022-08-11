@@ -14,10 +14,17 @@ import Sidebar from './Sidebar';
 interface Props {
   onCloseMobileSidebar: () => void;
   openMobileSidebar: boolean;
+  handleCloseSidebar: () => void;
+  openDrawer: boolean;
 }
 
 const DashboardSidebar: FC<Props> = (props) => {
-  const { onCloseMobileSidebar, openMobileSidebar } = props;
+  const {
+    onCloseMobileSidebar,
+    openMobileSidebar,
+    handleCloseSidebar,
+    openDrawer,
+  } = props;
   const { pathname } = useLocation();
   const prevPathName = usePrevious(pathname);
 
@@ -89,7 +96,8 @@ const DashboardSidebar: FC<Props> = (props) => {
       <Hidden lgDown>
         <Drawer
           anchor="left"
-          open
+          open={openDrawer}
+          onClose={handleCloseSidebar}
           variant="persistent"
           PaperProps={{
             sx: {

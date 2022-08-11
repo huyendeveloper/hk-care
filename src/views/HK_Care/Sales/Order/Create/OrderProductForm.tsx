@@ -136,12 +136,12 @@ const OrderProductForm = ({
     }
     setLoading(true);
     if (id) {
-      const { error } = await dispatch(
+      const { error, payload } = await dispatch(
         // @ts-ignore
         updateSalesOrder({ ...body, orderId: Number(id) })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setLoading(false);
         return;
       }
@@ -158,7 +158,7 @@ const OrderProductForm = ({
         createSalesOrder(body)
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setLoading(false);
         return;
       }

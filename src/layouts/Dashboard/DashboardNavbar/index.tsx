@@ -29,7 +29,7 @@ const DashboardNavbar: FC<Props> = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const mounted = useMounted();
-  const { onToggleMobileSidebar, openDrawer } = props;
+  const { onToggleMobileSidebar, openDrawer, onToggleDrawer } = props;
   const [openLogoutDialog, setOpenLogoutDialog] = useState<boolean>(false);
 
   const handleOpenLogoutDialog = () => {
@@ -51,7 +51,7 @@ const DashboardNavbar: FC<Props> = (props) => {
     <StyledAppBar open={openDrawer} elevation={0}>
       <Toolbar>
         <Hidden lgDown>
-          <IconButton edge="start">
+          <IconButton edge="start" onClick={onToggleDrawer}>
             <MenuIcon />
           </IconButton>
         </Hidden>

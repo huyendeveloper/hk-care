@@ -190,14 +190,6 @@ const TableData = () => {
               save.dispatchEvent(evt);
               (window.URL || window.webkitURL).revokeObjectURL(save.href);
             }
-            // //const url = window.URL.createObjectURL(new Blob([`${connectURL}/`+re.data.data]));
-            // const link = document.createElement('a');
-            // //link.setAttribute('target', '_blank');
-            // link.href = url;
-            // link.setAttribute('download', id + ".pdf");
-            // document.body.appendChild(link);
-            // link.dispatchEvent(new MouseEvent('click'));
-            // document.body.removeChild(link);
             handleClose();
           }, 5000);
         })

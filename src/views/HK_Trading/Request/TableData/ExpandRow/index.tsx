@@ -1,5 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, TableCell, TableRow } from '@mui/material';
+import { previousDay } from 'date-fns/esm';
 import { IRequestImport } from 'interface';
 import { useState } from 'react';
 import { FilterParams } from 'types';
@@ -24,11 +25,14 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
         key={groupName}
         onClick={() => setExpand(!expand)}
       >
-        <TableCell colSpan={3} sx={{ padding: '16px' }}>
-          {index} {groupName}
+        <TableCell>{index}</TableCell>
+        <TableCell>{groupName}:</TableCell>
+        <TableCell>
+          {`${numberFormat(
+            list.reduce((pre, cur) => pre + cur.quantity, 0)
+          )} (${list[0].measureName})`}
         </TableCell>
         <TableCell
-          colSpan={1}
           sx={{
             padding: '17px',
             display: 'flex',
@@ -49,13 +53,13 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: IRequestImport) => {
-          const { id, tenant, quantity, expectedDate } = item;
+          const { id, tenant, quantity, requestDate } = item;
           return (
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell></TableCell>
               <TableCell>{tenant}</TableCell>
               <TableCell>{numberFormat(quantity || 0)}</TableCell>{' '}
-              <TableCell>{formatDateTime(expectedDate)}</TableCell>
+              <TableCell>{formatDateTime(requestDate)}</TableCell>
             </TableRow>
           );
         })}
