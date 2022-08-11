@@ -375,21 +375,37 @@ export interface IUser {
   email?: string;
   role: string;
   tenant: string;
-  status: boolean;
+  isActive: boolean;
   id: number;
 }
 
 export interface IRole {
-  id: number;
+  id?: number;
   roleName: string;
   qlsp: boolean;
   qlkh: boolean;
   qlbh: boolean;
   qlvh: boolean;
+  roleKey?: string;
+}
+
+export interface IRevenueReport {
+  code: string;
+  employeeName: string;
+  saleDate: Date;
+  orderValue: number;
+  saleDateFormated: string;
+}
+
+export interface IRevenueReportStaff {
+  code: string;
+  employeeName: string;
+  saleDate: Date;
+  orderValue: number;
 }
 
 export interface IStaff {
-  id: number;
+  id: string;
   name: string;
   roleId?: string;
   roleName?: string;
@@ -399,14 +415,16 @@ export interface IStaff {
   email?: string;
   userName?: string;
   password?: string;
-  status?:number
+  status?: number;
+  userId?: string;
   namePathSalePointEmployeeStorageDtos?: { name: string; url: string }[];
+  files?: { name: string; url: string }[];
 }
 
 export interface ISalesReport {
   id: number;
   code: string;
-  staffName: string;
+  employeeName: string;
   saleDate: Date;
   orderValue: number;
 }

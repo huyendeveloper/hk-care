@@ -18,9 +18,9 @@ class StaffService {
     );
   }
 
-  // getAllStaff() {
-  //   return axiosClient.get(`${baseURL}/SalePointEmployee/GetStaffActive`);
-  // }
+  getRoles() {
+    return axiosClient.get(`${baseURL}/SalePointEmployee/GetRoles`);
+  }
 
   get(id: string) {
     return axiosClient.get(
@@ -34,18 +34,18 @@ class StaffService {
       `${baseURL}/SalePointEmployee/CreatedSalePointEmployee`,
       {
         ...payload,
-        roleId: '1c1e1bae-762b-5de0-28c2-3a0407245cd1',
       }
     );
   }
 
-  // update(payload: IStaff) {
-  //   return axiosClient.put(`${baseURL}/SalePointEmployee/Update/${payload.id}`, payload);
-  // }
-
-  // delete(id: number) {
-  //   return axiosClient.delete(`${baseURL}/SalePointEmployee/${id}`);
-  // }
+  update(payload: IStaff) {
+    const { files, ...res } = payload;
+    return axiosClient.put(
+      `${baseURL}/SalePointEmployee/UpdateSalePointEmloyee`,
+      res,
+      { params: { salePointEmployeeId: payload.id } }
+    );
+  }
 
   changeStatus(id: number) {
     return axiosClient.put(`${baseURL}/SalePointEmployee/ChangeStatus`, null, {

@@ -9,9 +9,10 @@ interface IProps {
   groupName: string;
   list: any[];
   filters: FilterParams;
+  index: number;
 }
 
-const ExpandRow = ({ groupName, list, filters }: IProps) => {
+const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
   const [expand, setExpand] = useState<boolean>(true);
 
   return (
@@ -37,14 +38,16 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: ISalesReport, index) => {
-          const { id, code, staffName, saleDate, orderValue } = item;
+          // @ts-ignore
+          const { id, code, employeeName, saleDate, orderValue, rowId } = item;
           return (
-            <TableRow hover tabIndex={-1} key={id}>
+            <TableRow hover tabIndex={-1} key={index}>
               <TableCell>
-                {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                {/* {(filters.pageIndex - 1) * filters.pageSize + index + 1} */}
+                {rowId}
               </TableCell>
               <TableCell>{code}</TableCell>
-              <TableCell>{staffName}</TableCell>
+              <TableCell>{employeeName}</TableCell>
               <TableCell>{formatDateTime(saleDate)}</TableCell>
               <TableCell>{numberFormat(orderValue)}</TableCell>
               <TableCell></TableCell>

@@ -4,6 +4,17 @@ import { IUser } from 'interface';
 import { FilterParams } from 'types';
 import DateFns from 'utils/DateFns';
 
+interface IPermission {
+  key: string;
+  name: string;
+  isGrant: boolean;
+}
+
+interface IRoleAdmin {
+  roleName: string;
+  status: boolean;
+  permissionDtos: IPermission[];
+}
 class UserService {
   getAll({
     pageIndex,
@@ -12,7 +23,7 @@ class UserService {
     startDate,
     lastDate,
   }: FilterParams) {
-    return axiosClient.get(`${baseURL}/identity/users`, {
+    return axiosClient.get(`${baseURL}/HkGroup/Search`, {
       params: {
         SkipCount: (pageIndex - 1) * pageSize,
         MaxResultCount: pageSize,
@@ -31,16 +42,24 @@ class UserService {
     return axiosClient.get(`${connectURL}/api/identity/roles/GetRoleCurrent`);
   }
 
+  loadRoleConvert() {
+    return axiosClient.get(`${baseURL}/HkGroup/LoadRoleConvert`);
+  }
+
   create(payload: IUser) {
     return axiosClient.post(`${baseURL}/Expected/CreateExpected`, payload);
+  }
+
+  processRoleAdmin(payload: IRoleAdmin) {
+    return axiosClient.post(`${baseURL}/HkGroup/ProcessRoleAdmin`, payload);
   }
 
   update({ id, ...payload }: IUser) {
     return axiosClient.put(`${baseURL}/usage/Update/${id}`, payload);
   }
 
-  get(id: number) {
-    return axiosClient.get(`${baseURL}/whInventory/detailInventoryWH/${id}`);
+  get(id: string) {
+    return axiosClient.get(`${baseURL}/HkGroup/Detail`, { params: { id } });
   }
 
   changeStatus(id: number, status: boolean) {
@@ -52,8 +71,12 @@ class UserService {
   }
 
   getAllRoles() {
-    return axiosClient.get(`${baseURL}/UserConfig/LoadRoleSalePoint`, {
-      params: { key: '' },
+    return axiosClient.get(`${baseURL}/HkGroup/SearchRole`, {
+      params: {
+        SkipCount: 0,
+        MaxResultCount: 1000,
+        Keyword: '',
+      },
     });
   }
 }

@@ -30,8 +30,7 @@ import { useNotification } from 'hooks';
 import { IStaff } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { getAllStaff, changeStatus } from 'redux/slices/staff';
-import { ClickEventCurrying } from 'types';
+import { changeStatus, getAllStaff } from 'redux/slices/staff';
 import type { FilterParams } from 'types/common';
 
 const getCells = (): Cells<IStaff> => [
@@ -47,7 +46,7 @@ const TableData = () => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
 
-  const [currentID, setCurrentID] = useState<number | null>(null);
+  const [currentID, setCurrentID] = useState<string | null>(null);
   const [staffList, setStaffList] = useState<IStaff[]>([]);
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
@@ -160,12 +159,12 @@ const TableData = () => {
     setShowBackdrop(false);
   };
 
-  const handleOpenBlockDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenBlockDialog = (id: string) => () => {
     setCurrentID(id);
     setOpenBlockDialog(true);
   };
 
-  const handleOpenUnBlockDialog: ClickEventCurrying = (id) => () => {
+  const handleOpenUnBlockDialog = (id: string) => () => {
     setCurrentID(id);
     setOpenUnBlockDialog(true);
   };

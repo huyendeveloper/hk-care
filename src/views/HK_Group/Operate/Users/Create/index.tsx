@@ -119,8 +119,17 @@ const Create = () => {
       .finally(() => {});
   };
 
+  const fetchDataDetail = async () => {
+    console.log('id', id);
+    const { data } = await userService.get(id || '');
+    console.log('data', data);
+  };
+
   useEffect(() => {
     fetchRoleList();
+    if (id) {
+      fetchDataDetail();
+    }
   }, []);
 
   if (loading) {
@@ -235,7 +244,7 @@ const Create = () => {
         </FormContent>
 
         <FormFooter>
-          <LinkButton to="/hk_group/users">
+          <LinkButton to="/hk_group/operate/users">
             {isUpdate || !Boolean(id) ? 'Hủy' : 'Quay lại'}
           </LinkButton>
 

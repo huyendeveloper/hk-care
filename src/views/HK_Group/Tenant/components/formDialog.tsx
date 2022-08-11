@@ -6,8 +6,10 @@ import {
   Button,
   CircularProgress,
   Dialog,
+  Divider,
   Grid,
   Skeleton,
+  Typography,
 } from '@mui/material';
 import {
   ControllerTextarea,
@@ -26,8 +28,10 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import importReceiptService from 'services/importReceipt.service';
 import * as yup from 'yup';
-import { AttachmentsFile, SalePointDto } from '../dto/salePointDto';
+import { SalePointDto } from '../dto/salePointDto';
 import service from '../service';
+
+const randexp = require('randexp').randexp;
 
 interface Props {
   open: boolean;
@@ -72,6 +76,7 @@ const validationSchema = yup.object().shape({
     .strict(true),
   address: yup
     .string()
+    .required('Vui lòng nhập địa chỉ')
     .matches(
       // eslint-disable-next-line no-useless-escape
       /^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
@@ -80,6 +85,22 @@ const validationSchema = yup.object().shape({
     .max(150, 'Địa chỉ không quá 150 ký tự.'),
 
   status: yup.boolean().default(true),
+  // username: yup
+  //   .string()
+  //   .required('Vui lòng nhập tên đăng nhập.')
+  //   .email('Không đúng định dạng email.')
+  //   // @ts-ignore
+  //   .trimCustom('Vui lòng nhập tên đăng nhập.'),
+  // password: yup
+  //   .string()
+  //   .required('Vui lòng nhập mật khẩu.')
+  //   // @ts-ignore
+  //   .trimCustom('Vui lòng nhập mật khẩu.')
+  //   .default(
+  //     randexp(
+  //       /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+  //     )
+  //   ),
 });
 
 const FormDialog = ({
@@ -134,7 +155,12 @@ const FormDialog = ({
       fetchData();
     } else {
       setloadding(false);
-      reset({ isActived: true });
+      reset({
+        isActived: true,
+        // password: randexp(
+        //   /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+        // ),
+      });
       setFiles([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,17 +168,6 @@ const FormDialog = ({
 
   const onSubmit = async (tenant: SalePointDto) => {
     setloadding(true);
-    // var filesConvert: AttachmentsFile[] = [];
-    // files.forEach((m: File | object | any) => {
-    //   if (m instanceof File && m !== null && m !== undefined) {
-    //     filesConvert = [...filesConvert, { url: '', file: m }];
-    //   } else if (typeof m === 'object' && m !== null && m !== undefined) {
-    //     filesConvert = [
-    //       ...filesConvert,
-    //       { url: m.name as string, file: undefined },
-    //     ];
-    //   }
-    // });
 
     // @ts-ignore
     tenant.attachments = files;
@@ -380,6 +395,40 @@ const FormDialog = ({
                 <Grid item xs={12} md={6}></Grid>
               </Grid>
             </FormGroup>
+            {/* <Divider sx={{ mt: 3.5, mb: 1.5 }} />
+            <Typography
+              color="text.secondary"
+              sx={{ fontWeight: 'regular', fontSize: '1.74rem' }}
+            >
+              Thông tin Admin quản lý điểm bán
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Grid item xs={12}>
+                  <FormLabel title="Tên tài khoản" required name="username" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField
+                    name="username"
+                    control={control}
+                    disabled={disabled}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Grid item xs={12}>
+                  <FormLabel title="Mật khẩu" required name="password" />
+                </Grid>
+                <Grid item xs={12}>
+                  <ControllerTextField
+                    name="password"
+                    control={control}
+                    disabled={disabled}
+                  />
+                </Grid>
+              </Grid>
+            </Grid> */}
           </FormContent>
 
           <FormFooter>

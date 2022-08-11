@@ -23,11 +23,11 @@ import { RootState } from 'redux/store';
 import * as yup from 'yup';
 
 const validationSchema = yup.object().shape({
-  __tenant: yup
-    .string()
-    .strict(true)
-    .required('Vui lòng chọn điểm bán.')
-    .typeError('Vui lòng chọn điểm bán.'),
+  // __tenant: yup
+  //   .string()
+  //   .strict(true)
+  //   .required('Vui lòng chọn điểm bán.')
+  //   .typeError('Vui lòng chọn điểm bán.'),
   username: yup
     .string()
     .strict(true)
@@ -130,7 +130,7 @@ const Login = () => {
                 src="/static/logo.png"
               />
               <FormGroup fullWidth>
-                <FormLabel required title="Điểm bán" name="__tenant" />
+                <FormLabel title="Điểm bán" name="__tenant" />
                 <EntitySelecter
                   name="__tenant"
                   required

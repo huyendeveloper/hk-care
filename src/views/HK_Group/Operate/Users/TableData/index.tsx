@@ -35,8 +35,8 @@ const getCells = (): Cells<IUser> => [
   { id: 'name', label: 'Họ và tên' },
   { id: 'phone', label: 'Số điện thoại' },
   { id: 'role', label: 'Vai trò' },
-  { id: 'status', label: 'Trạng thái' },
-  { id: 'status', label: 'Thao tác' },
+  { id: 'isActive', label: 'Trạng thái' },
+  { id: 'isActive', label: 'Thao tác' },
 ];
 
 const getCellsAdminCare = (): Cells<IUser> => [
@@ -45,14 +45,13 @@ const getCellsAdminCare = (): Cells<IUser> => [
   { id: 'phone', label: 'Số điện thoại' },
   { id: 'role', label: 'Vai trò' },
   { id: 'tenant', label: 'Điểm bán' },
-  { id: 'status', label: 'Trạng thái' },
-  { id: 'status', label: 'Thao tác' },
+  { id: 'isActive', label: 'Trạng thái' },
+  { id: 'isActive', label: 'Thao tác' },
 ];
 
 const TableData = () => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
-  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [currentID, setCurrentID] = useState<number | null>(null);
   const [userList, setUserList] = useState<IUser[]>([]);
@@ -129,7 +128,10 @@ const TableData = () => {
     // ]);
     // setTotalRows(33);
     // @ts-ignore
+
+    // @ts-ignore
     const { payload, error } = await dispatch(getAllUser(filters));
+    console.log('payload', payload);
     if (error) {
       setNotification({
         error: 'Lỗi!',
@@ -200,13 +202,13 @@ const TableData = () => {
           </IconButton>
         </LinkIconButton>
 
-        {!row.status ? (
-          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
-            <CheckIcon />
-          </IconButton>
-        ) : (
+        {row.isActive ? (
           <IconButton onClick={handleOpenBlockDialog(row.id)}>
             <BlockIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
+            <CheckIcon />
           </IconButton>
         )}
       </>
@@ -230,7 +232,7 @@ const TableData = () => {
           Thêm mới người dùng
         </LinkButton>
       </TableSearchField>
-      <TableContent total={userList.length} loading={false}>
+      <TableContent total={userList.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
@@ -243,7 +245,7 @@ const TableData = () => {
 
               <TableBody>
                 {userList.map((item, index) => {
-                  const { id, name, phone, role, tenant, status } = item;
+                  const { id, name, phone, role, tenant, isActive } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
@@ -256,7 +258,7 @@ const TableData = () => {
                         <TableCell>{tenant}</TableCell>
                       )}
                       <TableCell>
-                        {status ? (
+                        {isActive ? (
                           <Button>Hoạt động</Button>
                         ) : (
                           <Button color="error">Không hoạt động</Button>

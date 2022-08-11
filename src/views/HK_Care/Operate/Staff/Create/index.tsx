@@ -9,13 +9,14 @@ import {
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerTextField,
   EntityMultipleSelecter,
+  EntitySelecter,
   FormContent,
   FormFooter,
   FormHeader,
@@ -27,8 +28,17 @@ import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
 import { IStaff, ISupplier } from 'interface';
 import { useDispatch } from 'react-redux';
-import { createStaff, getStaff } from 'redux/slices/staff';
+import { createStaff, getStaff, updateStaff } from 'redux/slices/staff';
 import importReceiptService from 'services/importReceipt.service';
+import staffService from 'services/staff.service';
+
+interface IRole {
+  roleId: string;
+
+  roleName: string;
+}
+
+const randexp = require('randexp').randexp;
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
   return this.test(`test-trim`, errorMessage, function (value) {
@@ -40,8 +50,6 @@ yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
     );
   });
 });
-
-const randexp = require('randexp').randexp;
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -59,7 +67,11 @@ const validationSchema = yup.object().shape({
     .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
     .strict(true)
     .default(''),
-  // roleId: yup.string().required('Vui lòng chọn vai trò.'),
+  email: yup
+    .string()
+    .email('Không đúng định dạng email.')
+    .required('Vui lòng nhập địa chỉ email.'),
+  roleId: yup.string().required('Vui lòng chọn vai trò.'),
   userName: yup
     .string()
     .required('Vui lòng nhập tên đăng nhập.')
@@ -81,27 +93,25 @@ const Create = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const setNotification = useNotification();
-  const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [loadingFetchData, setLoadingFetchData] = useState<boolean>(false);
+  const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
+  const [roles, setRoles] = useState<IRole[]>([]);
 
   const isUpdate = useMemo(
     () => location.pathname.includes('/update'),
     [location]
   );
 
-  const { control, setValue, getValues, handleSubmit, reset } = useForm<IStaff>(
-    {
-      mode: 'onChange',
-      resolver: yupResolver(validationSchema),
-      defaultValues: validationSchema.getDefault(),
-    }
-  );
-
-  const active = useWatch({ control, name: 'active' });
+  const { control, setValue, handleSubmit, reset } = useForm<IStaff>({
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+    defaultValues: validationSchema.getDefault(),
+  });
 
   // @ts-ignore
   const handleChangeFiles = async (newValue) => {
@@ -137,24 +147,46 @@ const Create = () => {
 
   const onSubmit = async (payload: IStaff) => {
     setLoading(true);
-    // @ts-ignore
-    const { error } = await dispatch(
+    if (id) {
+      // @ts-ignore1
+      const { error } = await dispatch(
+        // @ts-ignore
+        updateStaff({
+          ...payload, // @ts-ignore
+          namePathSalePointEmployeeStorageDtos: files,
+          id,
+        })
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi!' });
+        setLoading(false);
+        return;
+      }
+      setNotification({
+        message: 'Cập nhật thành công',
+        severity: 'success',
+      });
+    } else {
       // @ts-ignore
-      createStaff({
-        ...payload, // @ts-ignore
-        namePathSalePointEmployeeStorageDtos: files,
-      })
-    );
-    if (error) {
-      setNotification({ error: 'Lỗi!' });
-      setLoading(false);
-      return;
+      const { error } = await dispatch(
+        // @ts-ignore
+        createStaff({
+          ...payload, // @ts-ignore
+          namePathSalePointEmployeeStorageDtos: files,
+        })
+      );
+      if (error) {
+        setNotification({ error: 'Lỗi!' });
+        setLoading(false);
+        return;
+      }
+      setNotification({
+        message: 'Thêm thành công',
+        severity: 'success',
+      });
     }
-    setNotification({
-      message: 'Thêm thành công',
-      severity: 'success',
-    });
     setLoading(false);
+    return navigate('/hk_care/operate/staff');
   };
 
   const fetchDataUpdate = async () => {
@@ -174,13 +206,20 @@ const Create = () => {
     setLoadingFetchData(false);
   };
 
+  const fetchRoles = async () => {
+    const { data } = await staffService.getRoles();
+    setRoles(data);
+  };
+
   useEffect(() => {
     if (id) {
       fetchDataUpdate();
     }
+    fetchRoles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
+  if (loadingFetchData) {
     return <LoadingScreen />;
   }
 
@@ -217,11 +256,6 @@ const Create = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel required title="Số CMND/CCCD" name="idCard" />
-                {/* <ControllerTextField
-                  name="idCard"
-                  control={control}
-                  disabled={!isUpdate && Boolean(id)}
-                /> */}
                 <ControllerTextField
                   inputProps={typeStringNumber((value) =>
                     setValue('idCard', value)
@@ -243,7 +277,7 @@ const Create = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel title="Địa chỉ email" name="email" />
+                <FormLabel title="Địa chỉ email" required name="email" />
                 <ControllerTextField
                   name="email"
                   control={control}
@@ -252,12 +286,13 @@ const Create = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormLabel title="Vai trò" required name="roleId" />
-                <EntityMultipleSelecter
+                <EntitySelecter
                   name="roleId"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
-                  options={supplierList}
-                  renderLabel={(field) => field.name}
+                  options={roles}
+                  renderLabel={(field) => field.roleName}
+                  renderValue="roleId"
                   noOptionsText="Không tìm thấy vai trò"
                   placeholder=""
                 />
@@ -265,15 +300,6 @@ const Create = () => {
               <Grid item xs={12} md={6}>
                 <FormLabel title="File đính kèm" name="roleId" />
                 <Grid container gap={1} gridTemplateRows={'auto 1fr auto'}>
-                  {/* <ControllerMultiFile
-                    files={files}
-                    setFiles={setFiles}
-                    max={7}
-                    accept="image/*,application/pdf"
-                    message="Tài liệu đính kèm chỉ cho phép file pdf và ảnh."
-                    viewOnly={!isUpdate && Boolean(id)}
-                  /> */}
-
                   <ControllerMultiFiles
                     files={files}
                     setFiles={(newValue) => {

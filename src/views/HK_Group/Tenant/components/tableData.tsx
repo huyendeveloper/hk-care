@@ -13,7 +13,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { BlockDialog, UnBlockDialog } from 'components/Dialog';
@@ -22,7 +22,7 @@ import {
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';

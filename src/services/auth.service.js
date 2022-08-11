@@ -9,7 +9,7 @@ class AuthService {
     params.append('client_id', 'Care_App');
     params.append('client_secret', '1q2w3e*');
     params.append('grant_type', 'password');
-    params.append('__tenant', body.__tenant);
+    body.__tenant && params.append('__tenant', body.__tenant);
     return axios.post(`${connectURL}/connect/token`, params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
