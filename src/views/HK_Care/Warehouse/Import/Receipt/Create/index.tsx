@@ -252,24 +252,6 @@ const CreateForm = () => {
       setNotification({ error: 'Bạn chưa nhập sản phẩm nào' });
       return;
     }
-    // @ts-ignore
-    data.productReceiptWHDtos.forEach((item) => {
-      if (moment(item.expiryDate).isBefore(moment(item.dateManufacture))) {
-        setNotification({ error: 'Hạn sử dụng sau ngày sản xuất!' });
-        return;
-      }
-
-      if (!id) {
-        if (moment(item.dateManufacture).isAfter(moment(today))) {
-          setNotification({ error: 'Ngày sản xuất trước ngày hôm nay!' });
-          return;
-        }
-        if (moment(yesterday).isAfter(moment(item.expiryDate))) {
-          setNotification({ error: 'Hạn sử dụng sau ngày hôm nay!' });
-          return;
-        }
-      }
-    });
     const newPayload = {
       ...data,
       vat: data.vat || 0,

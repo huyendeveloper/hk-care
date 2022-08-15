@@ -46,6 +46,8 @@ class TenantService {
     input?.phone && params.append('phone', input.phone.toString());
     input?.description &&
       params.append('description', input.description.toString());
+    input?.username && params.append('username', input.username.toString());
+    input?.password && params.append('password', input.password.toString());
 
     if (input?.attachments) {
       input?.attachments.forEach((m: AttachmentsFile, index) => {
@@ -82,6 +84,8 @@ class TenantService {
     input?.phone && params.append('phone', input.phone.toString());
     input?.description &&
       params.append('description', input.description.toString());
+    input?.username && params.append('username', input.username.toString());
+    input?.password && params.append('password', input.password.toString());
 
     if (input?.attachments) {
       input?.attachments.forEach((m, index) => {

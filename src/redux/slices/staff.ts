@@ -61,16 +61,16 @@ export const createStaff = createAsyncThunk(
   }
 );
 
-// export const updateStaff = createAsyncThunk(
-//   'staff/update',
-//   async (payload: IStaff, { rejectWithValue }) => {
-//     try {
-//       await staffService.update(payload);
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
+export const updateStaff = createAsyncThunk(
+  'staff/update',
+  async (payload: IStaff, { rejectWithValue }) => {
+    try {
+      await staffService.update(payload);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const changeStatus = createAsyncThunk(
   'staff/changeStatus',

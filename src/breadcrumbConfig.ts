@@ -11,7 +11,7 @@ const breadcrumbConfig = (tennant: string) => {
     },
     {
       breadcrumb: 'Quản trị người dùng',
-      path: '/hk_group/users',
+      path: '/hk_group/operate',
     },
     // hk group product
     {
@@ -74,6 +74,15 @@ const breadcrumbConfig = (tennant: string) => {
     {
       breadcrumb: 'Giá tham chiếu',
       path: '/hk_group/product/reference_prices',
+    },
+    // hk group operate
+    {
+      breadcrumb: 'Danh sách người dùng',
+      path: '/hk_group/operate/users',
+    },
+    {
+      breadcrumb: 'Phân quyền',
+      path: '/hk_group/operate/roles',
     },
     // hk care
     { breadcrumb: tennant, path: '/hk_care' },

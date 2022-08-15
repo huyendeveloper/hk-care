@@ -70,7 +70,7 @@ const TableData = () => {
     ]);
   }, []);
 
-  const handleOpenDeleteDialog = (id: number) => {};
+  const handleOpenDeleteDialog = (id: number | null) => {};
 
   return (
     <TableWrapper sx={{ height: 1, p: 1.5 }} component={Paper}>

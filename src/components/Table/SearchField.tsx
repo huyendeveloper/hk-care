@@ -1,3 +1,5 @@
+import { Stack } from '@mui/material';
+import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
@@ -5,9 +7,6 @@ import Typography from '@mui/material/Typography';
 import { memo, useState } from 'react';
 import { useDebounce } from 'react-use';
 import type { ChangeEvent, KeyDownEvent } from 'types';
-import type { BoxProps } from '@mui/material/Box';
-import { Stack } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 
 interface Props extends BoxProps {
   title?: string;

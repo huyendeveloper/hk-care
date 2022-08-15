@@ -1,116 +1,70 @@
 import { Stack, TableBody } from '@mui/material';
 import { TableHeader } from 'components/Table';
 import type { Cells } from 'components/Table/TableHeader';
-import { defaultFilters } from 'constants/defaultFilters';
-import { IImportReceipt, ISalesReport } from 'interface';
-import React, { useEffect, useMemo, useState } from 'react';
+import { IRevenueReportStaff } from 'interface';
+import moment from 'moment';
+import React, { useMemo } from 'react';
 import type { FilterParams } from 'types/common';
-import { formatDate } from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import ExpandRow from './ExpandRow';
 
-const getCells = (): Cells<IImportReceipt> => [
+const getCells = (): Cells<IRevenueReportStaff> => [
   {
-    id: 'id',
+    id: 'code',
     label: 'STT',
   },
   {
-    id: 'id',
+    id: 'code',
     label: 'Mã hóa đơn',
   },
   {
-    id: 'creationTime',
+    id: 'code',
     label: 'Ngày bán',
   },
   {
-    id: 'moneyToPay',
+    id: 'code',
     label: 'Giá trị hóa đơn',
   },
   {
-    id: 'debts',
+    id: 'code',
     label: 'Doanh thu',
   },
 ];
 
-const FilterByStaff = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const [salesReport, setSalesReport] = useState<object>([]);
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+interface IProps {
+  revenueReportStaff: IRevenueReportStaff[];
+  filters: FilterParams;
+}
 
+const FilterByStaff = ({ revenueReportStaff, filters }: IProps) => {
   const cells = useMemo(() => getCells(), []);
 
-  const fetchData = async () => {
-    // @ts-ignore
-    // const { payload, error } = await dispatch(getAllExportWHRotation(filters));
-    // if (error) {
-    //   setNotification({ error: 'Lỗi!' });
-    //   setLoading(false);
-    //   return;
-    // }
-    const payload = {
-      salesReport: [
-        {
-          id: 1,
-          code: 'RQ01',
-          saleDate: new Date('2022/12/15'),
-          staffName: 'Nguyễn Thu Hà',
-          orderValue: 300000,
-        },
-        {
-          id: 3,
-          code: 'RQ01',
-          saleDate: new Date('2022/12/15'),
-          staffName: 'Nguyễn Thu Hà',
-          orderValue: 300000,
-        },
-        {
-          id: 1,
-          code: 'RQ01',
-          saleDate: new Date('2022/12/16'),
-          staffName: 'Nguyễn Thu Hà',
-          orderValue: 300000,
-        },
-        {
-          id: 3,
-          code: 'RQ01',
-          saleDate: new Date('2022/12/16'),
-          staffName: 'Nguyễn Thu Hà',
-          orderValue: 300000,
-        },
-      ],
-      totalCount: 130,
-    };
-    const salesReport = [...(payload.salesReport as ISalesReport[])].reduce(
-      (group, product) => {
-        // @ts-ignore
-        const { saleDate } = product;
-        // @ts-ignore
-        group[formatDate(saleDate)] = group[formatDate(saleDate)] ?? [];
-        // @ts-ignore
-        group[formatDate(saleDate)].push(product);
-        return group;
-      },
-      {}
+  const revenueReportStaffList = useMemo(() => {
+    let rowId = 1 + (filters.pageIndex - 1) * filters.pageSize;
+
+    const formatedList = revenueReportStaff.map(
+      (item: IRevenueReportStaff) => ({
+        ...item,
+        saleDateFormated: moment(item.saleDate).format('DD/MM/YYYY'),
+      })
     );
 
-    setSalesReport(salesReport);
-    setTotalRows(payload.totalCount);
-    setLoading(false);
-  };
+    const revenueReportStaffObj = [
+      ...(formatedList as IRevenueReportStaff[]),
+    ].reduce((group, product) => {
+      // @ts-ignore
+      const { saleDateFormated } = product;
+      // @ts-ignore
+      group[saleDateFormated] = group[saleDateFormated] ?? [];
+      // @ts-ignore
+      group[saleDateFormated].push({ ...product, rowId });
+      rowId = rowId + 1;
+      return group;
+    }, {});
+    return revenueReportStaffObj;
+  }, [filters.pageIndex, filters.pageSize, revenueReportStaff]);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
-  const handleOnSort = (field: string) => {
-    setFilters((state) => ({
-      ...state,
-      sortBy: field,
-    }));
-  };
+  const handleOnSort = (field: string) => {};
 
   return (
     <>
@@ -122,25 +76,25 @@ const FilterByStaff = () => {
       />
 
       <TableBody>
-        {Object.keys(salesReport).map((key, index) => {
+        {Object.keys(revenueReportStaffList).map((key, index) => {
           return (
             <ExpandRow
               key={key}
               groupName={key} // @ts-ignore
-              list={salesReport[key]}
+              list={revenueReportStaffList[key]}
               filters={filters}
             />
           );
         })}
       </TableBody>
-      <tr>
+      {/* <tr>
         <td colSpan={4}></td>
         <td>
           <Stack flexDirection="row" justifyContent="space-between">
             <div>Tổng doanh thu</div>
             <div>
               {numberFormat(
-                Object.keys(salesReport).reduce((previous, key) => {
+                Object.keys(revenueReportStaffList).reduce((previous, key) => {
                   return (
                     previous +
                     // @ts-ignore
@@ -155,7 +109,7 @@ const FilterByStaff = () => {
             </div>
           </Stack>
         </td>
-      </tr>
+      </tr> */}
     </>
   );
 };

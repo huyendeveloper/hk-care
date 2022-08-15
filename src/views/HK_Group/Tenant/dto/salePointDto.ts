@@ -8,6 +8,8 @@ export interface SalePointDto {
   nameContact: string;
   phone: string;
   description: string;
+  username: string;
+  password: string;
 }
 
 export interface SalePointOutDto extends SalePointDto {

@@ -15,10 +15,19 @@ import { Selecter } from 'components/Form';
 import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import { IImportReceipt, IStaff } from 'interface';
+import {
+  IImportReceipt,
+  IRevenueReport,
+  IRevenueReportStaff,
+  IStaff,
+} from 'interface';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { getAllImportReceipt } from 'redux/slices/importReceipt';
+import {
+  getRevenueReportAll,
+  getRevenueReportByUser,
+} from 'redux/slices/revenueReport';
+import revenueReportService from 'services/revenueReport.service';
 import type { FilterParams } from 'types/common';
 import DefaultFilter from '../components/DefaultFilter';
 import FilterByStaff from '../components/FilterByStaff';
@@ -27,42 +36,70 @@ const TableData = () => {
   const dispatch = useDispatch();
   const setNotification = useNotification();
 
-  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [importReceipt, setImportReceipt] = useState<IImportReceipt[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [staffChoosed, setStaffChoosed] = useState<number | null>(null);
+  const [revenueReport, setRevenueReport] = useState<IRevenueReport[]>([]);
+  const [revenueReportStaff, setRevenueReportStaff] = useState<
+    IRevenueReportStaff[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [staffList, setStaffList] = useState<IStaff[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
+  const [filters, setFilters] = useState<FilterParams>(defaultFilters);
+  const [staffChoosed, setStaffChoosed] = useState<number | null>(null);
+  const [staffId, setStaffId] = useState<number | null>(null);
 
   useEffect(() => {
-    setStaffList([{ id: 1, name: 'Nhân viên bán hàng' }]);
+    setStaffList([{ id: '1', name: 'Nhân viên bán hàng' }]);
   }, []);
 
-  const onChangeSelect = (value: number | null) => {
-    setStaffChoosed(value);
-  };
-
   const fetchData = async () => {
-    // @ts-ignore
-    const { payload, error } = await dispatch(getAllImportReceipt(filters));
-    if (error) {
-      setNotification({
-        error: 'Lỗi!',
-      });
-      setLoading(false);
-      return;
-    }
+    if (staffChoosed) {
+      // @ts-ignore
+      const { payload, error } = await dispatch(
+        // @ts-ignore
+        getRevenueReportByUser({ ...filters, userId: staffChoosed })
+      );
+      console.log('payload', payload);
+      if (error) {
+        setNotification({
+          error: 'Lỗi!',
+        });
+        setLoading(false);
+        return;
+      }
 
-    setImportReceipt(payload.importReceiptList);
-    setTotalRows(payload.totalCount);
+      setRevenueReportStaff(payload.revenueReport);
+      setTotalRows(payload.totalCount);
+    } else {
+      // @ts-ignore
+      const { payload, error } = await dispatch(getRevenueReportAll(filters));
+      if (error) {
+        setNotification({
+          error: 'Lỗi!',
+        });
+        setLoading(false);
+        return;
+      }
+
+      setRevenueReport(payload.revenueReport);
+      setTotalRows(payload.totalCount);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     setLoading(true);
     fetchData();
+    revenueReportService
+      .getSaleEmployee()
+      .then(({ data }) => {
+        console.log('data', data);
+        setStaffList(data);
+        // setSupplierList(data);
+      })
+      .catch((err) => {})
+      .finally(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, []);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -77,6 +114,12 @@ const TableData = () => {
       pageIndex: 1,
       pageSize: rowsPerPage,
     }));
+  };
+
+  const handleReport = () => {
+    setLoading(true);
+    setStaffId(staffChoosed);
+    fetchData();
   };
 
   return (
@@ -94,7 +137,7 @@ const TableData = () => {
               options={staffList}
               renderLabel={(field) => field.name}
               noOptionsText="Không tìm thấy sản phẩm"
-              renderValue="id"
+              renderValue="userId"
               placeholder="Tất cả nhân viên"
               defaultValue=""
               onChangeSelect={(value: number | null) => setStaffChoosed(value)}
@@ -139,28 +182,40 @@ const TableData = () => {
               )}
             />
           </Grid>
+        </Stack>{' '}
+        <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
+          <LoadingButton
+            loadingPosition="start"
+            startIcon={<DownloadIcon />}
+            sx={{ height: '40px', width: '100px' }}
+            variant="outlined"
+          >
+            PDF
+          </LoadingButton>
+          <LoadingButton
+            sx={{ height: '40px', width: '100px' }}
+            onClick={handleReport}
+          >
+            Báo cáo
+          </LoadingButton>
         </Stack>
       </Box>
 
-      <Stack flexDirection="row" justifyContent="flex-end" px={2} gap={2}>
-        <LoadingButton
-          loadingPosition="start"
-          startIcon={<DownloadIcon />}
-          sx={{ height: '40px', width: '100px' }}
-          variant="outlined"
-        >
-          PDF
-        </LoadingButton>
-        <LoadingButton sx={{ height: '40px', width: '100px' }}>
-          Báo cáo
-        </LoadingButton>
-      </Stack>
-
-      <TableContent total={importReceipt.length} loading={loading}>
+      <TableContent total={revenueReport.length} loading={loading}>
         <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
           <Scrollbar>
             <Table sx={{ minWidth: 'max-content' }} size="small">
-              {staffChoosed ? <FilterByStaff /> : <DefaultFilter />}
+              {staffId ? (
+                <FilterByStaff
+                  revenueReportStaff={revenueReportStaff}
+                  filters={filters}
+                />
+              ) : (
+                <DefaultFilter
+                  revenueReport={revenueReport}
+                  filters={filters}
+                />
+              )}
             </Table>
           </Scrollbar>
         </TableContainer>

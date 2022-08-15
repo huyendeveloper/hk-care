@@ -10,22 +10,38 @@ import {
 } from '@mui/material';
 import { IRole } from 'interface';
 import { useState } from 'react';
+import { useDebounce } from 'react-use';
+import userService from 'services/user.service';
+
+interface IPermission {
+  key: string;
+  name: string;
+  isGrant: boolean;
+}
 
 interface IProps {
   role: IRole;
   index: number;
-  handleOpenDeleteDialog: (id: number | null) => void;
+  handleOpenDeleteDialog: (id: string | null) => void;
   addItem: boolean;
+  handleAddItem: () => void;
+  permission: IPermission[];
 }
 
-const Role = ({ role, index, handleOpenDeleteDialog, addItem }: IProps) => {
+const Role = ({
+  role,
+  index,
+  handleOpenDeleteDialog,
+  addItem,
+  handleAddItem,
+  permission,
+}: IProps) => {
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
     const value = e.target.value;
-    if (value) {
-      setRoleDetail({ ...roleDetail, roleName: value });
-    }
+
+    setRoleDetail({ ...roleDetail, roleName: value });
   };
 
   const handleChange = (e: any) => {
@@ -33,14 +49,58 @@ const Role = ({ role, index, handleOpenDeleteDialog, addItem }: IProps) => {
     setRoleDetail({ ...roleDetail, [e.target.name]: value });
   };
 
+  const handleSave = async () => {
+    if (roleDetail.roleName === '') {
+      return;
+    }
+    if (
+      roleDetail.roleName === role.roleName &&
+      roleDetail.qlsp === role.qlsp &&
+      roleDetail.qlkh === role.qlkh &&
+      roleDetail.qlbh === role.qlbh &&
+      roleDetail.qlvh === role.qlvh
+    ) {
+      return;
+    }
+    if (role.roleKey) {
+      console.log('role', role);
+    } else {
+      const newPermission = [...permission];
+      newPermission[0].isGrant = roleDetail.qlsp;
+      newPermission[1].isGrant = roleDetail.qlkh;
+      newPermission[2].isGrant = roleDetail.qlbh;
+      newPermission[3].isGrant = roleDetail.qlvh;
+      const newRole = [
+        {
+          roleName: roleDetail.roleName,
+          status: true,
+          permissionDtos: newPermission,
+        },
+      ];
+      // @ts-ignore
+      const { data } = await userService.processRoleAdmin(newRole);
+      console.log('data', data);
+    }
+  };
+
+  useDebounce(
+    () => {
+      handleSave();
+    },
+    1500,
+    [roleDetail]
+  );
+
   const renderAction = () => {
     return (
       <Stack>
-        <IconButton onClick={() => handleOpenDeleteDialog(role?.id || null)}>
+        <IconButton
+          onClick={() => handleOpenDeleteDialog(role?.roleKey || null)}
+        >
           <RemoveCircleIcon />
         </IconButton>
         {addItem && (
-          <IconButton>
+          <IconButton onClick={handleAddItem}>
             <AddIcon />
           </IconButton>
         )}

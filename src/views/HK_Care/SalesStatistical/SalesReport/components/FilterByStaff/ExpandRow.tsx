@@ -37,11 +37,13 @@ const ExpandRow = ({ groupName, list, filters }: IProps) => {
       {/* @ts-ignore */}
       {expand &&
         list.map((item: ISalesReport, index) => {
-          const { id, code, saleDate, orderValue } = item;
+          // @ts-ignore
+          const { id, code, saleDate, orderValue, rowId } = item;
           return (
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell>
-                {(filters.pageIndex - 1) * filters.pageSize + index + 1}
+                {/* {(filters.pageIndex - 1) * filters.pageSize + index + 1} */}
+                {rowId}
               </TableCell>
               <TableCell>{code}</TableCell>
               <TableCell>{formatDateTime(saleDate)}</TableCell>
