@@ -381,12 +381,29 @@ export interface IUser {
 
 export interface IRole {
   id?: number;
+  idRole?:string;
   roleName: string;
   qlsp: boolean;
   qlkh: boolean;
   qlbh: boolean;
   qlvh: boolean;
   roleKey?: string;
+}
+
+export interface RoleMappingDto {
+  id: string;
+  name: string;
+}
+
+export interface HkGroupDto {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  role: string[];
+  accountName: string;
+  password: string;
+  isActive: boolean;
 }
 
 export interface IRevenueReport {

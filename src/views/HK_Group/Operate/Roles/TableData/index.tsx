@@ -16,6 +16,14 @@ const getCells = (): Cells<IRole> => [
     id: 'roleName',
     label: 'Vai trò',
   },
+  // {
+  //   id: 'roleKey',
+  //   label: 'Key Vai trò',
+  // },
+  {
+    id: 'qlvh',
+    label: 'Quản lý điểm bán',
+  },
   {
     id: 'qlsp',
     label: 'Quản trị người dùng',
@@ -28,10 +36,7 @@ const getCells = (): Cells<IRole> => [
     id: 'qlbh',
     label: 'Quản lý kho tổng',
   },
-  {
-    id: 'qlvh',
-    label: 'Quản lý điểm bán',
-  },
+
   {
     id: 'qlvh',
     label: '',
@@ -64,60 +69,62 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    const { data } = await userService.loadRoleConvert();
-    console.log('data', data);
-    setPermission(data);
+    try {
+      const { data } = await userService.loadRoleConvert();
+      setPermission(data);
+      const res = await userService.getAllRoles();
 
-    const res = await userService.getAllRoles();
-
-    console.log('res.data', res.data);
-
-    const roleList = res?.data
-      ? // @ts-ignore
+      const roleList = res?.data
+        ? // @ts-ignore
         res.data.map((item) => ({
+          idRole: item.idRole,
           roleName: item.roleName,
           roleKey: item.roleKey,
           qlsp:
             // @ts-ignore
             item.permissionDtos.find((x) => x?.key === data[0].key)
               ? // @ts-ignore
-                item.permissionDtos.find((x) => x?.key === data[0].key).isGrant
+              item.permissionDtos.find((x) => x?.key === data[0].key).isGrant
               : false,
           qlkh:
             // @ts-ignore
             item.permissionDtos.find((x) => x?.key === data[1].key)
               ? // @ts-ignore
-                item.permissionDtos.find((x) => x?.key === data[1].key).isGrant
+              item.permissionDtos.find((x) => x?.key === data[1].key).isGrant
               : false,
           qlbh:
             // @ts-ignore
             item.permissionDtos.find((x) => x?.key === data[2].key)
               ? // @ts-ignore
-                item.permissionDtos.find((x) => x?.key === data[2].key).isGrant
+              item.permissionDtos.find((x) => x?.key === data[2].key).isGrant
               : false,
           qlvh:
             // @ts-ignore
             item.permissionDtos.find((x) => x?.key === data[3].key)
               ? // @ts-ignore
-                item.permissionDtos.find((x) => x?.key === data[3].key).isGrant
+              item.permissionDtos.find((x) => x?.key === data[3].key).isGrant
               : false,
         }))
-      : [];
+        : [];
 
-    setRoles(
-      roleList.length > 0
-        ? roleList
-        : [
+      setRoles(
+        roleList.length > 0
+          ? roleList
+          : [
             {
               roleName: '',
+              roleKey: undefined,
               qlsp: false,
               qlkh: false,
               qlbh: false,
               qlvh: false,
             },
           ]
-    );
-    setLoading(false);
+      );
+      setLoading(false);
+    } catch {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -150,8 +157,9 @@ const TableData = () => {
   };
 
   const handleAddItem = () => {
-    const newRoles = {
+    const newRoles: IRole = {
       roleName: '',
+      roleKey: undefined,
       qlsp: false,
       qlkh: false,
       qlbh: false,
@@ -183,12 +191,7 @@ const TableData = () => {
     setShowBackdrop(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
-    console.log('currentID', currentID);
-    // @ts-ignore
-    //  const {data} = await userService.processRoleAdmin()
     const role = roles.filter((x) => (x.roleKey = currentID));
-    console.log('currentID', currentID);
-    console.log('role :>> ', role);
     const newRole = role.map((item) => {
       const newPermission = [...permission];
       newPermission[0].isGrant = item.qlsp;
@@ -201,6 +204,7 @@ const TableData = () => {
         status: false,
         permissionDtos: newPermission,
       };
+
       return newRole;
     });
 
@@ -208,6 +212,7 @@ const TableData = () => {
     const { data } = await userService.processRoleAdmin([newRole[0]]);
     console.log('data', data);
     fetchData();
+    window.location.reload();
     setShowBackdrop(false);
   };
 

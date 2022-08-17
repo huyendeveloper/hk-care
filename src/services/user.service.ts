@@ -10,11 +10,22 @@ interface IPermission {
   isGrant: boolean;
 }
 
-interface IRoleAdmin {
+export interface IRoleAdmin {
+  idRole?: string;
   roleName: string;
+  //roleKey?: string;
+  roleKey: string | undefined
   status: boolean;
   permissionDtos: IPermission[];
 }
+
+export interface IUpdateNorma {
+  name: string;
+  isDefault: boolean,
+  isPublic: boolean,
+  concurrencyStamp?: string
+}
+
 class UserService {
   getAll({
     pageIndex,
@@ -50,8 +61,12 @@ class UserService {
     return axiosClient.post(`${baseURL}/Expected/CreateExpected`, payload);
   }
 
-  processRoleAdmin(payload: IRoleAdmin) {
+  processRoleAdmin(payload: IRoleAdmin[]) {
     return axiosClient.post(`${baseURL}/HkGroup/ProcessRoleAdmin`, payload);
+  }
+
+  changeNameRole(id: string, roleKey: any) {
+    return axiosClient.put(`${connectURL}/api/identity/roles/${id}`, roleKey);
   }
 
   update({ id, ...payload }: IUser) {
@@ -79,6 +94,11 @@ class UserService {
       },
     });
   }
+
+  getAllRolesForAccount() {
+    return axiosClient.get(`${baseURL}/HkGroup/LoadRole`);
+  }
+
 }
 
 export default new UserService();
