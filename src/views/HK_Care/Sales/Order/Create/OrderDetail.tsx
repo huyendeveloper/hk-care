@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import importReceiptService from 'services/importReceipt.service';
 import { numberFormat } from 'utils/numberFormat';
-import MapDialog from './MapDialog';
+import MapDialog from './PreviewImagesDialog';
 
 interface IProps {
   control: any;

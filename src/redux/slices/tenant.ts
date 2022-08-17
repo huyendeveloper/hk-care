@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import salePointService from 'services/salePoint.service';
 import tenantService from 'services/tenant.service';
+import { SalePointDto } from 'views/HK_Group/Tenant/dto/salePointDto';
 
 interface IInitialState {
   loading: boolean;
@@ -29,6 +31,32 @@ export const changeStatus = createAsyncThunk(
     const { id } = params;
     try {
       await tenantService.changeStatus(id);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const createSalePoint = createAsyncThunk(
+  'auth/create',
+  async (body: SalePointDto, { rejectWithValue }) => {
+    try {
+      const res = await salePointService.createAccount(body);
+
+      console.log('res :>> ', res);
+
+      if (res.data.id) {
+        const { data } = await salePointService.updateMoreInfo(
+          body,
+          res.data.id
+        );
+
+        return {
+          data,
+        };
+      }
+
+      return rejectWithValue('Error');
     } catch (error) {
       return rejectWithValue(error);
     }

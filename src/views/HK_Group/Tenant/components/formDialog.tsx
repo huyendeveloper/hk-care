@@ -23,14 +23,16 @@ import {
 } from 'components/Form';
 import ControllerMultiPdfs from 'components/Form/ControllerMultiPdfs';
 import { typeStringNumber } from 'constants/typeInput';
+import { create } from 'domain';
 import { useNotification } from 'hooks';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { createSalePoint } from 'redux/slices/tenant';
 import importReceiptService from 'services/importReceipt.service';
-import randomPassword from 'utils/randomPasword';
+import salePointService from 'services/salePoint.service';
 import * as yup from 'yup';
 import { SalePointDto } from '../dto/salePointDto';
-import service from '../service';
 
 const randexp = require('randexp').randexp;
 
@@ -84,24 +86,23 @@ const validationSchema = yup.object().shape({
       'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.'
     )
     .max(150, 'Địa chỉ không quá 150 ký tự.'),
-
   status: yup.boolean().default(true),
-  // username: yup
-  //   .string()
-  //   .required('Vui lòng nhập tên đăng nhập.')
-  //   .email('Không đúng định dạng email.')
-  //   // @ts-ignore
-  //   .trimCustom('Vui lòng nhập tên đăng nhập.'),
-  // password: yup
-  //   .string()
-  //   .required('Vui lòng nhập mật khẩu.')
-  //   // @ts-ignore
-  //   .trimCustom('Vui lòng nhập mật khẩu.')
-  //   .default(
-  //     randexp(
-  //       /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-  //     )
-  //   ),
+  adminEmailAddress: yup
+    .string()
+    .required('Vui lòng nhập tên đăng nhập.')
+    .email('Không đúng định dạng email.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập tên đăng nhập.'),
+  adminPassword: yup
+    .string()
+    .required('Vui lòng nhập mật khẩu.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập mật khẩu.')
+    .default(
+      randexp(
+        /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+      )
+    ),
 });
 
 const FormDialog = ({
@@ -111,10 +112,13 @@ const FormDialog = ({
   disable,
   fetchTable,
 }: Props) => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
+  const [loadding, setloadding] = useState<boolean>(false);
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [disabled, setDisabled] = useState<boolean>(disable);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [loaddingInit, setloaddingInit] = useState<boolean>(false);
 
   const { control, handleSubmit, setValue, reset } = useForm<SalePointDto>({
     mode: 'onChange',
@@ -122,17 +126,10 @@ const FormDialog = ({
     defaultValues: validationSchema.getDefault(),
   });
 
-  useEffect(() => {
-    setDisabled(disable);
-  }, [disable, open]);
-
-  const [loadding, setloadding] = useState<boolean>(false);
-  const [loaddingInit, setloaddingInit] = useState<boolean>(false);
-
   const fetchData = async () => {
     setloaddingInit(true);
     setFiles([]);
-    const data = async () => await service.detail(currentID);
+    const data = async () => await salePointService.detail(currentID);
     data()
       .then((rel) => {
         reset(rel);
@@ -144,35 +141,61 @@ const FormDialog = ({
           setFiles([]);
         }
       })
-      .catch((error) => {
+      .catch(() => {
         setloaddingInit(false);
       });
   };
 
-  useEffect(() => {
-    if (currentID && open) {
-      setloadding(false);
-      reset({ isActived: true });
-      fetchData();
-    } else {
-      setloadding(false);
-      reset({
-        isActived: true,
-        password: randomPassword(8, 15, true, true, true, true).toString(),
+  const create = async (tenant: SalePointDto) => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(createSalePoint(tenant));
+    console.log('payload :>> ', payload);
+    console.log('error :>> ', error);
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
       });
-      setFiles([]);
+      console.log('error :>> ', error);
+      setloadding(false);
+
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentID, open]);
+
+    // try {
+    //   // create admin account
+
+    //   const data = await salePointService.create(tenant);
+    //   setloadding(false);
+    //   if (data.status >= 500) {
+    //     setNotification({
+    //       message: 'Không thể gửi dữ liệu.',
+    //       severity: 'error',
+    //     });
+    //   } else if (data.status !== 200) {
+    //     setloadding(false);
+    //     setNotification({ message: data.data, severity: 'error' });
+    //   } else {
+    //     setloadding(false);
+    //     setNotification({ message: data.data, severity: 'success' });
+    //     handleClose();
+    //     fetchTable();
+    //   }
+    // } catch (error: any) {
+    //   setNotification({
+    //     message: error.response.data.toString().replace(',', '\n'),
+    //     severity: 'error',
+    //   });
+    //   setloadding(false);
+    // }
+  };
 
   const onSubmit = async (tenant: SalePointDto) => {
     setloadding(true);
-
     // @ts-ignore
     tenant.attachments = files;
     if (currentID) {
       try {
-        const data = await service.update(currentID, tenant);
+        const data = await salePointService.update(currentID, tenant);
         if (data.status >= 500) {
           setloadding(false);
           setNotification({
@@ -196,30 +219,7 @@ const FormDialog = ({
         setloadding(false);
       }
     } else {
-      try {
-        const data = await service.create(tenant);
-        setloadding(false);
-        if (data.status >= 500) {
-          setNotification({
-            message: 'Không thể gửi dữ liệu.',
-            severity: 'error',
-          });
-        } else if (data.status !== 200) {
-          setloadding(false);
-          setNotification({ message: data.data, severity: 'error' });
-        } else {
-          setloadding(false);
-          setNotification({ message: data.data, severity: 'success' });
-          handleClose();
-          fetchTable();
-        }
-      } catch (error: any) {
-        setNotification({
-          message: error.response.data.toString().replace(',', '\n'),
-          severity: 'error',
-        });
-        setloadding(false);
-      }
+      create(tenant);
     }
   };
 
@@ -254,6 +254,28 @@ const FormDialog = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, showBackdrop]);
+
+  useEffect(() => {
+    setDisabled(disable);
+  }, [disable, open]);
+
+  useEffect(() => {
+    if (currentID && open) {
+      setloadding(false);
+      reset({ isActived: true });
+      fetchData();
+    } else {
+      setloadding(false);
+      reset({
+        isActived: true,
+        adminPassword: randexp(
+          /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+        ),
+      });
+      setFiles([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentID, open]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -404,11 +426,15 @@ const FormDialog = ({
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Tên tài khoản" required name="username" />
+                  <FormLabel
+                    title="Tên tài khoản"
+                    required
+                    name="adminEmailAddress"
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerTextField
-                    name="username"
+                    name="adminEmailAddress"
                     control={control}
                     disabled={disabled}
                   />
@@ -417,11 +443,11 @@ const FormDialog = ({
 
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Mật khẩu" required name="password" />
+                  <FormLabel title="Mật khẩu" required name="adminPassword" />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerTextField
-                    name="password"
+                    name="adminPassword"
                     control={control}
                     disabled={disabled}
                   />

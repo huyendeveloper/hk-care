@@ -11,7 +11,7 @@ class RevenueReportService {
     startDate,
     lastDate,
   }: FilterParams) {
-    return axiosClient.get(`${baseURL}/BillOfSale/RevenueReportAll`, {
+    return axiosClient.get(`${baseURL}/RevenueReport/RevenueReportAll`, {
       params: {
         SkipCount: (pageIndex - 1) * pageSize,
         MaxResultCount: pageSize,
@@ -35,7 +35,7 @@ class RevenueReportService {
     // @ts-ignore
     userId,
   }: FilterParams) {
-    return axiosClient.get(`${baseURL}/BillOfSale/RevenueReportByUser`, {
+    return axiosClient.get(`${baseURL}/RevenueReport/RevenueReportByUser`, {
       params: {
         SkipCount: (pageIndex - 1) * pageSize,
         MaxResultCount: pageSize,
@@ -52,9 +52,50 @@ class RevenueReportService {
   }
 
   getSaleEmployee() {
-    return axiosClient.get(`${baseURL}/BillOfSale/GetSaleEmployee`, {
+    return axiosClient.get(`${baseURL}/RevenueReport/GetSaleEmployee`, {
       params: { roleId: '56bad1a4-bcf4-f871-a006-3a040724688e' },
     });
+  }
+
+  dowLoadFile(
+    { startDate, lastDate }: FilterParams,
+    staffChoosed: number | null
+  ) {
+    if (staffChoosed) {
+      return axiosClient.get(
+        `${baseURL}/RevenueReport/ExportPDFRevenueReportByUser`,
+        {
+          params: {
+            // SkipCount: (pageIndex - 1) * pageSize,
+            MaxResultCount: 1000,
+            // Keyword: searchText,
+            startDate: startDate
+              ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00'
+              : '',
+            lastDate: lastDate
+              ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59'
+              : '',
+            userId: staffChoosed,
+          },
+        }
+      );
+    }
+    return axiosClient.get(
+      `${baseURL}/RevenueReport/ExportPDFRevenueReportAll`,
+      {
+        params: {
+          // SkipCount: (pageIndex - 1) * pageSize,
+          MaxResultCount: 1000,
+          // Keyword: searchText,
+          startDate: startDate
+            ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00'
+            : '',
+          lastDate: lastDate
+            ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59'
+            : '',
+        },
+      }
+    );
   }
 }
 
