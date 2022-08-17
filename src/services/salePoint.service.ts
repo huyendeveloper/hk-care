@@ -50,9 +50,8 @@ class SalePointService {
   }
 
   public async updateMoreInfo(body: IAccount, id: string) {
-    const { adminEmailAddress, adminPassword, ...res } = body;
     return axiosClient.put(`${baseURL}/SalePoint/UpdateMoreInfo/${id}`, {
-      ...res,
+      ...body,
       id,
     });
   }

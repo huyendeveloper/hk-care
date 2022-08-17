@@ -113,32 +113,35 @@ const OrderInfo = ({ order }: IProps) => {
             <b>Tiền thừa trả khách</b>
             <div>
               {numberFormat(
-                (order?.giveMoney || 0) -
-                  ((order?.orderDetailDtos
-                    ? order?.orderDetailDtos.reduce(
-                        // @ts-ignore
-                        (prev, cur) =>
-                          prev +
-                          (Number(
-                            (cur.quantity || 0) * cur.price -
-                              (cur.discount || 0)
-                          ) || 0),
-                        0
-                      )
-                    : 0) -
-                    ((order?.disCount ?? 0) / 100) *
-                      (order?.orderDetailDtos
-                        ? order?.orderDetailDtos.reduce(
-                            // @ts-ignore
-                            (prev, cur) =>
-                              prev +
-                              (Number(
-                                (cur.quantity || 0) * cur.price -
-                                  (cur.discount || 0)
-                              ) || 0),
-                            0
-                          )
-                        : 0))
+                Math.max(
+                  (order?.giveMoney || 0) -
+                    ((order?.orderDetailDtos
+                      ? order?.orderDetailDtos.reduce(
+                          // @ts-ignore
+                          (prev, cur) =>
+                            prev +
+                            (Number(
+                              (cur.quantity || 0) * cur.price -
+                                (cur.discount || 0)
+                            ) || 0),
+                          0
+                        )
+                      : 0) -
+                      ((order?.disCount ?? 0) / 100) *
+                        (order?.orderDetailDtos
+                          ? order?.orderDetailDtos.reduce(
+                              // @ts-ignore
+                              (prev, cur) =>
+                                prev +
+                                (Number(
+                                  (cur.quantity || 0) * cur.price -
+                                    (cur.discount || 0)
+                                ) || 0),
+                              0
+                            )
+                          : 0)),
+                  0
+                )
               )}
             </div>
           </Stack>

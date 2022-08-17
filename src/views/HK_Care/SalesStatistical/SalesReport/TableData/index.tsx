@@ -95,7 +95,6 @@ const TableData = () => {
     revenueReportService
       .getSaleEmployee()
       .then(({ data }) => {
-        console.log('data', data);
         setStaffList(data);
         // setSupplierList(data);
       })

@@ -1,7 +1,9 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import {
+  Backdrop,
   Checkbox,
+  CircularProgress,
   IconButton,
   Stack,
   TableCell,
@@ -26,6 +28,7 @@ interface IProps {
   addItem: boolean;
   handleAddItem: () => void;
   permission: IPermission[];
+  setShowBackdrop: (status: boolean) => void;
 }
 
 const Role = ({
@@ -35,8 +38,8 @@ const Role = ({
   addItem,
   handleAddItem,
   permission,
+  setShowBackdrop,
 }: IProps) => {
-
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
@@ -50,7 +53,6 @@ const Role = ({
   };
 
   const handleSave = async () => {
-    console.log('roleDetail', roleDetail)
     if (roleDetail.roleName === '') {
       return;
     }
@@ -66,42 +68,47 @@ const Role = ({
     }
 
     if (roleDetail.roleName || roleDetail.roleKey) {
-      console.log('[...permission]', [...permission])
       const newPermission = [...permission];
       newPermission[0].isGrant = roleDetail.qlsp;
       newPermission[1].isGrant = roleDetail.qlkh;
       newPermission[2].isGrant = roleDetail.qlbh;
       newPermission[3].isGrant = roleDetail.qlvh;
 
-      let newRole: IRoleAdmin[] = [{
-        idRole: roleDetail.idRole,
-        roleName: roleDetail.roleName,
-        roleKey: roleDetail.roleKey,
-        status: true,
-        permissionDtos: newPermission,
-      }];
+      let newRole: IRoleAdmin[] = [
+        {
+          idRole: roleDetail.idRole,
+          roleName: roleDetail.roleName,
+          roleKey: roleDetail.roleKey,
+          status: true,
+          permissionDtos: newPermission,
+        },
+      ];
+
+      setShowBackdrop(true);
 
       const { data } = await userService.processRoleAdmin(newRole);
       if (data) {
-        console.log('data', data)
         if (newRole[0].idRole) {
           var changNo: IUpdateNorma = {
             name: data[0].roleKey,
             isDefault: false,
             isPublic: true,
-            concurrencyStamp: undefined
+            concurrencyStamp: undefined,
           };
           await userService.changeNameRole(newRole[0].idRole, changNo);
-
         }
+        setShowBackdrop(false);
         window.location.reload();
       }
     }
   };
 
-  useDebounce(() => {
-    handleSave();
-  }, 1500, [roleDetail]
+  useDebounce(
+    () => {
+      handleSave();
+    },
+    1000,
+    [roleDetail]
   );
 
   const renderAction = () => {

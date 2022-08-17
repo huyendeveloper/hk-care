@@ -1,7 +1,14 @@
-import { Paper, Table, TableBody, TableContainer } from '@mui/material';
+import {
+  Backdrop,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableContainer,
+} from '@mui/material';
 import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
-import { TableContent, TablePagination, TableWrapper } from 'components/Table';
+import { TableContent, TableWrapper } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -16,10 +23,6 @@ const getCells = (): Cells<IRole> => [
     id: 'roleName',
     label: 'Vai trò',
   },
-  // {
-  //   id: 'roleKey',
-  //   label: 'Key Vai trò',
-  // },
   {
     id: 'qlvh',
     label: 'Quản lý điểm bán',
@@ -57,6 +60,7 @@ const TableData = () => {
   const [permission, setPermission] = useState<IPermission[]>([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [currentID, setCurrentID] = useState<string | null>(null);
+  const [showBackdropDelete, setShowBackdropDelete] = useState<boolean>(false);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
@@ -76,50 +80,54 @@ const TableData = () => {
 
       const roleList = res?.data
         ? // @ts-ignore
-        res.data.map((item) => ({
-          idRole: item.idRole,
-          roleName: item.roleName,
-          roleKey: item.roleKey,
-          qlsp:
-            // @ts-ignore
-            item.permissionDtos.find((x) => x?.key === data[0].key)
-              ? // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[0].key).isGrant
-              : false,
-          qlkh:
-            // @ts-ignore
-            item.permissionDtos.find((x) => x?.key === data[1].key)
-              ? // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[1].key).isGrant
-              : false,
-          qlbh:
-            // @ts-ignore
-            item.permissionDtos.find((x) => x?.key === data[2].key)
-              ? // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[2].key).isGrant
-              : false,
-          qlvh:
-            // @ts-ignore
-            item.permissionDtos.find((x) => x?.key === data[3].key)
-              ? // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[3].key).isGrant
-              : false,
-        }))
+          res.data.map((item) => ({
+            idRole: item.idRole,
+            roleName: item.roleName,
+            roleKey: item.roleKey,
+            qlsp:
+              // @ts-ignore
+              item.permissionDtos.find((x) => x?.key === data[0].key)
+                ? // @ts-ignore
+                  item.permissionDtos.find((x) => x?.key === data[0].key)
+                    .isGrant
+                : false,
+            qlkh:
+              // @ts-ignore
+              item.permissionDtos.find((x) => x?.key === data[1].key)
+                ? // @ts-ignore
+                  item.permissionDtos.find((x) => x?.key === data[1].key)
+                    .isGrant
+                : false,
+            qlbh:
+              // @ts-ignore
+              item.permissionDtos.find((x) => x?.key === data[2].key)
+                ? // @ts-ignore
+                  item.permissionDtos.find((x) => x?.key === data[2].key)
+                    .isGrant
+                : false,
+            qlvh:
+              // @ts-ignore
+              item.permissionDtos.find((x) => x?.key === data[3].key)
+                ? // @ts-ignore
+                  item.permissionDtos.find((x) => x?.key === data[3].key)
+                    .isGrant
+                : false,
+          }))
         : [];
 
       setRoles(
         roleList.length > 0
           ? roleList
           : [
-            {
-              roleName: '',
-              roleKey: undefined,
-              qlsp: false,
-              qlkh: false,
-              qlbh: false,
-              qlvh: false,
-            },
-          ]
+              {
+                roleName: '',
+                roleKey: undefined,
+                qlsp: false,
+                qlkh: false,
+                qlbh: false,
+                qlvh: false,
+              },
+            ]
       );
       setLoading(false);
     } catch {
@@ -128,30 +136,11 @@ const TableData = () => {
   };
 
   useEffect(() => {
-    // setRoles([
-    //   {
-    //     id: 1,
-    //     roleName: 'Quản lý bán hàng',
-    //     qlsp: true,
-    //     qlkh: true,
-    //     qlbh: true,
-    //     qlvh: true,
-    //   },
-    //   {
-    //     id: 2,
-    //     roleName: 'Quản lý sản phẩm',
-    //     qlsp: false,
-    //     qlkh: false,
-    //     qlbh: false,
-    //     qlvh: false,
-    //   },
-    // ]);
     setLoading(true);
     fetchData();
   }, []);
 
   const handleOpenDeleteDialog = (id: string | null) => {
-    console.log('id', id);
     setCurrentID(id);
     setOpenDeleteDialog(true);
   };
@@ -168,27 +157,12 @@ const TableData = () => {
     setRoles([...roles, newRoles]);
   };
 
-  const handleChangePage = (pageIndex: number) => {
-    setFilters((state) => ({
-      ...state,
-      pageIndex,
-    }));
-  };
-
-  const handleChangeRowsPerPage = (rowsPerPage: number) => {
-    setFilters((state) => ({
-      ...state,
-      pageIndex: 1,
-      pageSize: rowsPerPage,
-    }));
-  };
-
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
   };
 
   const handleDelete = async () => {
-    setShowBackdrop(true);
+    setShowBackdropDelete(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
     const role = roles.filter((x) => (x.roleKey = currentID));
@@ -209,11 +183,10 @@ const TableData = () => {
     });
 
     // @ts-ignore
-    const { data } = await userService.processRoleAdmin([newRole[0]]);
-    console.log('data', data);
+    await userService.processRoleAdmin([newRole[0]]);
     fetchData();
     window.location.reload();
-    setShowBackdrop(false);
+    setShowBackdropDelete(false);
   };
 
   return (
@@ -240,6 +213,7 @@ const TableData = () => {
                       addItem={index + 1 === roles.length}
                       handleAddItem={handleAddItem}
                       permission={permission}
+                      setShowBackdrop={setShowBackdrop}
                     />
                   );
                 })}
@@ -247,14 +221,6 @@ const TableData = () => {
             </Table>
           </Scrollbar>
         </TableContainer>
-        {/* <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={roles.length}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        /> */}
       </TableContent>
 
       <DeleteDialog
@@ -264,8 +230,14 @@ const TableData = () => {
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
-        loading={showBackdrop}
+        loading={showBackdropDelete}
       />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

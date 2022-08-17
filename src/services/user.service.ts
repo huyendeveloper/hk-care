@@ -14,16 +14,25 @@ export interface IRoleAdmin {
   idRole?: string;
   roleName: string;
   //roleKey?: string;
-  roleKey: string | undefined
+  roleKey: string | undefined;
   status: boolean;
   permissionDtos: IPermission[];
 }
 
+export interface IRoleSalePoint {
+  roleId?: string;
+  roleName: string;
+  //roleKey?: string;
+  roleKey: string | undefined;
+  status: boolean;
+  grantPermissionDtos: IPermission[];
+}
+
 export interface IUpdateNorma {
   name: string;
-  isDefault: boolean,
-  isPublic: boolean,
-  concurrencyStamp?: string
+  isDefault: boolean;
+  isPublic: boolean;
+  concurrencyStamp?: string;
 }
 
 class UserService {
@@ -57,20 +66,36 @@ class UserService {
     return axiosClient.get(`${baseURL}/HkGroup/LoadRoleConvert`);
   }
 
+  getPermissionSalePoint() {
+    return axiosClient.get(
+      `${baseURL}/SalePointPermission/GetPermissionSalePoint`
+    );
+  }
+
   create(payload: IUser) {
-    return axiosClient.post(`${baseURL}/Expected/CreateExpected`, payload);
+    return axiosClient.post(`${baseURL}/HkGroup/Insert`, {
+      ...payload,
+      isActive: true,
+    });
   }
 
   processRoleAdmin(payload: IRoleAdmin[]) {
     return axiosClient.post(`${baseURL}/HkGroup/ProcessRoleAdmin`, payload);
   }
 
+  changeSalePointPermission(payload: IRoleSalePoint) {
+    return axiosClient.post(
+      `${baseURL}/SalePointPermission/ChangeSalePointPermission`,
+      payload
+    );
+  }
+
   changeNameRole(id: string, roleKey: any) {
     return axiosClient.put(`${connectURL}/api/identity/roles/${id}`, roleKey);
   }
 
-  update({ id, ...payload }: IUser) {
-    return axiosClient.put(`${baseURL}/usage/Update/${id}`, payload);
+  update(payload: IUser) {
+    return axiosClient.put(`${baseURL}/HkGroup/Update`, payload);
   }
 
   get(id: string) {
@@ -95,10 +120,15 @@ class UserService {
     });
   }
 
+  getPermissionDefault() {
+    return axiosClient.get(
+      `${baseURL}/SalePointPermission/GetPermissionDefault`
+    );
+  }
+
   getAllRolesForAccount() {
     return axiosClient.get(`${baseURL}/HkGroup/LoadRole`);
   }
-
 }
 
 export default new UserService();

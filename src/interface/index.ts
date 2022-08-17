@@ -373,7 +373,9 @@ export interface IUser {
   name: string;
   phone: string;
   email?: string;
-  role: string;
+  role: string[];
+  userName: string;
+  password: string;
   tenant: string;
   isActive: boolean;
   id: number;
@@ -381,7 +383,7 @@ export interface IUser {
 
 export interface IRole {
   id?: number;
-  idRole?:string;
+  idRole?: string;
   roleName: string;
   qlsp: boolean;
   qlkh: boolean;
@@ -424,7 +426,8 @@ export interface IRevenueReportStaff {
 export interface IStaff {
   id: string;
   name: string;
-  roleId?: string;
+  roleId?: string[];
+  role?: string[];
   roleName?: string;
   phoneNumber?: string;
   active?: number;
@@ -434,6 +437,7 @@ export interface IStaff {
   password?: string;
   status?: number;
   userId?: string;
+  phone: string;
   namePathSalePointEmployeeStorageDtos?: { name: string; url: string }[];
   files?: { name: string; url: string }[];
 }

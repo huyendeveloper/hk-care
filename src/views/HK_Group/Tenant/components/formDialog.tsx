@@ -28,7 +28,7 @@ import { useNotification } from 'hooks';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { createSalePoint } from 'redux/slices/tenant';
+import { createSalePoint, updateSalePoint } from 'redux/slices/tenant';
 import importReceiptService from 'services/importReceipt.service';
 import salePointService from 'services/salePoint.service';
 import * as yup from 'yup';
@@ -149,44 +149,42 @@ const FormDialog = ({
   const create = async (tenant: SalePointDto) => {
     // @ts-ignore
     const { payload, error } = await dispatch(createSalePoint(tenant));
-    console.log('payload :>> ', payload);
-    console.log('error :>> ', error);
+
     if (error) {
       setNotification({
         error: 'Lỗi!',
       });
-      console.log('error :>> ', error);
       setloadding(false);
-
       return;
     }
 
-    // try {
-    //   // create admin account
+    setNotification({
+      message: 'Thêm thành công',
+      severity: 'success',
+    });
+    setloadding(false);
+    handleClose();
+    fetchData();
+  };
 
-    //   const data = await salePointService.create(tenant);
-    //   setloadding(false);
-    //   if (data.status >= 500) {
-    //     setNotification({
-    //       message: 'Không thể gửi dữ liệu.',
-    //       severity: 'error',
-    //     });
-    //   } else if (data.status !== 200) {
-    //     setloadding(false);
-    //     setNotification({ message: data.data, severity: 'error' });
-    //   } else {
-    //     setloadding(false);
-    //     setNotification({ message: data.data, severity: 'success' });
-    //     handleClose();
-    //     fetchTable();
-    //   }
-    // } catch (error: any) {
-    //   setNotification({
-    //     message: error.response.data.toString().replace(',', '\n'),
-    //     severity: 'error',
-    //   });
-    //   setloadding(false);
-    // }
+  const update = async (tenant: SalePointDto) => {
+    // @ts-ignore
+    const { payload, error } = await dispatch(updateSalePoint(tenant));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setloadding(false);
+      return;
+    }
+
+    setNotification({
+      message: 'Cập nhật thành công',
+      severity: 'success',
+    });
+    setloadding(false);
+    handleClose();
+    fetchData();
   };
 
   const onSubmit = async (tenant: SalePointDto) => {
@@ -194,30 +192,7 @@ const FormDialog = ({
     // @ts-ignore
     tenant.attachments = files;
     if (currentID) {
-      try {
-        const data = await salePointService.update(currentID, tenant);
-        if (data.status >= 500) {
-          setloadding(false);
-          setNotification({
-            message: 'Không thể gửi dữ liệu.',
-            severity: 'error',
-          });
-        } else if (data.status !== 200) {
-          setloadding(false);
-          setNotification({ message: data.data, severity: 'error' });
-        } else {
-          setloadding(false);
-          setNotification({ message: data.data, severity: 'success' });
-          handleClose();
-          fetchTable();
-        }
-      } catch (error: any) {
-        setNotification({
-          message: error.response.data.toString().replace(',', '\n'),
-          severity: 'error',
-        });
-        setloadding(false);
-      }
+      update(tenant);
     } else {
       create(tenant);
     }
@@ -436,7 +411,7 @@ const FormDialog = ({
                   <ControllerTextField
                     name="adminEmailAddress"
                     control={control}
-                    disabled={disabled}
+                    disabled={disabled || Boolean(currentID)}
                   />
                 </Grid>
               </Grid>

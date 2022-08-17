@@ -44,8 +44,6 @@ const FilterByStaff = ({
 }: IProps) => {
   const cells = useMemo(() => getCells(), []);
 
-  console.log('object');
-
   const revenueReportStaffList = useMemo(() => {
     let rowId = 1 + (filters.pageIndex - 1) * filters.pageSize;
 

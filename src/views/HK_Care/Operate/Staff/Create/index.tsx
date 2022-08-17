@@ -8,14 +8,13 @@ import {
   Grid,
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerTextField,
-  EntityMultipleSelecter,
   EntitySelecter,
   FormContent,
   FormFooter,
@@ -71,12 +70,12 @@ const validationSchema = yup.object().shape({
     .string()
     .email('Không đúng định dạng email.')
     .required('Vui lòng nhập địa chỉ email.'),
-  roleId: yup.string().required('Vui lòng chọn vai trò.'),
-  userName: yup
-    .string()
-    .required('Vui lòng nhập tên đăng nhập.')
-    // @ts-ignore
-    .trimCustom('Vui lòng nhập tên đăng nhập.'),
+  // roleId: yup.string().required('Vui lòng chọn vai trò.'),
+  roleId: yup
+    .array()
+    .min(1, 'Vui lòng chọn vai trò.')
+    .required('Vui lòng chọn vai trò.'),
+  userName: yup.string().required('Vui lòng nhập tên đăng nhập.'),
   password: yup
     .string()
     .required('Vui lòng nhập mật khẩu.')

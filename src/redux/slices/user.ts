@@ -30,29 +30,29 @@ export const getAllUser = createAsyncThunk(
   }
 );
 
-// export const createUser = createAsyncThunk(
-//   'user/create',
-//   async (payload: IUser, { rejectWithValue }) => {
-//     try {
-//       const { data } = await userService.create(payload);
-//       return { id: data.id };
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
+export const createUser = createAsyncThunk(
+  'user/create',
+  async (payload: IUser, { rejectWithValue }) => {
+    try {
+      const { data } = await userService.create(payload);
+      return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
-// export const updateUser = createAsyncThunk(
-//   'user/update',
-//   async (payload: IUser, { rejectWithValue }) => {
-//     try {
-//       const { data } = await userService.update(payload);
-//       return { id: data.id };
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
+export const updateUser = createAsyncThunk(
+  'user/update',
+  async (payload: IUser, { rejectWithValue }) => {
+    try {
+      const { data } = await userService.update(payload);
+      return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
