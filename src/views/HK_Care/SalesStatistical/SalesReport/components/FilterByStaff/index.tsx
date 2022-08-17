@@ -34,10 +34,17 @@ const getCells = (): Cells<IRevenueReportStaff> => [
 interface IProps {
   revenueReportStaff: IRevenueReportStaff[];
   filters: FilterParams;
+  totalRevenue: number;
 }
 
-const FilterByStaff = ({ revenueReportStaff, filters }: IProps) => {
+const FilterByStaff = ({
+  revenueReportStaff,
+  filters,
+  totalRevenue,
+}: IProps) => {
   const cells = useMemo(() => getCells(), []);
+
+  console.log('object');
 
   const revenueReportStaffList = useMemo(() => {
     let rowId = 1 + (filters.pageIndex - 1) * filters.pageSize;
@@ -87,31 +94,17 @@ const FilterByStaff = ({ revenueReportStaff, filters }: IProps) => {
           );
         })}
       </TableBody>
-      {/* <tr>
-        <td colSpan={4}></td>
-        <td>
-          <Stack flexDirection="row" justifyContent="space-between">
-            <div>Tổng doanh thu</div>
-            <div>
-              {numberFormat(
-                Object.keys(revenueReportStaffList).reduce((previous, key) => {
-                  return (
-                    previous +
-                    // @ts-ignore
-                    salesReport[key].reduce(
-                      // @ts-ignore
-                      (pre, cur) => pre + cur.orderValue,
-                      0
-                    )
-                  );
-                }, 0)
-              )}
-            </div>
+      <tr>
+        <td colSpan={3}></td>
+        <td colSpan={2} style={{ paddingTop: '40px' }}>
+          <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
+            <div>Tổng doanh thu: </div>
+            <div>{numberFormat(totalRevenue)}</div>
           </Stack>
         </td>
-      </tr> */}
+      </tr>
     </>
   );
 };
 
-export default React.memo(FilterByStaff);
+export default FilterByStaff;

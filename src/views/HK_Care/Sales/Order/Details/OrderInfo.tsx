@@ -12,7 +12,7 @@ import formatDateTime from 'utils/dateTimeFormat';
 import { numberFormat } from 'utils/numberFormat';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { useMemo, useState } from 'react';
-import MapDialog from '../Create/MapDialog';
+import MapDialog from '../Create/PreviewImagesDialog';
 
 interface IProps {
   order: ISalesOrder | null;

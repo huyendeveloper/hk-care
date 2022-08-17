@@ -17,10 +17,12 @@ export const getRevenueReportByUser = createAsyncThunk(
       if (data.items) {
         const revenueReport = data.items;
         const totalCount = data.totalCount;
+        const totalRevenue = data.totalRevenue;
 
         return {
           revenueReport,
           totalCount,
+          totalRevenue,
         };
       }
 
@@ -40,10 +42,12 @@ export const getRevenueReportAll = createAsyncThunk(
       if (data.items) {
         const revenueReport = data.items;
         const totalCount = data.totalCount;
+        const totalRevenue = data.totalRevenue;
 
         return {
           revenueReport,
           totalCount,
+          totalRevenue,
         };
       }
 

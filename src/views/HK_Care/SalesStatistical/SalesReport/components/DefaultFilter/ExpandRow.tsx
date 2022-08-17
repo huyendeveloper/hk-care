@@ -26,12 +26,7 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
         <TableCell colSpan={5} sx={{ padding: '16px' }}>
           {groupName}
         </TableCell>
-        <TableCell
-          colSpan={1}
-          sx={{
-            textAlign: 'center',
-          }}
-        >
+        <TableCell colSpan={1} sx={{ width: '100px !important' }}>
           {numberFormat(list.reduce((pre, cur) => pre + cur.orderValue, 0))}
         </TableCell>
       </TableRow>

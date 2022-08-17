@@ -1,4 +1,4 @@
-import { TableBody, TableCell, TableRow } from '@mui/material';
+import { Stack, TableBody, TableCell, TableRow } from '@mui/material';
 import type { Cells } from 'components/Table/TableHeader';
 import TableHeader from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -7,6 +7,7 @@ import { IImportReceipt, IRevenueReport } from 'interface';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
 import type { FilterParams } from 'types/common';
+import { numberFormat } from 'utils/numberFormat';
 import ExpandRow from './ExpandRow';
 
 const getCells = (): Cells<IImportReceipt> => [
@@ -39,9 +40,10 @@ const getCells = (): Cells<IImportReceipt> => [
 interface IProps {
   revenueReport: IRevenueReport[];
   filters: FilterParams;
+  totalRevenue: number;
 }
 
-const DefaultFilter = ({ revenueReport, filters }: IProps) => {
+const DefaultFilter = ({ revenueReport, filters, totalRevenue }: IProps) => {
   const cells = useMemo(() => getCells(), []);
 
   const revenueReportList = useMemo(() => {
@@ -92,31 +94,17 @@ const DefaultFilter = ({ revenueReport, filters }: IProps) => {
           );
         })}
       </TableBody>
-      {/* <tr>
-        <td colSpan={5}></td>
-        <td>
-          <Stack flexDirection="row" justifyContent="space-between">
-            <div>Tổng doanh thu</div>
-            <div>
-              {numberFormat(
-                Object.keys(revenueReport).reduce((previous, key) => {
-                  return (
-                    previous +
-                    // @ts-ignore
-                    revenueReport[key].reduce(
-                      // @ts-ignore
-                      (pre, cur) => pre + cur.orderValue,
-                      0
-                    )
-                  );
-                }, 0)
-              )}
-            </div>
+      <tr>
+        <td colSpan={4}></td>
+        <td colSpan={2} style={{ paddingTop: '40px' }}>
+          <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
+            <div>Tổng doanh thu:</div>
+            <div>{numberFormat(totalRevenue)}</div>
           </Stack>
         </td>
-      </tr> */}
+      </tr>
     </>
   );
 };
 
-export default React.memo(DefaultFilter);
+export default DefaultFilter;

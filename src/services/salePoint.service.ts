@@ -1,16 +1,22 @@
 import axiosClient from 'api';
 import axios from 'axios';
-import { baseURL } from 'config';
+import { baseURL, connectURL } from 'config';
 import { FilterParams } from 'types/common';
 import LocalStorage from 'utils/LocalStorage';
-import { PagedResultDto } from './dto/pagedResultDto';
+import { PagedResultDto } from 'views/HK_Group/Tenant/dto/pagedResultDto';
 import {
   AttachmentsFile,
   SalePointDto,
   SalePointOutDto,
-} from './dto/salePointDto';
+} from 'views/HK_Group/Tenant/dto/salePointDto';
 
-class TenantService {
+interface IAccount {
+  name: string;
+  adminEmailAddress: string;
+  adminPassword: string;
+}
+
+class SalePointService {
   public async upload(file: any) {
     try {
       const token = LocalStorage.get('accessToken');
@@ -35,6 +41,22 @@ class TenantService {
     }
   }
 
+  public async createAccount(body: IAccount) {
+    return axiosClient.post(`${connectURL}/api/multi-tenancy/tenants`, {
+      name: body.name,
+      adminEmailAddress: body.adminEmailAddress,
+      adminPassword: body.adminPassword,
+    });
+  }
+
+  public async updateMoreInfo(body: IAccount, id: string) {
+    const { adminEmailAddress, adminPassword, ...res } = body;
+    return axiosClient.put(`${baseURL}/SalePoint/UpdateMoreInfo/${id}`, {
+      ...res,
+      id,
+    });
+  }
+
   public async create(input: SalePointDto | undefined) {
     const params = new FormData();
     input?.name && params.append('name', input.name.toString());
@@ -46,8 +68,10 @@ class TenantService {
     input?.phone && params.append('phone', input.phone.toString());
     input?.description &&
       params.append('description', input.description.toString());
-    input?.username && params.append('username', input.username.toString());
-    input?.password && params.append('password', input.password.toString());
+    input?.adminEmailAddress &&
+      params.append('adminEmailAddress', input.adminEmailAddress.toString());
+    input?.adminPassword &&
+      params.append('adminPassword', input.adminPassword.toString());
 
     if (input?.attachments) {
       input?.attachments.forEach((m: AttachmentsFile, index) => {
@@ -84,8 +108,10 @@ class TenantService {
     input?.phone && params.append('phone', input.phone.toString());
     input?.description &&
       params.append('description', input.description.toString());
-    input?.username && params.append('username', input.username.toString());
-    input?.password && params.append('password', input.password.toString());
+    input?.adminEmailAddress &&
+      params.append('adminEmailAddress', input.adminEmailAddress.toString());
+    input?.adminPassword &&
+      params.append('adminPassword', input.adminPassword.toString());
 
     if (input?.attachments) {
       input?.attachments.forEach((m, index) => {
@@ -144,4 +170,4 @@ class TenantService {
     }
   }
 }
-export default new TenantService();
+export default new SalePointService();
