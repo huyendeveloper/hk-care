@@ -27,6 +27,7 @@ import { useNotification } from 'hooks';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import importReceiptService from 'services/importReceipt.service';
+import randomPassword from 'utils/randomPasword';
 import * as yup from 'yup';
 import { SalePointDto } from '../dto/salePointDto';
 import service from '../service';
@@ -157,9 +158,7 @@ const FormDialog = ({
       setloadding(false);
       reset({
         isActived: true,
-        // password: randexp(
-        //   /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-        // ),
+        password: randomPassword(8, 15, true, true, true, true).toString(),
       });
       setFiles([]);
     }
@@ -395,7 +394,7 @@ const FormDialog = ({
                 <Grid item xs={12} md={6}></Grid>
               </Grid>
             </FormGroup>
-            {/* <Divider sx={{ mt: 3.5, mb: 1.5 }} />
+            <Divider sx={{ mt: 3.5, mb: 1.5 }} />
             <Typography
               color="text.secondary"
               sx={{ fontWeight: 'regular', fontSize: '1.74rem' }}
@@ -428,7 +427,7 @@ const FormDialog = ({
                   />
                 </Grid>
               </Grid>
-            </Grid> */}
+            </Grid>
           </FormContent>
 
           <FormFooter>

@@ -14,3 +14,4 @@ export { default as FormHeader } from './FormHeader';
 export { default as FormLabel } from './FormLabel';
 export { default as FormPaperGrid } from './FormPaperGrid';
 export { default as Selecter } from './Selecter';
+export { default as ControllerTextFieldPassword } from './ControllerTextFieldPassword';

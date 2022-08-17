@@ -11,17 +11,17 @@ import {
   FormHeader,
   FormLabel,
   FormPaperGrid,
+  ControllerTextFieldPassword
 } from 'components/Form';
-import { IRole, IStaff } from 'interface';
+import { IRole, IStaff, RoleMappingDto } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { RootState } from 'redux/store';
 import userService from 'services/user.service';
+import randomPassword from 'utils/randomPasword';
 import * as yup from 'yup';
-
-const randexp = require('randexp').randexp;
 
 yup.addMethod(yup.string, 'trimCustom', function (errorMessage) {
   return this.test(`test-trim`, errorMessage, function (value) {
@@ -61,18 +61,13 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập mật khẩu.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
-    .default(
-      randexp(
-        /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-      )
-    ),
-  // .default(Math.random().toString(36).slice(-8)),
+    .default(randomPassword(8, 15, true, true, true, true).toString())
 });
 
 const Create = () => {
   const { id } = useParams();
   const location = useLocation();
-  const [roles, setRoles] = useState<IRole[]>([]);
+  const [roles, setRoles] = useState<RoleMappingDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
@@ -110,13 +105,14 @@ const Create = () => {
 
   const fetchRoleList = () => {
     userService
-      .getAllRoles()
+      .getAllRolesForAccount()
       // @ts-ignore
       .then(({ data }) => {
-        // setRoles(data);
+        console.log('dataRole', data)
+        setRoles(data);
       })
-      .catch((err) => {})
-      .finally(() => {});
+      .catch((err) => { })
+      .finally(() => { });
   };
 
   const fetchDataDetail = async () => {
@@ -142,8 +138,8 @@ const Create = () => {
         isUpdate
           ? 'Chỉnh sửa thông tin người dùng'
           : id
-          ? 'Xem chi tiết thông tin'
-          : 'Tạo mới người dùng'
+            ? 'Xem chi tiết thông tin'
+            : 'Tạo mới người dùng'
       }
     >
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
@@ -152,8 +148,8 @@ const Create = () => {
             isUpdate
               ? 'Chỉnh sửa thông tin người dùng'
               : id
-              ? 'Xem chi tiết thông tin'
-              : 'Tạo mới người dùng'
+                ? 'Xem chi tiết thông tin'
+                : 'Tạo mới người dùng'
           }
         />
         <FormContent>
@@ -184,7 +180,7 @@ const Create = () => {
                   disabled={!isUpdate && Boolean(id)}
                 />
               </Grid>
-              {userRoles.includes('hkl2') && (
+              {/* {userRoles.includes('hkl2') && (
                 <Grid item xs={12} md={6}>
                   <FormLabel title="Điểm bán" name="roleId" />
                   <EntityMultipleSelecter
@@ -197,7 +193,7 @@ const Create = () => {
                     placeholder=""
                   />
                 </Grid>
-              )}
+              )} */}
               <Grid item xs={12} md={6}>
                 <FormLabel title="Vai trò" required name="roleId" />
                 <EntityMultipleSelecter
@@ -205,7 +201,7 @@ const Create = () => {
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                   options={roles}
-                  renderLabel={(field) => field.roleName}
+                  renderLabel={(field) => field.name}
                   noOptionsText="Không tìm thấy vai trò"
                   placeholder=""
                 />
@@ -233,7 +229,7 @@ const Create = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Mật khẩu" required name="password" />
-                <ControllerTextField
+                <ControllerTextFieldPassword
                   name="password"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}

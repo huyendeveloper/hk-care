@@ -11,7 +11,7 @@ import {
 import { IRole } from 'interface';
 import { useState } from 'react';
 import { useDebounce } from 'react-use';
-import userService from 'services/user.service';
+import userService, { IRoleAdmin, IUpdateNorma } from 'services/user.service';
 
 interface IPermission {
   key: string;
@@ -36,11 +36,11 @@ const Role = ({
   handleAddItem,
   permission,
 }: IProps) => {
+
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
     const value = e.target.value;
-
     setRoleDetail({ ...roleDetail, roleName: value });
   };
 
@@ -50,9 +50,11 @@ const Role = ({
   };
 
   const handleSave = async () => {
+
     if (roleDetail.roleName === '') {
       return;
     }
+
     if (
       roleDetail.roleName === role.roleName &&
       roleDetail.qlsp === role.qlsp &&
@@ -62,33 +64,44 @@ const Role = ({
     ) {
       return;
     }
-    if (role.roleKey) {
-      console.log('role', role);
-    } else {
+
+    if (roleDetail.roleName || roleDetail.roleKey) {
+      console.log('[...permission]', [...permission])
       const newPermission = [...permission];
       newPermission[0].isGrant = roleDetail.qlsp;
       newPermission[1].isGrant = roleDetail.qlkh;
       newPermission[2].isGrant = roleDetail.qlbh;
       newPermission[3].isGrant = roleDetail.qlvh;
-      const newRole = [
-        {
-          roleName: roleDetail.roleName,
-          status: true,
-          permissionDtos: newPermission,
-        },
-      ];
-      // @ts-ignore
+
+      let newRole: IRoleAdmin[] = [{
+        idRole: roleDetail.idRole,
+        roleName: roleDetail.roleName,
+        roleKey: roleDetail.roleKey,
+        status: true,
+        permissionDtos: newPermission,
+      }];
+
       const { data } = await userService.processRoleAdmin(newRole);
-      console.log('data', data);
+      if (data) {
+        console.log('data', data)
+        if (newRole[0].idRole) {
+          var changNo: IUpdateNorma = {
+            name: data[0].roleKey,
+            isDefault: false,
+            isPublic: true,
+            concurrencyStamp: undefined
+          };
+          await userService.changeNameRole(newRole[0].idRole, changNo);
+
+        }
+        window.location.reload();
+      }
     }
   };
 
-  useDebounce(
-    () => {
-      handleSave();
-    },
-    1500,
-    [roleDetail]
+  useDebounce(() => {
+    handleSave();
+  }, 1500, [roleDetail]
   );
 
   const renderAction = () => {
