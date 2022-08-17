@@ -10,17 +10,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { Scrollbar } from 'components/common';
 import { Selecter } from 'components/Form';
 import { TableContent, TablePagination, TableWrapper } from 'components/Table';
+import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
-import {
-  IImportReceipt,
-  IRevenueReport,
-  IRevenueReportStaff,
-  IStaff,
-} from 'interface';
+import { IRevenueReport, IRevenueReportStaff, IStaff } from 'interface';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -43,22 +40,26 @@ const TableData = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [staffList, setStaffList] = useState<IStaff[]>([]);
   const [totalRows, setTotalRows] = useState<number>(0);
+  const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [staffChoosed, setStaffChoosed] = useState<number | null>(null);
   const [staffId, setStaffId] = useState<number | null>(null);
-
-  useEffect(() => {
-    setStaffList([{ id: '1', name: 'Nhân viên bán hàng' }]);
-  }, []);
+  const [reported, setReported] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
 
   const fetchData = async () => {
+    if (!Boolean(filters.startDate) || !Boolean(filters.lastDate)) {
+      setLoading(false);
+      return;
+    }
+
     if (staffChoosed) {
       // @ts-ignore
       const { payload, error } = await dispatch(
         // @ts-ignore
         getRevenueReportByUser({ ...filters, userId: staffChoosed })
       );
-      console.log('payload', payload);
+
       if (error) {
         setNotification({
           error: 'Lỗi!',
@@ -69,6 +70,7 @@ const TableData = () => {
 
       setRevenueReportStaff(payload.revenueReport);
       setTotalRows(payload.totalCount);
+      setTotalRevenue(payload.totalRevenue);
     } else {
       // @ts-ignore
       const { payload, error } = await dispatch(getRevenueReportAll(filters));
@@ -82,6 +84,7 @@ const TableData = () => {
 
       setRevenueReport(payload.revenueReport);
       setTotalRows(payload.totalCount);
+      setTotalRevenue(payload.totalRevenue);
     }
     setLoading(false);
   };
@@ -116,10 +119,109 @@ const TableData = () => {
     }));
   };
 
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleDownload = () => {
+    if (!Boolean(filters.startDate) || !Boolean(filters.lastDate)) {
+      setLoading(false);
+      return;
+    }
+    handleOpen();
+
+    return revenueReportService
+      .dowLoadFile(filters, staffChoosed)
+      .then((re: any) => {
+        setTimeout(() => {
+          const url = `${connectURL}/` + re.data;
+          //download_file(url);
+          var save = document.createElement('a');
+          save.href = url;
+          save.target = '_blank';
+          var filename = url.substring(url.lastIndexOf('/') + 1);
+          save.download = filename;
+          if (
+            navigator.userAgent.toLowerCase().match(/(ipad|iphone|safari)/) &&
+            navigator.userAgent.search('Chrome') < 0
+          ) {
+            document.location = save.href;
+            // window event not working here
+          } else {
+            var evt = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: false,
+            });
+            save.dispatchEvent(evt);
+            (window.URL || window.webkitURL).revokeObjectURL(save.href);
+          }
+          handleClose();
+        }, 5000);
+      })
+      .catch((err) => {
+        setNotification({ error: 'xử lý file lỗi!' });
+        handleClose();
+      });
+  };
+
   const handleReport = () => {
     setLoading(true);
     setStaffId(staffChoosed);
+    setReported(true);
     fetchData();
+  };
+
+  const renderTable = () => {
+    if (
+      !Boolean(filters.startDate) ||
+      !Boolean(filters.lastDate) ||
+      !reported
+    ) {
+      return (
+        <Wrapper>
+          <Box sx={{ display: 'grid', placeContent: 'center' }}>
+            <Typography variant="h6" color="text.secondary">
+              Vui lòng chọn ngày bắt đầu và ngày kết thúc
+            </Typography>
+          </Box>
+        </Wrapper>
+      );
+    }
+
+    return (
+      <TableContent
+        total={staffId ? revenueReportStaff.length : revenueReport.length}
+        loading={loading}
+      >
+        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+          <Scrollbar>
+            <Table sx={{ minWidth: 'max-content' }} size="small">
+              {staffId ? (
+                <FilterByStaff
+                  revenueReportStaff={revenueReportStaff}
+                  filters={filters}
+                  totalRevenue={totalRevenue}
+                />
+              ) : (
+                <DefaultFilter
+                  revenueReport={revenueReport}
+                  filters={filters}
+                  totalRevenue={totalRevenue}
+                />
+              )}
+            </Table>
+          </Scrollbar>
+        </TableContainer>
+        <TablePagination
+          pageIndex={filters.pageIndex}
+          totalPages={totalRows}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          rowsPerPage={filters.pageSize}
+          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+        />
+      </TableContent>
+    );
   };
 
   return (
@@ -182,13 +284,15 @@ const TableData = () => {
               )}
             />
           </Grid>
-        </Stack>{' '}
+        </Stack>
         <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
           <LoadingButton
             loadingPosition="start"
             startIcon={<DownloadIcon />}
             sx={{ height: '40px', width: '100px' }}
             variant="outlined"
+            onClick={handleDownload}
+            loading={open}
           >
             PDF
           </LoadingButton>
@@ -201,35 +305,14 @@ const TableData = () => {
         </Stack>
       </Box>
 
-      <TableContent total={revenueReport.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              {staffId ? (
-                <FilterByStaff
-                  revenueReportStaff={revenueReportStaff}
-                  filters={filters}
-                />
-              ) : (
-                <DefaultFilter
-                  revenueReport={revenueReport}
-                  filters={filters}
-                />
-              )}
-            </Table>
-          </Scrollbar>
-        </TableContainer>
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      {renderTable()}
     </TableWrapper>
   );
 };
+
+const Wrapper = styled(Box)({
+  display: 'grid',
+  gridTemplateRows: '1fr auto',
+});
 
 export default TableData;

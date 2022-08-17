@@ -35,12 +35,9 @@ const TableData = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [currentID, setCurrentID] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
-  const [openFormDialog, setOpenFormDialog] = useState<boolean>(false);
   const [requestImport, setRequestImport] = useState<object>([]);
   const [open, setOpen] = useState(false);
-  const [contentDowload, setcontentDowload] = useState<string>();
 
   const cells = useMemo(() => getCells(), []);
 
@@ -51,6 +48,7 @@ const TableData = () => {
     setFilters((state) => ({
       ...state,
       searchText,
+      pageIndex: 1,
     }));
   };
 
@@ -116,13 +114,11 @@ const TableData = () => {
   };
 
   const handleDownload = () => {
-    setcontentDowload('Đang xử lý. Vui lòng chờ!');
     handleOpen();
 
     return expectedService
       .dowLoadFile(filters)
       .then((re: any) => {
-        setcontentDowload('Kiểm tra dữ liệu và tải xuống!');
         setTimeout(() => {
           const url = `${connectURL}/` + re.data;
           //download_file(url);

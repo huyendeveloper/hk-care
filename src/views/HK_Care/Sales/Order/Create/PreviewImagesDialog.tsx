@@ -1,20 +1,17 @@
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import CloseIcon from '@mui/icons-material/Close';
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
-  Divider,
-  Grid,
   IconButton,
   Stack,
-  Tooltip,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { LoadingButton } from '@mui/lab';
-import { useState } from 'react';
 import { connectURL } from 'config';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import { useState } from 'react';
 
 interface Props {
   open: boolean;
@@ -22,54 +19,7 @@ interface Props {
   images: any[];
 }
 
-const LeftCabinet = ({
-  cabinetNumber,
-  buttonLabel,
-  tooltip,
-}: {
-  cabinetNumber: number;
-  buttonLabel?: string;
-  tooltip?: string;
-}) => {
-  return (
-    <Stack flexDirection="row" gap={1} mb={1}>
-      <Tooltip title={tooltip || ''} placement="right">
-        <Button variant="outlined">Tủ {cabinetNumber}</Button>
-      </Tooltip>
-      <Button sx={buttonLabel ? { backgroundColor: '#da6a04' } : {}}>
-        {buttonLabel}
-      </Button>
-    </Stack>
-  );
-};
-
-const RightCabinet = ({
-  cabinetNumber,
-  tooltip,
-}: {
-  cabinetNumber: number;
-  tooltip?: string;
-}) => {
-  return (
-    <Stack flexDirection="row" gap={1} mb={1}>
-      <Button></Button>
-      <Tooltip title={tooltip || ''} placement="right">
-        <Button variant="outlined">Tủ {cabinetNumber}</Button>
-      </Tooltip>
-    </Stack>
-  );
-};
-
-const BottomCabinet = ({ cabinetNumber }: { cabinetNumber: number }) => {
-  return (
-    <Stack gap={1} mr={1}>
-      <Button sx={{ color: '#00AB55' }}>.</Button>
-      <Button variant="outlined">Tủ {cabinetNumber}</Button>
-    </Stack>
-  );
-};
-
-const MapDialog = (props: Props) => {
+const PreviewImagesDialog = (props: Props) => {
   const { open, onClose, images } = props;
   const [imageIndex, setImageIndex] = useState<number>(0);
 
@@ -78,7 +28,7 @@ const MapDialog = (props: Props) => {
       <Box
         sx={{ display: 'flex', justifyContent: 'space-between', px: 2, py: 2 }}
       >
-        <Button sx={{ borderRadius: '30px' }}>
+        <Button sx={{ borderRadius: '30px', cursor: 'default' }}>
           Hình {imageIndex + 1}/{images.length}
         </Button>
         <LoadingButton
@@ -135,4 +85,4 @@ const MapDialog = (props: Props) => {
   );
 };
 
-export default MapDialog;
+export default PreviewImagesDialog;

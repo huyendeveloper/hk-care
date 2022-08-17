@@ -68,67 +68,6 @@ const TableData = () => {
   );
 
   const fetchData = async () => {
-    // setUserList([
-    //   {
-    //     id: 1,
-    //     name: 'Jeth',
-    //     phone: '7034887175',
-    //     role: 'Electrician',
-    //     tenant: 'Gigashots',
-    //     status: false,
-    //   },
-    //   {
-    //     id: 2,
-    //     name: 'Edie',
-    //     phone: '4611020964',
-    //     role: 'Construction Expeditor',
-    //     tenant: 'Skyble',
-    //     status: false,
-    //   },
-    //   {
-    //     id: 3,
-    //     name: 'Nell',
-    //     phone: '6794000846',
-    //     role: 'Project Manager',
-    //     tenant: 'Realbuzz',
-    //     status: true,
-    //   },
-    //   {
-    //     id: 4,
-    //     name: 'Emelia',
-    //     phone: '4652709644',
-    //     role: 'Subcontractor',
-    //     tenant: 'Eidel',
-    //     status: false,
-    //   },
-    //   {
-    //     id: 5,
-    //     name: 'Edwin',
-    //     phone: '3126986142',
-    //     role: 'Construction Worker',
-    //     tenant: 'Bluejam',
-    //     status: false,
-    //   },
-    //   {
-    //     id: 6,
-    //     name: 'Nalani',
-    //     phone: '8209306276',
-    //     role: 'Construction Worker',
-    //     tenant: 'Nlounge',
-    //     status: true,
-    //   },
-    //   {
-    //     id: 7,
-    //     name: 'Nikkie',
-    //     phone: '9837242081',
-    //     role: 'Surveyor',
-    //     tenant: 'Yamia',
-    //     status: true,
-    //   },
-    // ]);
-    // setTotalRows(33);
-    // @ts-ignore
-
     // @ts-ignore
     const { payload, error } = await dispatch(getAllUser(filters));
     console.log('payload', payload);

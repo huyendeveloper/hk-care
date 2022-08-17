@@ -30,10 +30,10 @@ import { useNotification } from 'hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { changeStatus } from 'redux/slices/tenant';
+import salePointService from 'services/salePoint.service';
 import { FilterParams } from 'types';
 import { SalePointOutDto } from '../dto/salePointDto';
 import { TableActive } from '../enum/IsStatus';
-import service from '../service';
 import FormDialog from './formDialog';
 
 const getCells = (): Cells<SalePointOutDto> => [
@@ -173,7 +173,7 @@ const TableData = () => {
   };
 
   const fetchData = async () => {
-    const data = async () => await service.search(filters);
+    const data = async () => await salePointService.search(filters);
     data()
       .then((rel) => {
         setTenantList(rel.items);

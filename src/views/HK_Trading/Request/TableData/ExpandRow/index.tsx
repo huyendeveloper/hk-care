@@ -1,6 +1,5 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, TableCell, TableRow } from '@mui/material';
-import { previousDay } from 'date-fns/esm';
 import { IRequestImport } from 'interface';
 import { useState } from 'react';
 import { FilterParams } from 'types';
@@ -25,8 +24,13 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
         key={groupName}
         onClick={() => setExpand(!expand)}
       >
-        <TableCell>{index}</TableCell>
-        <TableCell>{groupName}:</TableCell>
+        <TableCell>
+          <span style={{ marginRight: '20px', width: 'min-content' }}>
+            {index}
+          </span>
+          {groupName}:
+        </TableCell>
+        <TableCell></TableCell>
         <TableCell>
           {`${numberFormat(
             list.reduce((pre, cur) => pre + cur.quantity, 0)
