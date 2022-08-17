@@ -50,7 +50,7 @@ const Role = ({
   };
 
   const handleSave = async () => {
-
+    console.log('roleDetail', roleDetail)
     if (roleDetail.roleName === '') {
       return;
     }
