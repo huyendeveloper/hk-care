@@ -20,17 +20,12 @@ interface SectionItem {
 const getSections = (): SectionItem[] => [
   {
     title: 'HK_Group',
-    roles: ['hkl1', 'hkl2', 'hkl3', 'Group.DecentralizationAdmin'
-      , 'Group.UserAdministration'
-      , 'Group.UserListAdmin', 'CareManager.DecentralizationAdmin'
-      , 'CareManager.PointOfSaleInformation'],
+    roles: ['hkl1', 'hkl2', 'hkl3'],
     children: [
       {
         title: 'Quản lý sản phẩm',
         path: '/404',
-        roles: ['Group.DecentralizationAdmin'
-          , 'Group.UserAdministration'
-          , 'Group.UserListAdmin'],
+        roles: ['hkl3'],
         children: [
           {
             title: 'Danh sách sản phẩm',
@@ -79,26 +74,22 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Thông tin điểm bán',
         path: '/hk_group/tenant',
-        roles: ['hkl2', 'CareManager.DecentralizationAdmin'
-          , 'CareManager.PointOfSaleInformation'],
+        roles: ['hkl2'],
       },
       {
         title: 'Quản trị người dùng',
         path: '/404',
-        roles: ['hkl1', 'hkl2', 'CareManager.DecentralizationAdmin'
-          , 'CareManager.PointOfSaleInformation'],
+        roles: ['hkl1', 'hkl2'],
         children: [
           {
             title: 'Danh sách người dùng',
             path: '/hk_group/operate/users',
-            roles: ['hkl1', 'hkl2', 'CareManager.DecentralizationAdmin'
-              , 'CareManager.PointOfSaleInformation'],
+            roles: ['hkl1', 'hkl2'],
           },
           {
             title: 'Phân quyền',
             path: '/hk_group/operate/roles',
-            roles: ['hkl1', 'CareManager.DecentralizationAdmin'
-              , 'CareManager.PointOfSaleInformation'],
+            roles: ['hkl1'],
           },
         ],
       },
@@ -236,8 +227,8 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
   const itemsFiltered =
     depth === 0
       ? items.filter(
-        (item) => item.roles && item.roles.some((r) => roleUser.includes(r))
-      )
+          (item) => item.roles && item.roles.some((r) => roleUser.includes(r))
+        )
       : items;
 
   return (

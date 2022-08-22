@@ -6,19 +6,40 @@ import {
   Stack,
   TableCell,
   TableRow,
-  TextField,
+  TextField
 } from '@mui/material';
 import { IRole } from 'interface';
 import { useState } from 'react';
+import { useDebounce } from 'react-use';
+import userService, {
+  IRoleSalePoint
+} from 'services/user.service';
+
+interface IPermission {
+  key: string;
+  name: string;
+  isGrant: boolean;
+}
 
 interface IProps {
   role: IRole;
   index: number;
-  handleOpenDeleteDialog: (id: number | null) => void;
+  handleOpenDeleteDialog: (id: string | null) => void;
   addItem: boolean;
+  handleAddItem: () => void;
+  permission: IPermission[];
+  setShowBackdrop: (status: boolean) => void;
 }
 
-const Role = ({ role, index, handleOpenDeleteDialog, addItem }: IProps) => {
+const Role = ({
+  role,
+  index,
+  handleOpenDeleteDialog,
+  addItem,
+  handleAddItem,
+  permission,
+  setShowBackdrop,
+}: IProps) => {
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
@@ -33,14 +54,63 @@ const Role = ({ role, index, handleOpenDeleteDialog, addItem }: IProps) => {
     setRoleDetail({ ...roleDetail, [e.target.name]: value });
   };
 
+  const handleSave = async () => {
+    if (roleDetail.roleName === '') {
+      return;
+    }
+
+    if (
+      roleDetail.roleName === role.roleName &&
+      roleDetail.qlsp === role.qlsp &&
+      roleDetail.qlkh === role.qlkh &&
+      roleDetail.qlbh === role.qlbh &&
+      roleDetail.qlvh === role.qlvh
+    ) {
+      return;
+    }
+
+    if (roleDetail.roleName || roleDetail.roleKey) {
+      const newPermission = [...permission];
+      newPermission[0].isGrant = roleDetail.qlsp;
+      newPermission[1].isGrant = roleDetail.qlkh;
+      newPermission[2].isGrant = roleDetail.qlbh;
+      newPermission[3].isGrant = roleDetail.qlvh;
+
+      let newRole: IRoleSalePoint = {
+        roleId: roleDetail.idRole,
+        roleName: roleDetail.roleName,
+        roleKey: roleDetail.roleKey,
+        status: true,
+        grantPermissionDtos: newPermission,
+      };
+      setShowBackdrop(true);
+
+      const { data } = await userService.changeSalePointPermission(newRole);
+      if (data) {
+        setShowBackdrop(false);
+        window.location.reload();
+      }
+    }
+  };
+
+  useDebounce(
+    () => {
+      handleSave();
+    },
+    1000,
+    [roleDetail]
+  );
+
   const renderAction = () => {
     return (
       <Stack>
-        <IconButton onClick={() => handleOpenDeleteDialog(role?.id || null)}>
+        <IconButton
+          onClick={() => handleOpenDeleteDialog(role?.idRole || null)}
+        >
           <RemoveCircleIcon />
         </IconButton>
         {addItem && (
-          <IconButton>
+          <IconButton onClick={handleAddItem}>
             <AddIcon />
           </IconButton>
         )}

@@ -70,7 +70,6 @@ const TableData = () => {
   const fetchData = async () => {
     // @ts-ignore
     const { payload, error } = await dispatch(getAllUser(filters));
-    console.log('payload', payload);
     if (error) {
       setNotification({
         error: 'Lỗi!',
