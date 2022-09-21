@@ -1,5 +1,5 @@
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -37,6 +37,10 @@ const TotalBill = ({ control, setValue, getValues }: IProps) => {
   );
 
   const debts = useMemo(() => moneyToPay - paid, [moneyToPay, paid]);
+
+  useEffect(() => {
+    setValue('paid', moneyToPay);
+  }, [moneyToPay]);
 
   return (
     <table style={{ float: 'right' }}>

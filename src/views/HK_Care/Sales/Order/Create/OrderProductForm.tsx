@@ -150,7 +150,7 @@ const OrderProductForm = ({
         severity: 'success',
       });
       setLoading(false);
-      window.open(`/hk_care/sales/order/${id}/print`);
+      // window.open(`/hk_care/sales/order/${id}/print`);
       return navigate(`/hk_care/sales/order`);
     } else {
       const { error, payload } = await dispatch(

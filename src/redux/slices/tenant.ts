@@ -41,20 +41,7 @@ export const createSalePoint = createAsyncThunk(
   'auth/create',
   async (body: SalePointDto, { rejectWithValue }) => {
     try {
-      const res = await salePointService.createAccount(body);
-
-      if (res.data.id) {
-        const { data } = await salePointService.updateMoreInfo(
-          body,
-          res.data.id
-        );
-
-        return {
-          data,
-        };
-      }
-
-      return rejectWithValue('Error');
+      const res = await salePointService.create(body);
     } catch (error) {
       return rejectWithValue(error);
     }

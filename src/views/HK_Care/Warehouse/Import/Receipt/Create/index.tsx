@@ -344,19 +344,21 @@ const CreateForm = () => {
         <FormContent>
           <FormGroup>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-                <ChooseOption
-                  options={productList}
-                  renderLabel={(field) => field.productName}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  renderValue="productId"
-                  placeholder=""
-                  onChangeSelect={onChangeSelect}
-                  loading={loadingProductList}
-                  value={productChoosed}
-                />
-              </Grid>
+              {!id && (
+                <Grid item xs={12}>
+                  <FormLabel title="Tìm kiếm sản phẩm" name="name" />
+                  <ChooseOption
+                    options={productList}
+                    renderLabel={(field) => field.productName}
+                    noOptionsText="Không tìm thấy sản phẩm"
+                    renderValue="productId"
+                    placeholder=""
+                    onChangeSelect={onChangeSelect}
+                    loading={loadingProductList}
+                    value={productChoosed}
+                  />
+                </Grid>
+              )}
               <Grid item xs={12} sx={{ minHeight: '200px' }}>
                 <TableWrapper sx={{ height: 1 }} component={Paper}>
                   <TableContent total={1} noDataText=" " loading={loading}>

@@ -49,7 +49,7 @@ const ControllerNumberInput = <T extends FieldValues>(props: Props<T>) => {
                 setValue(name, v ? Number(v) : null)
               }
               allowedDecimalSeparators={[',', '.']}
-              decimalScale={0}
+              decimalScale={3}
               isNumericString
               thousandSeparator=","
               allowNegative={false}

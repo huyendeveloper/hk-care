@@ -24,14 +24,9 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
         key={groupName}
         onClick={() => setExpand(!expand)}
       >
-        <TableCell>
-          <span style={{ marginRight: '20px', width: 'min-content' }}>
-            {index}
-          </span>
-          {groupName}:
-        </TableCell>
-        <TableCell></TableCell>
-        <TableCell>
+        <TableCell sx={{ width: '100px !important' }}>{list[0].rank}</TableCell>
+        <TableCell colSpan={2}>
+          {groupName}:{' '}
           {`${numberFormat(
             list.reduce((pre, cur) => pre + cur.quantity, 0)
           )} (${list[0].measureName})`}
@@ -62,7 +57,7 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
             <TableRow hover tabIndex={-1} key={id}>
               <TableCell></TableCell>
               <TableCell>{tenant}</TableCell>
-              <TableCell>{numberFormat(quantity || 0)}</TableCell>{' '}
+              <TableCell>{numberFormat(quantity || 0)}</TableCell>
               <TableCell>{formatDateTime(requestDate)}</TableCell>
             </TableRow>
           );

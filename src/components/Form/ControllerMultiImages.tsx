@@ -9,6 +9,7 @@ interface IProps {
   accept?: string;
   message?: string;
   handleView: () => void;
+  disabled?: boolean;
 }
 
 const ControllerMultiImages = ({
@@ -17,6 +18,7 @@ const ControllerMultiImages = ({
   accept = 'image/*',
   message = 'File không đúng định dạng',
   handleView,
+  disabled,
 }: IProps) => {
   const setNotification = useNotification();
 
@@ -49,7 +51,12 @@ const ControllerMultiImages = ({
         gap={1}
         flexDirection="row"
       >
-        <Button variant="contained" fullWidth component="label">
+        <Button
+          variant="contained"
+          sx={disabled ? { cursor: 'default' } : {}}
+          fullWidth
+          component="label"
+        >
           {files.length === 0
             ? 'Chọn file'
             : // @ts-ignore
@@ -65,6 +72,7 @@ const ControllerMultiImages = ({
             }}
             multiple
             hidden
+            disabled={disabled}
           />
         </Button>
         {files.length > 0 && (

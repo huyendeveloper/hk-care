@@ -216,7 +216,11 @@ export interface ISalesOrder {
   description: string;
   orderDetailDtos: OrderDetailDtos[];
   discountValue: number;
+  name?: string;
+  telephoneNumber: string;
   images: { name: string; url: string }[];
+  tenantPhone: string;
+  tenantAddress: string;
 }
 
 export interface OrderSales {
@@ -373,28 +377,30 @@ export interface IUser {
   name: string;
   phone: string;
   email?: string;
-  role: string[];
+  roleId: string;
+  roleName: string;
   userName: string;
   password: string;
   tenant: string;
   isActive: boolean;
   id: number;
+  role: string[];
 }
 
 export interface IRole {
   id?: number;
   idRole?: string;
+  roleId?: string;
   roleName: string;
   qlsp: boolean;
   qlkh: boolean;
   qlbh: boolean;
   qlvh: boolean;
-  roleKey?: string;
 }
 
 export interface RoleMappingDto {
-  id: string;
-  name: string;
+  roleId: string;
+  roleName: string;
 }
 
 export interface HkGroupDto {
@@ -426,7 +432,7 @@ export interface IRevenueReportStaff {
 export interface IStaff {
   id: string;
   name: string;
-  roleId?: string[];
+  roleId?: string;
   role?: string[];
   roleName?: string;
   phoneNumber?: string;

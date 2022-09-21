@@ -18,7 +18,9 @@ import * as yup from 'yup';
 import { Header } from '../components';
 import OrderProductForm from './OrderProductForm';
 
-const validationSchema = yup.object().shape({});
+const validationSchema = yup
+  .object()
+  .shape({ orderType: yup.number().default(1) });
 
 interface IForm {
   name: string;

@@ -263,46 +263,48 @@ const FormData = ({ defaultValue }: IProps) => {
             <FormHeader title=" " hidden />
             <FormContent>
               <FormGroup>
-                <Grid item xs={12} mb={2}>
-                  <FormLabel title="Tìm kiếm sản phẩm" name="name" />
+                {!id && (
+                  <Grid item xs={12} mb={2}>
+                    <FormLabel title="Tìm kiếm sản phẩm" name="name" />
 
-                  <Box
-                    sx={{
-                      paddingY: 1,
-                      width: '100%',
-                      maxWidth: '100%',
-                      position: 'relative',
-                    }}
-                  >
-                    <Selecter
-                      renderValue="id"
-                      options={productList}
-                      renderLabel={(field) => field.name}
-                      noOptionsText="Không tìm thấy sản phẩm"
-                      placeholder="Thêm sản phẩm vào đơn"
-                      images="path"
-                      rightContentRender="amount"
-                      rightContent="Có thể xuất: "
-                      onChangeSelect={(value: number | null) => {
-                        if (!value) {
-                          return;
-                        }
-                        const item = productList.find((x) => x.id === value);
-                        // @ts-ignore
-                        if (item.amount === 0) {
-                          setNotification({
-                            message: 'Sản phẩm này hiện tại hết hàng',
-                            severity: 'warning',
-                          });
-                          return;
-                        }
-                        item && addItem(item);
+                    <Box
+                      sx={{
+                        paddingY: 1,
+                        width: '100%',
+                        maxWidth: '100%',
+                        position: 'relative',
                       }}
-                      defaultValue=""
-                      loading={loading}
-                    />
-                  </Box>
-                </Grid>
+                    >
+                      <Selecter
+                        renderValue="id"
+                        options={productList}
+                        renderLabel={(field) => field.name}
+                        noOptionsText="Không tìm thấy sản phẩm"
+                        placeholder="Thêm sản phẩm vào đơn"
+                        images="path"
+                        rightContentRender="amount"
+                        rightContent="Có thể xuất: "
+                        onChangeSelect={(value: number | null) => {
+                          if (!value) {
+                            return;
+                          }
+                          const item = productList.find((x) => x.id === value);
+                          // @ts-ignore
+                          if (item.amount === 0) {
+                            setNotification({
+                              message: 'Sản phẩm này hiện tại hết hàng',
+                              severity: 'warning',
+                            });
+                            return;
+                          }
+                          item && addItem(item);
+                        }}
+                        defaultValue=""
+                        loading={loading}
+                      />
+                    </Box>
+                  </Grid>
+                )}
                 <Grid item xs={12} sx={{ minHeight: '200px' }}>
                   <TableWrapper
                     sx={{ height: 1, minHeight: '200px' }}

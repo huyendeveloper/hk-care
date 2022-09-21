@@ -232,7 +232,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
   const renderAction = (row: IProduct) => {
     return (
       <>
-        <LinkIconButton to={`${row.id}`}>
+        <LinkIconButton to={`/hk_group/product/list/${row.id}`}>
           <IconButton>
             <VisibilityIcon />
           </IconButton>

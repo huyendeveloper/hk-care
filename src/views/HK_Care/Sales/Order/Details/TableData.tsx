@@ -18,13 +18,6 @@ import { useMemo, useState } from 'react';
 import { FilterParams } from 'types';
 import { numberFormat } from 'utils/numberFormat';
 
-interface Data {
-  mor: string;
-  noon: string;
-  night: string;
-  description: string;
-}
-
 const getCells = (): Cells<ISalesOrder> => [
   {
     id: 'id',
@@ -60,25 +53,6 @@ const getCells = (): Cells<ISalesOrder> => [
   },
 ];
 
-const getCellsChild = (): Cells<Data> => [
-  {
-    id: 'mor',
-    label: 'Sáng',
-  },
-  {
-    id: 'noon',
-    label: 'Trưa',
-  },
-  {
-    id: 'night',
-    label: 'Tối',
-  },
-  {
-    id: 'description',
-    label: 'Ghi chú',
-  },
-];
-
 interface IProps {
   orderDetailDtos: OrderDetailDtos[];
 }
@@ -87,8 +61,6 @@ const TableData = ({ orderDetailDtos }: IProps) => {
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
 
   const cells = useMemo(() => getCells(), []);
-
-  const cellsChild = useMemo(() => getCellsChild(), []);
 
   const handleOnSort = (field: string) => {
     setFilters((state) => ({

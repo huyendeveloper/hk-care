@@ -11,19 +11,14 @@ interface IPermission {
 }
 
 export interface IRoleAdmin {
-  idRole?: string;
+  roleId?: string;
   roleName: string;
-  //roleKey?: string;
-  roleKey: string | undefined;
-  status: boolean;
-  permissionDtos: IPermission[];
+  grantPermissionDtos: IPermission[];
 }
 
 export interface IRoleSalePoint {
   roleId?: string;
   roleName: string;
-  //roleKey?: string;
-  roleKey: string | undefined;
   status: boolean;
   grantPermissionDtos: IPermission[];
 }
@@ -63,7 +58,7 @@ class UserService {
   }
 
   loadRoleConvert() {
-    return axiosClient.get(`${baseURL}/HkGroup/LoadRoleConvert`);
+    return axiosClient.get(`${baseURL}/HkGroup/GetPermissionSalePoint`);
   }
 
   getPermissionSalePoint() {
@@ -79,8 +74,11 @@ class UserService {
     });
   }
 
-  processRoleAdmin(payload: IRoleAdmin[]) {
-    return axiosClient.post(`${baseURL}/HkGroup/ProcessRoleAdmin`, payload);
+  processRoleAdmin(payload: IRoleAdmin) {
+    return axiosClient.post(
+      `${baseURL}/HkGroup/ChangeSalePointPermission`,
+      payload
+    );
   }
 
   changeSalePointPermission(payload: IRoleSalePoint) {
@@ -102,22 +100,14 @@ class UserService {
     return axiosClient.get(`${baseURL}/HkGroup/Detail`, { params: { id } });
   }
 
-  changeStatus(id: number, status: boolean) {
-    return axiosClient.patch(`${baseURL}/product/ChangeStatus/${id}`, null, {
-      params: {
-        status,
-      },
+  changeStatus(id: number) {
+    return axiosClient.put(`${baseURL}/HkGroup/ChangeStatus`, null, {
+      params: { id },
     });
   }
 
   getAllRoles() {
-    return axiosClient.get(`${baseURL}/HkGroup/SearchRole`, {
-      params: {
-        SkipCount: 0,
-        MaxResultCount: 1000,
-        Keyword: '',
-      },
-    });
+    return axiosClient.get(`${baseURL}/HkGroup/GetPermissionDefault`);
   }
 
   getPermissionDefault() {

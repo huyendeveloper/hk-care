@@ -12,6 +12,7 @@ import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
@@ -29,6 +30,7 @@ const OrderProduct = ({
   getValues,
   handleRemove,
 }: IProps) => {
+  const { id } = useParams();
   const object = `orderDetailDtos.${index}`;
   const product = useWatch({
     control,
@@ -75,9 +77,11 @@ const OrderProduct = ({
     <TableRow hover tabIndex={-1} key={product.productId}>
       <TableCell>
         {(defaultFilters.pageIndex - 1) * defaultFilters.pageSize + index + 1}{' '}
-        <IconButton onClick={handleRemove} sx={{ p: 0 }}>
-          <CloseIcon />
-        </IconButton>
+        {!id && (
+          <IconButton onClick={handleRemove} sx={{ p: 0 }}>
+            <CloseIcon />
+          </IconButton>
+        )}
       </TableCell>
       <TableCell>{product.productName}</TableCell>
       <TableCell sx={{ width: '120px !important' }}>
@@ -89,6 +93,7 @@ const OrderProduct = ({
           placeholder=""
           disableClearable
           noOptionsText="Không có đơn vị nào có thể chọn"
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell sx={{ width: '90px !important' }}>
@@ -97,6 +102,7 @@ const OrderProduct = ({
           setValue={setValue}
           value={getValues(`${object}.quantity`)}
           control={control}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell>{numberFormat(price)}</TableCell>
@@ -106,6 +112,7 @@ const OrderProduct = ({
           setValue={setValue}
           value={getValues(`${object}.discount`)}
           control={control}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell>{numberFormat(product.billPerProduct)}</TableCell>
@@ -141,6 +148,7 @@ const OrderProduct = ({
                     variant="standard"
                     control={control}
                     defaultValue={getValues(`${object}.mor`)}
+                    disabled={Boolean(id)}
                   />
                 </TableCell>
                 <TableCell
@@ -155,6 +163,7 @@ const OrderProduct = ({
                     variant="standard"
                     control={control}
                     defaultValue={getValues(`${object}.noon`)}
+                    disabled={Boolean(id)}
                   />
                 </TableCell>
                 <TableCell
@@ -169,6 +178,7 @@ const OrderProduct = ({
                     variant="standard"
                     control={control}
                     defaultValue={getValues(`${object}.night`)}
+                    disabled={Boolean(id)}
                   />
                 </TableCell>
                 <TableCell
@@ -183,6 +193,7 @@ const OrderProduct = ({
                     variant="standard"
                     control={control}
                     defaultValue={getValues(`${object}.description`)}
+                    disabled={Boolean(id)}
                   />
                 </TableCell>
               </TableRow>

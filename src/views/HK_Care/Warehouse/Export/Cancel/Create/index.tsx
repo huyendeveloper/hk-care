@@ -341,87 +341,89 @@ const CreateForm = () => {
 
   return (
     <PageWrapperFullwidth title={id ? 'Cập nhật hóa đơn' : 'Thêm hóa đơn'}>
-      <Paper
-        component="div"
-        sx={{
-          p: 2.5,
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={5}>
-            <FormLabel title="Thời gian sử dụng còn" name="name" />
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Stack flexDirection="row" alignItems="center" gap="10px">
-                  <FormLabel title="Từ:" name="name" />
-                  <Selecter
-                    options={fromList}
-                    renderLabel={(field) => field.name}
-                    noOptionsText="Không tìm thấy sản phẩm"
-                    renderValue="id"
-                    placeholder=""
-                    defaultValue=""
-                    onChangeSelect={(value: number | null) =>
-                      setDetailAdd({ ...detailAdd, from: value })
-                    }
-                  />
-                </Stack>
+      {!id && (
+        <Paper
+          component="div"
+          sx={{
+            p: 2.5,
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={5}>
+              <FormLabel title="Thời gian sử dụng còn" name="name" />
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Stack flexDirection="row" alignItems="center" gap="10px">
+                    <FormLabel title="Từ:" name="name" />
+                    <Selecter
+                      options={fromList}
+                      renderLabel={(field) => field.name}
+                      noOptionsText="Không tìm thấy sản phẩm"
+                      renderValue="id"
+                      placeholder=""
+                      defaultValue=""
+                      onChangeSelect={(value: number | null) =>
+                        setDetailAdd({ ...detailAdd, from: value })
+                      }
+                    />
+                  </Stack>
+                </Grid>
+                <Grid item xs={6} sx={{ gap: '10px' }}>
+                  <Stack flexDirection="row" alignItems="center" gap="10px">
+                    <FormLabel title="Đến:" name="name" />
+                    <Selecter
+                      options={
+                        detailAdd.from === -1 || detailAdd.from === null
+                          ? toList
+                          : [...toList].splice(2, toList.length)
+                      }
+                      renderLabel={(field) => field.name}
+                      noOptionsText="Không tìm thấy sản phẩm"
+                      renderValue="id"
+                      placeholder=""
+                      defaultValue=""
+                      onChangeSelect={(value: number | null) =>
+                        setDetailAdd({ ...detailAdd, to: value })
+                      }
+                    />
+                  </Stack>
+                </Grid>
               </Grid>
-              <Grid item xs={6} sx={{ gap: '10px' }}>
-                <Stack flexDirection="row" alignItems="center" gap="10px">
-                  <FormLabel title="Đến:" name="name" />
+            </Grid>
+            <Grid item xs={12} md={7}>
+              <FormLabel title="Tìm kiếm sản phẩm" name="name" />
+              <Grid container spacing={1}>
+                <Grid item xs={8}>
                   <Selecter
-                    options={
-                      detailAdd.from === -1 || detailAdd.from === null
-                        ? toList
-                        : [...toList].splice(2, toList.length)
-                    }
+                    renderValue="id"
+                    options={productList}
                     renderLabel={(field) => field.name}
                     noOptionsText="Không tìm thấy sản phẩm"
-                    renderValue="id"
                     placeholder=""
-                    defaultValue=""
                     onChangeSelect={(value: number | null) =>
-                      setDetailAdd({ ...detailAdd, to: value })
+                      setDetailAdd({ ...detailAdd, productId: value })
                     }
+                    defaultValue=""
+                    loading={loadingFetchProducts}
                   />
-                </Stack>
+                </Grid>
+                <Grid item xs={4}>
+                  <LoadingButton
+                    onClick={addProduct}
+                    loading={loadingAdd}
+                    loadingPosition="start"
+                    startIcon={<></>}
+                    sx={{ height: 1, width: '100px' }}
+                    disabled={loadingExpiredProduct}
+                  >
+                    Thêm
+                  </LoadingButton>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} md={7}>
-            <FormLabel title="Tìm kiếm sản phẩm" name="name" />
-            <Grid container spacing={1}>
-              <Grid item xs={8}>
-                <Selecter
-                  renderValue="id"
-                  options={productList}
-                  renderLabel={(field) => field.name}
-                  noOptionsText="Không tìm thấy sản phẩm"
-                  placeholder=""
-                  onChangeSelect={(value: number | null) =>
-                    setDetailAdd({ ...detailAdd, productId: value })
-                  }
-                  defaultValue=""
-                  loading={loadingFetchProducts}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <LoadingButton
-                  onClick={addProduct}
-                  loading={loadingAdd}
-                  loadingPosition="start"
-                  startIcon={<></>}
-                  sx={{ height: 1, width: '100px' }}
-                  disabled={loadingExpiredProduct}
-                >
-                  Thêm
-                </LoadingButton>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Paper>
+        </Paper>
+      )}
       <FormPaperGrid onSubmit={handleSubmit(onSubmit)}>
         <FormHeader title="Thông tin sản phẩm" />
         <FormContent>

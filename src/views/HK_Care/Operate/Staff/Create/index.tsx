@@ -25,7 +25,7 @@ import {
 import ControllerMultiFiles from 'components/Form/ControllerMultiFiles';
 import { typeStringNumber } from 'constants/typeInput';
 import { useNotification } from 'hooks';
-import { IStaff, ISupplier } from 'interface';
+import { IStaff } from 'interface';
 import { useDispatch } from 'react-redux';
 import { createStaff, getStaff, updateStaff } from 'redux/slices/staff';
 import importReceiptService from 'services/importReceipt.service';
@@ -33,7 +33,6 @@ import staffService from 'services/staff.service';
 
 interface IRole {
   roleId: string;
-
   roleName: string;
 }
 
@@ -68,17 +67,27 @@ const validationSchema = yup.object().shape({
     .default(''),
   email: yup
     .string()
-    .email('Không đúng định dạng email.')
-    .required('Vui lòng nhập địa chỉ email.'),
-  // roleId: yup.string().required('Vui lòng chọn vai trò.'),
-  roleId: yup
-    .array()
-    .min(1, 'Vui lòng chọn vai trò.')
-    .required('Vui lòng chọn vai trò.'),
-  userName: yup.string().required('Vui lòng nhập tên đăng nhập.'),
+    .email('Không đúng định dạng Email.')
+    .required('Vui lòng nhập địa chỉ Email.'),
+  roleId: yup.string().required('Vui lòng chọn vai trò.'),
+  userName: yup
+    .string()
+    .required('Vui lòng nhập tên đăng nhập.')
+    .matches(/^[A-Za-z0-9_-]+$/, 'Tên đăng nhập chỉ gồm chữ và số.')
+    .test(
+      'validateSpace',
+      'Tên đăng nhập không chứa khoảng cách',
+      function (item) {
+        if (item?.includes(' ')) {
+          return false;
+        }
+        return true;
+      }
+    ),
   password: yup
     .string()
     .required('Vui lòng nhập mật khẩu.')
+    .min(8, 'Mật khẩu ít nhất 8 ký tự.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
     .default(
@@ -98,7 +107,6 @@ const Create = () => {
   const [files, setFiles] = useState<File[] | object[]>([]);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
   const [loadingFetchData, setLoadingFetchData] = useState<boolean>(false);
-  const [supplierList, setSupplierList] = useState<ISupplier[]>([]);
   const [roles, setRoles] = useState<IRole[]>([]);
 
   const isUpdate = useMemo(
@@ -138,26 +146,24 @@ const Create = () => {
     const fileList = files.filter((item) => Boolean(item.type));
     if (fileList.length === 0) {
       setShowBackdrop(false);
-      // @ts-ignore
-      // setValue('attachments', files);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, showBackdrop]);
 
-  const onSubmit = async (payload: IStaff) => {
+  const onSubmit = async (body: IStaff) => {
     setLoading(true);
     if (id) {
       // @ts-ignore1
-      const { error } = await dispatch(
+      const { payload, error } = await dispatch(
         // @ts-ignore
         updateStaff({
-          ...payload, // @ts-ignore
+          ...body, // @ts-ignore
           namePathSalePointEmployeeStorageDtos: files,
           id,
         })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setLoading(false);
         return;
       }
@@ -167,15 +173,15 @@ const Create = () => {
       });
     } else {
       // @ts-ignore
-      const { error } = await dispatch(
+      const { payload, error } = await dispatch(
         // @ts-ignore
         createStaff({
-          ...payload, // @ts-ignore
+          ...body, // @ts-ignore
           namePathSalePointEmployeeStorageDtos: files,
         })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setLoading(false);
         return;
       }
@@ -276,7 +282,7 @@ const Create = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel title="Địa chỉ email" required name="email" />
+                <FormLabel title="Địa chỉ Email" required name="email" />
                 <ControllerTextField
                   name="email"
                   control={control}
@@ -319,13 +325,13 @@ const Create = () => {
                   name="userName"
                   helperText={
                     <>
-                      HK [Dia chi diem ban] - Ho va ten
+                      HK[DiaChiDiemBan]_HoVaTen
                       <br />
-                      Ví dụ: HK 46 Nui Truc - Nguyen Thu Trang
+                      Ví dụ: HK46NuiTruc_NguyenThuTrang
                     </>
                   }
                   control={control}
-                  disabled={!isUpdate && Boolean(id)}
+                  disabled={Boolean(id)}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -334,6 +340,14 @@ const Create = () => {
                   name="password"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
+                  helperText={
+                    <>
+                      Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường, một
+                      chữ số và một ký tự đặc biệt
+                      <br />
+                      Ví dụ: abcXYZ123@
+                    </>
+                  }
                 />
               </Grid>
             </Grid>

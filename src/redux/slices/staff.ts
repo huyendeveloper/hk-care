@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IStaff } from 'interface';
 import staffService from 'services/staff.service';
+import userService from 'services/user.service';
 import { FilterParams } from 'types';
 
 interface IInitialState {}
@@ -50,6 +51,26 @@ export const getStaff = createAsyncThunk(
   }
 );
 
+export const getUser = createAsyncThunk(
+  'staff/getUser',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const { data } = await userService.get(id);
+      if (data) {
+        const user = data;
+
+        return {
+          user,
+        };
+      }
+
+      return rejectWithValue('Get data fail');
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const createStaff = createAsyncThunk(
   'staff/create',
   async (payload: IStaff, { rejectWithValue }) => {
@@ -78,6 +99,18 @@ export const changeStatus = createAsyncThunk(
     const { id } = params;
     try {
       await staffService.changeStatus(id);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const changeStatusUser = createAsyncThunk(
+  'staff/changeStatusUser',
+  async (params: { id: number }, { rejectWithValue }) => {
+    const { id } = params;
+    try {
+      await userService.changeStatus(id);
     } catch (error) {
       return rejectWithValue(error);
     }

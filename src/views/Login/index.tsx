@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { connectToken } from 'redux/slices/auth';
+import { connectToken, resetLoading } from 'redux/slices/auth';
 import { getTenants } from 'redux/slices/tenant';
 import { RootState } from 'redux/store';
 import * as yup from 'yup';
@@ -51,6 +51,14 @@ const Login = () => {
   const { loading: loadingLogin } = useSelector(
     (state: RootState) => state.auth
   );
+
+  const loadingInit = async () => {
+    await dispatch(resetLoading());
+  };
+
+  useEffect(() => {
+    loadingInit();
+  }, []);
 
   const [tenantList, setTenantList] = useState<ITenant[]>([]);
 

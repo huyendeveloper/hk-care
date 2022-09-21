@@ -31,7 +31,7 @@ const OrderInfo = ({ order }: IProps) => {
         md={6}
         sx={{ display: 'flex', gap: '20px', flexDirection: 'column' }}
       >
-        <TableWrapper
+        {/* <TableWrapper
           sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: '10px' }}
           component={Paper}
         >
@@ -39,7 +39,7 @@ const OrderInfo = ({ order }: IProps) => {
           <div>
             Khách hàng: <b>Nhân viên bán hàng</b> - <b>0123456789</b>
           </div>
-        </TableWrapper>
+        </TableWrapper> */}
         <TableWrapper
           sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: '10px' }}
           component={Paper}
@@ -170,7 +170,7 @@ const OrderInfo = ({ order }: IProps) => {
             </tr>
             <tr>
               <td>Bán bởi:</td>
-              <td>Nhân viên bán hàng</td>
+              <td>{order?.name}</td>
             </tr>
             <tr>
               <td>Ngày bán:</td>
@@ -190,7 +190,8 @@ const OrderInfo = ({ order }: IProps) => {
           <hr />
           <Typography variant="h5">Ghi chú</Typography>
           <TextareaAutosize
-            minRows={11}
+            // minRows={11}
+            minRows={4}
             style={{ width: '100%' }}
             value={order?.description || ''}
             disabled

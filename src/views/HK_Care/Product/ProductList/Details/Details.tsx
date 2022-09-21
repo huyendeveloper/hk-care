@@ -75,7 +75,7 @@ const Details = ({ control, fileValue }) => {
               {fileValue?.name
                 ? // @ts-ignore
                   fileValue.name
-                : 'Không có chứng nhận'}
+                : 'Không có tài liệu'}
               <input
                 disabled
                 type="file"

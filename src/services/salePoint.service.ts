@@ -50,88 +50,15 @@ class SalePointService {
   }
 
   public async updateMoreInfo(body: IAccount, id: string) {
-    return axiosClient.put(`${baseURL}/SalePoint/UpdateMoreInfo/${id}`, {
-      ...body,
-      id,
-    });
+    return axiosClient.put(`${baseURL}/SalePoint/UpdateSalePointAsync`, body);
   }
 
   public async create(input: SalePointDto | undefined) {
-    const params = new FormData();
-    input?.name && params.append('name', input.name.toString());
-    input?.address && params.append('address', input.address.toString());
-    input?.hotline && params.append('hotline', input.hotline.toString());
-    input?.isActived && params.append('isActived', input.isActived.toString());
-    input?.nameContact &&
-      params.append('nameContact', input.nameContact.toString());
-    input?.phone && params.append('phone', input.phone.toString());
-    input?.description &&
-      params.append('description', input.description.toString());
-    input?.adminEmailAddress &&
-      params.append('adminEmailAddress', input.adminEmailAddress.toString());
-    input?.adminPassword &&
-      params.append('adminPassword', input.adminPassword.toString());
-
-    if (input?.attachments) {
-      input?.attachments.forEach((m: AttachmentsFile, index) => {
-        if (m) {
-          params.append(`attachments[${index}].name`, m.name);
-          params.append(`attachments[${index}].url`, m.url);
-        }
-      });
-    } else {
-      params.append(`attachments`, ''.toString());
-    }
-
-    const token = LocalStorage.get('accessToken');
-
-    return axios({
-      method: 'post',
-      url: `${baseURL}/SalePoint/Create`,
-      data: params,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return axiosClient.post(`${baseURL}/SalePoint/CreateSalePointAsync`, input);
   }
 
   public async update(id: string | undefined, input: SalePointDto | undefined) {
-    const params = new FormData();
-    input?.name && params.append('name', input.name.toString());
-    input?.address && params.append('address', input.address.toString());
-    input?.hotline && params.append('hotline', input.hotline.toString());
-    input?.isActived && params.append('isActived', input.isActived.toString());
-    input?.nameContact &&
-      params.append('nameContact', input.nameContact.toString());
-    input?.phone && params.append('phone', input.phone.toString());
-    input?.description &&
-      params.append('description', input.description.toString());
-    input?.adminEmailAddress &&
-      params.append('adminEmailAddress', input.adminEmailAddress.toString());
-    input?.adminPassword &&
-      params.append('adminPassword', input.adminPassword.toString());
-
-    if (input?.attachments) {
-      input?.attachments.forEach((m, index) => {
-        if (m) {
-          params.append(`attachments[${index}].name`, m.name);
-          params.append(`attachments[${index}].url`, m.url);
-        }
-      });
-    }
-
-    const token = LocalStorage.get('accessToken');
-
-    return axios({
-      method: 'put',
-      url: `${baseURL}/SalePoint/Update/${id}`,
-      data: params,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return axiosClient.put(`${baseURL}/SalePoint/UpdateSalePointAsync`, input);
   }
 
   public async search(
@@ -152,7 +79,7 @@ class SalePointService {
   }
 
   public async detail(id: string | null | undefined): Promise<SalePointOutDto> {
-    let rs = await axiosClient.get(`${baseURL}/salepoint/detail/${id}`);
+    let rs = await axiosClient.get(`${baseURL}/SalePoint/Detail/${id}`);
     if (rs) {
       return rs.data;
     } else {

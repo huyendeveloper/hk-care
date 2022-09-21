@@ -244,9 +244,9 @@ const TableData = () => {
             <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
               <CheckIcon />
             </IconButton>
-            <IconButton onClick={handleOpenDeleteDialog(row.id)}>
+            {/* <IconButton onClick={handleOpenDeleteDialog(row.id)}>
               <DeleteIcon />
-            </IconButton>
+            </IconButton> */}
           </>
         )}
       </>

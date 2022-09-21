@@ -4,21 +4,24 @@ import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TablePagination,
   TableSearchField,
-  TableWrapper,
+  TableWrapper
 } from 'components/Table';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -26,6 +29,7 @@ import { useNotification } from 'hooks';
 import { IUser } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { changeStatusUser } from 'redux/slices/staff';
 import { getAllUser } from 'redux/slices/user';
 import { RootState } from 'redux/store';
 import { ClickEventCurrying, FilterParams } from 'types';
@@ -34,7 +38,7 @@ const getCells = (): Cells<IUser> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Họ và tên' },
   { id: 'phone', label: 'Số điện thoại' },
-  { id: 'role', label: 'Vai trò' },
+  { id: 'roleId', label: 'Vai trò' },
   { id: 'isActive', label: 'Trạng thái' },
   { id: 'isActive', label: 'Thao tác' },
 ];
@@ -43,8 +47,8 @@ const getCellsAdminCare = (): Cells<IUser> => [
   { id: 'id', label: 'STT' },
   { id: 'name', label: 'Họ và tên' },
   { id: 'phone', label: 'Số điện thoại' },
-  { id: 'role', label: 'Vai trò' },
-  { id: 'tenant', label: 'Điểm bán' },
+  { id: 'roleId', label: 'Vai trò' },
+  // { id: 'tenant', label: 'Điểm bán' },
   { id: 'isActive', label: 'Trạng thái' },
   { id: 'isActive', label: 'Thao tác' },
 ];
@@ -59,6 +63,7 @@ const TableData = () => {
   const [openBlockDialog, setOpenBlockDialog] = useState<boolean>(false);
   const [openUnBlockDialog, setOpenUnBlockDialog] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
 
   const { userRoles } = useSelector((state: RootState) => state.auth);
 
@@ -126,6 +131,57 @@ const TableData = () => {
     setOpenUnBlockDialog(true);
   };
 
+  const handleCloseBlockDialog = () => {
+    setOpenBlockDialog(false);
+  };
+
+  const handleCloseUnBlockDialog = () => {
+    setOpenUnBlockDialog(false);
+  };
+
+  const handleBlock = async () => {
+    if (!currentID) return;
+    handleCloseBlockDialog();
+    setShowBackdrop(true);
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatusUser({ id: currentID })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Vô hiệu hóa thành công!',
+      severity: 'success',
+    });
+    fetchData();
+    setShowBackdrop(false);
+  };
+
+  const handleUnBlock = async () => {
+    if (!currentID) return;
+    handleCloseUnBlockDialog();
+    setShowBackdrop(true);
+    const { error } = await dispatch(
+      // @ts-ignore
+      changeStatusUser({ id: currentID })
+    );
+    if (error) {
+      setNotification({ error: 'Lỗi!' });
+      setShowBackdrop(false);
+      return;
+    }
+    setNotification({
+      message: 'Kích hoạt thành công!',
+      severity: 'success',
+    });
+
+    fetchData();
+    setShowBackdrop(false);
+  };
+
   const renderAction = (row: IUser) => {
     return (
       <>
@@ -183,7 +239,7 @@ const TableData = () => {
 
               <TableBody>
                 {userList.map((item, index) => {
-                  const { id, name, phone, role, tenant, isActive } = item;
+                  const { id, name, phone, roleName, tenant,role, isActive } = item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
@@ -191,10 +247,11 @@ const TableData = () => {
                       </TableCell>
                       <TableCell>{name}</TableCell>
                       <TableCell>{phone}</TableCell>
-                      <TableCell>{role}</TableCell>
-                      {userRoles.includes('hkl2') && (
+                      {/* <TableCell>{roleName}</TableCell> */}
+                      <TableCell>{role[0]}</TableCell>
+                      {/* {userRoles.includes('hkl2') && (
                         <TableCell>{tenant}</TableCell>
-                      )}
+                      )} */}
                       <TableCell>
                         {isActive ? (
                           <Button>Hoạt động</Button>
@@ -220,6 +277,32 @@ const TableData = () => {
           rowsPerPageOptions={[10, 20, 30, 40, 50]}
         />
       </TableContent>
+
+      <BlockDialog
+        id={currentID}
+        tableName="người dùng"
+        name={userList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseBlockDialog}
+        open={openBlockDialog}
+        handleBlock={handleBlock}
+      />
+
+      <UnBlockDialog
+        id={currentID}
+        tableName="người dùng"
+        name={userList.find((x) => x.id === currentID)?.name}
+        onClose={handleCloseUnBlockDialog}
+        open={openUnBlockDialog}
+        handleUnBlock={handleUnBlock}
+      />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+        onClick={() => setShowBackdrop(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </TableWrapper>
   );
 };

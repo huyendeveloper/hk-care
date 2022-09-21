@@ -101,18 +101,31 @@ const PrintOrder = () => {
             ref={(el) => setRefs(el)}
           >
             <Box sx={{ padding: '30px 10px' }}>
-              <Box
-                component="img"
-                sx={{
-                  width: '3cm',
-                  mb: 1,
-                }}
-                src="/static/logo.png"
-              />
-              <div>HỆ THỐNG HK CARE</div>
-              <div>Điểm bán: {LocalStorage.get('tennant')}</div>
-              <div>Địa chỉ: HL Tower</div>
-              <Box sx={{ mb: 2 }}>Điện thoại: 0337664222</Box>
+              <Stack
+                flexDirection="row"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ mb: 2 }}
+              >
+                <div>
+                  <Box
+                    component="img"
+                    sx={{
+                      width: '3cm',
+                    }}
+                    src="/static/logo.png"
+                  />
+                  <h5 style={{ margin: 0 }}>HỆ THỐNG HK CARE</h5>
+                </div>
+                <Box sx={{ textAlign: 'right', fontSize: '12px' }}>
+                  <Box sx={{ whiteSpace: 'no-wrap' }}>
+                    {LocalStorage.get('tennant')}
+                  </Box>
+                  <div>Địa chỉ: {order?.tenantAddress}</div>
+                  <Box>Điện thoại: {order?.tenantPhone}</Box>
+                </Box>
+              </Stack>
+
               <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <h6 style={{ fontSize: '13px', margin: 0 }}>
                   HÓA ĐƠN BÁN HÀNG
@@ -121,7 +134,7 @@ const PrintOrder = () => {
               </Box>
               <Stack flexDirection="row" mb={2} justifyContent="space-between">
                 <div>
-                  BH: <b>Dược sĩ Huyền</b>
+                  BH: <b>{order?.name}</b>
                 </div>
                 <div>
                   Mã HĐ: <b>{order?.code}</b>
@@ -161,9 +174,7 @@ const PrintOrder = () => {
                           <td style={{ padding: '2px' }}>
                             {numberFormat(item.price)}
                           </td>
-                          <td style={{ padding: '2px' }}>
-                            {numberFormat(item.discount)}
-                          </td>
+                          <td style={{ padding: '2px' }}>{item.discount}</td>
                           <td>
                             {numberFormat(
                               item.quantity * item.price - item.discount
@@ -197,7 +208,7 @@ const PrintOrder = () => {
                   flexWrap="wrap"
                 >
                   <div>Chiết khấu(%):</div>
-                  <div>{numberFormat(order?.disCount || 0)}</div>
+                  <div>{order?.disCount || 0}</div>
                 </Stack>
                 <Stack
                   flexDirection="row"

@@ -1,11 +1,9 @@
-import { Stack, TableBody, TableCell, TableRow } from '@mui/material';
+import { Stack, TableBody } from '@mui/material';
 import type { Cells } from 'components/Table/TableHeader';
 import TableHeader from 'components/Table/TableHeader';
-import { defaultFilters } from 'constants/defaultFilters';
-import { useNotification } from 'hooks';
 import { IImportReceipt, IRevenueReport } from 'interface';
 import moment from 'moment';
-import React, { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { FilterParams } from 'types/common';
 import { numberFormat } from 'utils/numberFormat';
 import ExpandRow from './ExpandRow';
@@ -19,10 +17,10 @@ const getCells = (): Cells<IImportReceipt> => [
     id: 'id',
     label: 'Mã hóa đơn',
   },
-  {
-    id: 'id',
-    label: 'Nhân viên bán hàng',
-  },
+  // {
+  //   id: 'id',
+  //   label: 'Nhân viên bán hàng',
+  // },
   {
     id: 'creationTime',
     label: 'Ngày bán',
@@ -95,7 +93,7 @@ const DefaultFilter = ({ revenueReport, filters, totalRevenue }: IProps) => {
         })}
       </TableBody>
       <tr>
-        <td colSpan={4}></td>
+        <td colSpan={3}></td>
         <td colSpan={2} style={{ paddingTop: '40px' }}>
           <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
             <div>Tổng doanh thu:</div>

@@ -6,14 +6,14 @@ import {
   Stack,
   TableCell,
   TableRow,
-  TextField
+  TextareaAutosize,
 } from '@mui/material';
+import { Box } from '@mui/system';
+import { useNotification } from 'hooks';
 import { IRole } from 'interface';
 import { useState } from 'react';
 import { useDebounce } from 'react-use';
-import userService, {
-  IRoleSalePoint
-} from 'services/user.service';
+import userService, { IRoleSalePoint } from 'services/user.service';
 
 interface IPermission {
   key: string;
@@ -40,6 +40,7 @@ const Role = ({
   permission,
   setShowBackdrop,
 }: IProps) => {
+  const setNotification = useNotification();
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
@@ -69,7 +70,7 @@ const Role = ({
       return;
     }
 
-    if (roleDetail.roleName || roleDetail.roleKey) {
+    if (roleDetail.roleName || roleDetail.roleId) {
       const newPermission = [...permission];
       newPermission[0].isGrant = roleDetail.qlsp;
       newPermission[1].isGrant = roleDetail.qlkh;
@@ -79,16 +80,20 @@ const Role = ({
       let newRole: IRoleSalePoint = {
         roleId: roleDetail.idRole,
         roleName: roleDetail.roleName,
-        roleKey: roleDetail.roleKey,
         status: true,
         grantPermissionDtos: newPermission,
       };
       setShowBackdrop(true);
 
-      const { data } = await userService.changeSalePointPermission(newRole);
-      if (data) {
+      try {
+        const { data } = await userService.changeSalePointPermission(newRole);
+        if (data) {
+          setShowBackdrop(false);
+          window.location.reload();
+        }
+      } catch (error) {
+        setNotification({ error: 'Lỗi!' });
         setShowBackdrop(false);
-        window.location.reload();
       }
     }
   };
@@ -104,11 +109,13 @@ const Role = ({
   const renderAction = () => {
     return (
       <Stack>
-        <IconButton
-          onClick={() => handleOpenDeleteDialog(role?.idRole || null)}
-        >
-          <RemoveCircleIcon />
-        </IconButton>
+        {index !== 1 && (
+          <IconButton
+            onClick={() => handleOpenDeleteDialog(role?.idRole || null)}
+          >
+            <RemoveCircleIcon />
+          </IconButton>
+        )}
         {addItem && (
           <IconButton onClick={handleAddItem}>
             <AddIcon />
@@ -121,7 +128,14 @@ const Role = ({
   return (
     <TableRow hover tabIndex={-1} key={index}>
       <TableCell>
-        <TextField defaultValue={role.roleName} onChange={handleChangeName} />
+        {index === 1 ? (
+          <Box pl="14px">Admin quản lý điểm bán</Box>
+        ) : (
+          <TextareaAutosize
+            defaultValue={role.roleName}
+            onChange={handleChangeName}
+          />
+        )}
       </TableCell>
       <TableCell>
         {

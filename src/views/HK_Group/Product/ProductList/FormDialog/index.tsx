@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Button, Dialog, Grid, IconButton, Stack } from '@mui/material';
+import { getValue } from '@testing-library/user-event/dist/utils';
 import { LoadingScreen } from 'components/common';
 import {
   ControllerDatePicker,
@@ -14,7 +15,7 @@ import {
   FormGroup,
   FormHeader,
   FormLabel,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import EntitySelecter from 'components/Form/EntitySelecter';
@@ -27,10 +28,10 @@ import {
   IProductGroup,
   ISupplier,
   ITreatmentGroup,
-  IUsage
+  IUsage,
 } from 'interface';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { createProduct, updateProduct } from 'redux/slices/product';
 import measureService from 'services/measure.service';
@@ -117,6 +118,7 @@ const FormDialog = ({
     formState: { errors },
     setValue,
     reset,
+    getValues,
   } = useForm<IProduct>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -205,6 +207,10 @@ const FormDialog = ({
     reset({
       dosage: 'Null',
       routeOfUse: 'Theo chỉ định',
+      outOfDate: null,
+      dateManufacture: null,
+      price: 0,
+      importPrice: 0,
     });
     setImage(undefined);
     fetchDataUpdate();
@@ -286,15 +292,15 @@ const FormDialog = ({
     setOpenFormDialog(false);
   };
 
-  const onSubmit = async (payload: IProduct) => {
+  const onSubmit = async (body: IProduct) => {
     setShowBackdrop(true);
-    if (payload.id) {
-      const { error } = await dispatch(
+    if (body.id) {
+      const { payload, error } = await dispatch(
         // @ts-ignore
-        updateProduct({ ...payload, image })
+        updateProduct({ ...body, image })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setShowBackdrop(false);
         return;
       }
@@ -304,12 +310,12 @@ const FormDialog = ({
       });
     } else {
       const suppliers = productsSupplier.length > 0 ? { productsSupplier } : {};
-      const { error } = await dispatch(
+      const { payload, error } = await dispatch(
         // @ts-ignore
-        createProduct({ ...payload, image, ...suppliers })
+        createProduct({ ...body, image, ...suppliers })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setShowBackdrop(false);
         return;
       }
@@ -317,9 +323,28 @@ const FormDialog = ({
     }
     setShowBackdrop(false);
     fetchData();
-    reset();
+    reset({ price: 0, importPrice: 0 });
     handleClose(true);
   };
+
+  const importPrice = useWatch({
+    control,
+    name: 'importPrice',
+  });
+
+  const price = useWatch({
+    control,
+    name: 'price',
+  });
+
+  useEffect(() => {
+    console.log('price', price);
+    console.log('importPrice', importPrice);
+    if (importPrice > price) {
+      setValue('price', importPrice);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [importPrice]);
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth onClose={() => handleClose()}>
@@ -518,8 +543,8 @@ const FormDialog = ({
                     <ControllerNumberInput
                       name="importPrice"
                       // @ts-ignore
-                      defaultValue={productDetail?.importPrice || 0}
                       setValue={setValue}
+                      value={getValues('importPrice')}
                       control={control}
                     />
                   </Grid>
@@ -532,9 +557,12 @@ const FormDialog = ({
                     <ControllerNumberInput
                       name="price"
                       // @ts-ignore
-                      defaultValue={productDetail?.price || 0}
                       setValue={setValue}
                       control={control}
+                      value={getValues('price')}
+                      errors={
+                        importPrice > price ? 'Giá bán không hợp lệ!' : ''
+                      }
                     />
                   </Grid>
                 </Grid>

@@ -80,11 +80,8 @@ const validationSchema = yup.object().shape({
   address: yup
     .string()
     .required('Vui lòng nhập địa chỉ')
-    .matches(
-      // eslint-disable-next-line no-useless-escape
-      /^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
-      'Địa chỉ không đúng định dạng hoặc chứa ký tự đặc biệt.'
-    )
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập địa chỉ')
     .max(150, 'Địa chỉ không quá 150 ký tự.'),
   status: yup.boolean().default(true),
   adminEmailAddress: yup
@@ -152,7 +149,7 @@ const FormDialog = ({
 
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: payload.response.data || 'Lỗi!',
       });
       setloadding(false);
       return;
@@ -164,7 +161,7 @@ const FormDialog = ({
     });
     setloadding(false);
     handleClose();
-    fetchData();
+    fetchTable();
   };
 
   const update = async (tenant: SalePointDto) => {
@@ -184,7 +181,7 @@ const FormDialog = ({
     });
     setloadding(false);
     handleClose();
-    fetchData();
+    fetchTable();
   };
 
   const onSubmit = async (tenant: SalePointDto) => {
@@ -412,6 +409,7 @@ const FormDialog = ({
                     name="adminEmailAddress"
                     control={control}
                     disabled={disabled || Boolean(currentID)}
+                    helperText="Nhập địa chỉ Email."
                   />
                 </Grid>
               </Grid>
@@ -425,6 +423,14 @@ const FormDialog = ({
                     name="adminPassword"
                     control={control}
                     disabled={disabled}
+                    helperText={
+                      <>
+                        Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường,
+                        một chữ số và một ký tự đặc biệt
+                        <br />
+                        Ví dụ: abcXYZ123@
+                      </>
+                    }
                   />
                 </Grid>
               </Grid>

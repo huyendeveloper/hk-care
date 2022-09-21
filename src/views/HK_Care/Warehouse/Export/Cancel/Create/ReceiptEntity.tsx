@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, TableCell, TableRow } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import DateFns from 'utils/DateFns';
 import { numberFormat } from 'utils/numberFormat';
 
@@ -10,6 +11,7 @@ interface IProps {
 }
 
 const ReceiptEntity = ({ item, index, remove }: IProps) => {
+  const { id } = useParams();
   const { productId } = item;
 
   return (
@@ -26,13 +28,15 @@ const ReceiptEntity = ({ item, index, remove }: IProps) => {
       <TableCell>{DateFns.formatDate(item.expiryDate)}</TableCell>
 
       <TableCell align="left">
-        <IconButton
-          onClick={() => {
-            remove(index - 1);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        {!id && (
+          <IconButton
+            onClick={() => {
+              remove(index - 1);
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </TableCell>
     </TableRow>
   );

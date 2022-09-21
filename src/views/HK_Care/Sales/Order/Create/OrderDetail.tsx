@@ -1,14 +1,4 @@
-import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import {
-  Backdrop,
-  Box,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  Stack,
-} from '@mui/material';
-import { LinkIconButton } from 'components/common';
+import { Backdrop, Box, CircularProgress, Stack } from '@mui/material';
 import { ControllerTextarea, EntitySelecter } from 'components/Form';
 import ControllerMultiImages from 'components/Form/ControllerMultiImages';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
@@ -60,14 +50,6 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
     []
   );
 
-  const mockCustomers = useMemo(
-    () => [
-      { id: 1, name: 'Nguyễn Thu Hà', phone: '0987654321' },
-      { id: 2, name: 'Tô Thanh Minh', phone: '0987654321' },
-    ],
-    []
-  );
-
   useEffect(() => {
     setValue('moneyToPay', bill - (discountValue / 100) * bill || 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,11 +95,12 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
       setShowBackdrop(false);
       setValue('images', files);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, showBackdrop]);
 
   return (
     <Stack p={2} gap={2}>
-      <Stack
+      {/* <Stack
         flexDirection="row"
         justifyContent="space-between"
         alignItems="center"
@@ -145,7 +128,7 @@ const OrderDetail = ({ control, setValue, getValues }: IProps) => {
             <AddIcon />
           </IconButton>
         </LinkIconButton>
-      </Stack>
+      </Stack> */}
       <Stack
         flexDirection="row"
         justifyContent="space-between"

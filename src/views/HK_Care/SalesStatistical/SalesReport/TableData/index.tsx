@@ -234,15 +234,15 @@ const TableData = () => {
         </Typography>
         <Stack flexDirection="row" py={2} gap={1}>
           <Grid item width="800px">
-            <Selecter
+            {/* <Selecter
               options={staffList}
               renderLabel={(field) => field.name}
-              noOptionsText="Không tìm thấy sản phẩm"
+              noOptionsText="Không tìm thấy nhân viên"
               renderValue="userId"
               placeholder="Tất cả nhân viên"
               defaultValue=""
               onChangeSelect={(value: number | null) => setStaffChoosed(value)}
-            />
+            /> */}
           </Grid>
           <Grid item xs={3}>
             <DatePicker

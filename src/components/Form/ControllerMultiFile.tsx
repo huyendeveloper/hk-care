@@ -78,8 +78,8 @@ const ControllerMultiFile = ({
             {/* @ts-ignore */}
             {item?.name
               ? // @ts-ignore
-              item.name
-              : 'Không có chứng nhận'}
+                item.name
+              : 'Không có tài liệu'}
             <input
               type="file"
               name="bussinessLicense"
@@ -104,7 +104,15 @@ const ControllerMultiFile = ({
               {item?.name && !item.type && (
                 // @ts-ignore
                 // eslint-disable-next-line react/jsx-no-target-blank
-                <a href={item?.name.includes(connectURL) ? item?.name : connectURL + "/" + item?.name} target={'_blank'}>
+                <a
+                  href={
+                    // @ts-ignore
+                    item?.name.includes(connectURL) // @ts-ignore
+                      ? item?.name // @ts-ignore
+                      : connectURL + '/' + item?.name
+                  }
+                  target={'_blank'}
+                >
                   <Stack
                     height={1}
                     bgcolor="#00AB55"

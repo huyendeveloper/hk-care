@@ -81,37 +81,44 @@ const TableData = () => {
       const roleList = res?.data
         ? // @ts-ignore
           res.data.map((item) => ({
-            idRole: item.idRole,
             roleName: item.roleName,
-            roleKey: item.roleKey,
-            qlsp:
+            roleId: item.roleId,
+            qlsp: item.grantPermissionDtos.find(
               // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[0].key)
-                ? // @ts-ignore
-                  item.permissionDtos.find((x) => x?.key === data[0].key)
-                    .isGrant
-                : false,
-            qlkh:
+              (x) => x?.permissionName === data[0].permissionName
+            )
+              ? item.grantPermissionDtos.find(
+                  // @ts-ignore
+                  (x) => x?.permissionName === data[0].permissionName
+                ).isGrant
+              : false,
+            qlkh: item.grantPermissionDtos.find(
               // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[1].key)
-                ? // @ts-ignore
-                  item.permissionDtos.find((x) => x?.key === data[1].key)
-                    .isGrant
-                : false,
-            qlbh:
+              (x) => x?.permissionName === data[1].permissionName
+            )
+              ? item.grantPermissionDtos.find(
+                  // @ts-ignore
+                  (x) => x?.permissionName === data[1].permissionName
+                ).isGrant
+              : false,
+            qlbh: item.grantPermissionDtos.find(
               // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[2].key)
-                ? // @ts-ignore
-                  item.permissionDtos.find((x) => x?.key === data[2].key)
-                    .isGrant
-                : false,
-            qlvh:
+              (x) => x?.permissionName === data[2].permissionName
+            )
+              ? item.grantPermissionDtos.find(
+                  // @ts-ignore
+                  (x) => x?.permissionName === data[2].permissionName
+                ).isGrant
+              : false,
+            qlvh: item.grantPermissionDtos.find(
               // @ts-ignore
-              item.permissionDtos.find((x) => x?.key === data[3].key)
-                ? // @ts-ignore
-                  item.permissionDtos.find((x) => x?.key === data[3].key)
-                    .isGrant
-                : false,
+              (x) => x?.permissionName === data[3].permissionName
+            )
+              ? item.grantPermissionDtos.find(
+                  // @ts-ignore
+                  (x) => x?.permissionName === data[3].permissionName
+                ).isGrant
+              : false,
           }))
         : [];
 
@@ -148,7 +155,7 @@ const TableData = () => {
   const handleAddItem = () => {
     const newRoles: IRole = {
       roleName: '',
-      roleKey: undefined,
+      roleId: undefined,
       qlsp: false,
       qlkh: false,
       qlbh: false,
@@ -165,28 +172,22 @@ const TableData = () => {
     setShowBackdropDelete(true);
     if (!currentID) return;
     handleCloseDeleteDialog();
-    const role = roles.filter((x) => (x.roleKey = currentID));
-    const newRole = role.map((item) => {
-      const newPermission = [...permission];
-      newPermission[0].isGrant = item.qlsp;
-      newPermission[1].isGrant = item.qlkh;
-      newPermission[2].isGrant = item.qlbh;
-      newPermission[3].isGrant = item.qlvh;
-      const newRole = {
-        roleKey: item.roleKey,
-        roleName: item.roleName,
-        status: false,
-        permissionDtos: newPermission,
-      };
+    const role = roles.find((x) => (x.roleId = currentID));
 
-      return newRole;
-    });
+    if (!role?.roleId) {
+      return;
+    }
+    const newRole = {
+      roleId: role.roleId,
+      roleName: null,
+    };
+    setShowBackdrop(true);
 
     // @ts-ignore
-    await userService.processRoleAdmin([newRole[0]]);
+    const { data } = await userService.processRoleAdmin(newRole);
     fetchData();
+    setShowBackdrop(false);
     window.location.reload();
-    setShowBackdropDelete(false);
   };
 
   return (
@@ -226,7 +227,7 @@ const TableData = () => {
       <DeleteDialog
         id={currentID}
         tableName="vai trò"
-        name={roles.find((x) => x.roleKey === currentID)?.roleName}
+        name={roles.find((x) => x.roleId === currentID)?.roleName}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}

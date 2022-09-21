@@ -193,6 +193,7 @@ const TableData = () => {
 
               <TableBody>
                 {Object.keys(requestImport).map((key, index) => {
+                  // @ts-ignore
                   return (
                     <ExpandRow
                       key={key}

@@ -21,6 +21,8 @@ interface Props {
   message?: string;
   type?: string;
   loading?: boolean;
+  forwardContent?: React.ReactNode;
+  textAlign?: string;
 }
 
 const DeleteDialog = (props: Props) => {
@@ -34,6 +36,8 @@ const DeleteDialog = (props: Props) => {
     message,
     type = 'Xóa',
     loading,
+    forwardContent,
+    textAlign = 'center',
   } = props;
 
   return (
@@ -54,11 +58,16 @@ const DeleteDialog = (props: Props) => {
       </Box>
       <Divider />
       <DialogContent>
-        <Typography
-          variant="subtitle1"
-          gutterBottom
-          sx={{ textAlign: 'center' }}
-        >
+        {forwardContent && (
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ textAlign: 'center' }}
+          >
+            {forwardContent}
+          </Typography>
+        )}
+        <Typography variant="subtitle1" gutterBottom sx={{ textAlign }}>
           {message ||
             `Bạn có chắc chắn bạn muốn ${type.toLocaleLowerCase()} ${tableName} ${name}${spanContent}?`}
         </Typography>
@@ -70,7 +79,7 @@ const DeleteDialog = (props: Props) => {
             Hủy
           </Button>
 
-          <LoadingButton color="error" loading={loading} onClick={handleDelete}>
+          <LoadingButton loading={loading} onClick={handleDelete}>
             {type}
           </LoadingButton>
         </Stack>

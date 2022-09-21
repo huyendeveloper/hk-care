@@ -34,6 +34,7 @@ const Details = () => {
     if (id) {
       fetchDataUpdate();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {

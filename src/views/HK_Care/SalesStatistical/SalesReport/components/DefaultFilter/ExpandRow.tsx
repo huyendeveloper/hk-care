@@ -23,11 +23,13 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
         key={groupName}
         onClick={() => setExpand(!expand)}
       >
-        <TableCell colSpan={5} sx={{ padding: '16px' }}>
+        <TableCell colSpan={4} sx={{ padding: '16px' }}>
           {groupName}
         </TableCell>
-        <TableCell colSpan={1} sx={{ width: '100px !important' }}>
-          {numberFormat(list.reduce((pre, cur) => pre + cur.orderValue, 0))}
+        <TableCell colSpan={1} sx={{ width: '150px !important' }}>
+          {numberFormat(
+            list.reduce((pre, cur) => pre + Math.round(cur.orderValue), 0)
+          )}
         </TableCell>
       </TableRow>
       {/* @ts-ignore */}
@@ -42,7 +44,7 @@ const ExpandRow = ({ groupName, list, filters, index }: IProps) => {
                 {rowId}
               </TableCell>
               <TableCell>{code}</TableCell>
-              <TableCell>{employeeName}</TableCell>
+              {/* <TableCell>{employeeName}</TableCell> */}
               <TableCell>{formatDateTime(saleDate)}</TableCell>
               <TableCell>{numberFormat(orderValue)}</TableCell>
               <TableCell></TableCell>

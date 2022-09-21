@@ -3,6 +3,7 @@ import { IconButton, TableCell, TableRow } from '@mui/material';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useWatch } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import { numberFormat } from 'utils/numberFormat';
 
 interface IProps {
@@ -24,6 +25,7 @@ const ReceiptEntity = ({
   control,
   remove,
 }: IProps) => {
+  const { id } = useParams();
   const { productId } = item;
   const object = `${arrayName}.${index}`;
 
@@ -45,6 +47,7 @@ const ReceiptEntity = ({
           setValue={setValue}
           defaultValue={getValues(`${object}.amount`)}
           control={control}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell>{numberFormat(getValues(`${object}.importPrice`))}</TableCell>
@@ -52,13 +55,15 @@ const ReceiptEntity = ({
         {numberFormat(getValues(`${object}.importPrice`) * amount)}
       </TableCell>
       <TableCell align="right">
-        <IconButton
-          onClick={() => {
-            remove(index);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        {!id && (
+          <IconButton
+            onClick={() => {
+              remove(index);
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </TableCell>
     </TableRow>
   );

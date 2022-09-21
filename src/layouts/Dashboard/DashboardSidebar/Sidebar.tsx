@@ -64,11 +64,6 @@ const getSections = (): SectionItem[] => [
             path: '/hk_group/product/supplier',
             roles: ['hkl3'],
           },
-          {
-            title: 'Giá tham chiếu',
-            path: '/hk_group/product/reference_prices',
-            roles: ['hkl3'],
-          },
         ],
       },
       {
@@ -79,7 +74,7 @@ const getSections = (): SectionItem[] => [
       {
         title: 'Quản trị người dùng',
         path: '/404',
-        roles: ['hkl1', 'hkl2'],
+        roles: ['hkl1'],
         children: [
           {
             title: 'Danh sách người dùng',
@@ -96,7 +91,7 @@ const getSections = (): SectionItem[] => [
     ],
   },
   {
-    title: LocalStorage.get('tennant'),
+    title: LocalStorage.get('tennant') || 'HK Care',
     roles: ['hkl2_1', 'hkl2_1_1', 'hkl2_1_2', 'hkl2_1_3', 'hkl2_1_4'],
     children: [
       {
@@ -219,10 +214,11 @@ interface NavItemsProps {
   pathname: string;
   depth?: number;
   roleUser: string[];
+  isFirst: boolean;
 }
 
 const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
-  const { depth = 0, items, roleUser, pathname } = props;
+  const { depth = 0, items, roleUser, pathname, isFirst } = props;
 
   const itemsFiltered =
     depth === 0
@@ -251,7 +247,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
               path={path}
               title={title}
               depth={depth}
-              open={partialMatch}
+              open={partialMatch || isFirst}
               active={partialMatch}
             >
               {renderNavSectionItems({
@@ -259,6 +255,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
                 items,
                 pathname,
                 roleUser,
+                isFirst: false,
               })}
             </SidebarItem>
           );
@@ -294,6 +291,7 @@ const Sidebar = () => {
         items: sections,
         pathname: location.pathname,
         roleUser: auth.userRoles,
+        isFirst: true,
       })}
     </Box>
   );

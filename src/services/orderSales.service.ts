@@ -56,10 +56,7 @@ class ImportReceiptService {
   }
 
   update(payload: OrderSales) {
-    return axiosClient.put(`${baseURL}/BillOfSale/UpdateBillOfSale`, {
-      ...payload,
-      disCount: payload.disCount || 0,
-    });
+    return axiosClient.put(`${baseURL}/BillOfSale/UpdateBillOfSale`, payload);
   }
 
   getAll({

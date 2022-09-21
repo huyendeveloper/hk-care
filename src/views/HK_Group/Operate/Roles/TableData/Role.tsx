@@ -1,19 +1,18 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import {
-  Backdrop,
+  Box,
   Checkbox,
-  CircularProgress,
   IconButton,
   Stack,
   TableCell,
   TableRow,
-  TextField,
+  TextareaAutosize,
 } from '@mui/material';
 import { IRole } from 'interface';
 import { useState } from 'react';
 import { useDebounce } from 'react-use';
-import userService, { IRoleAdmin, IUpdateNorma } from 'services/user.service';
+import userService, { IRoleAdmin } from 'services/user.service';
 
 interface IPermission {
   key: string;
@@ -67,36 +66,23 @@ const Role = ({
       return;
     }
 
-    if (roleDetail.roleName || roleDetail.roleKey) {
+    if (roleDetail.roleName || roleDetail.roleId) {
       const newPermission = [...permission];
       newPermission[0].isGrant = roleDetail.qlsp;
       newPermission[1].isGrant = roleDetail.qlkh;
       newPermission[2].isGrant = roleDetail.qlbh;
       newPermission[3].isGrant = roleDetail.qlvh;
 
-      let newRole: IRoleAdmin[] = [
-        {
-          idRole: roleDetail.idRole,
-          roleName: roleDetail.roleName,
-          roleKey: roleDetail.roleKey,
-          status: true,
-          permissionDtos: newPermission,
-        },
-      ];
+      let newRole: IRoleAdmin = {
+        roleId: roleDetail.roleId,
+        roleName: roleDetail.roleName,
+        grantPermissionDtos: newPermission,
+      };
 
       setShowBackdrop(true);
 
       const { data } = await userService.processRoleAdmin(newRole);
       if (data) {
-        if (newRole[0].idRole) {
-          var changNo: IUpdateNorma = {
-            name: data[0].roleKey,
-            isDefault: false,
-            isPublic: true,
-            concurrencyStamp: undefined,
-          };
-          await userService.changeNameRole(newRole[0].idRole, changNo);
-        }
         setShowBackdrop(false);
         window.location.reload();
       }
@@ -115,7 +101,7 @@ const Role = ({
     return (
       <Stack>
         <IconButton
-          onClick={() => handleOpenDeleteDialog(role?.roleKey || null)}
+          onClick={() => handleOpenDeleteDialog(role?.roleId || null)}
         >
           <RemoveCircleIcon />
         </IconButton>
@@ -131,7 +117,14 @@ const Role = ({
   return (
     <TableRow hover tabIndex={-1} key={index}>
       <TableCell>
-        <TextField defaultValue={role.roleName} onChange={handleChangeName} />
+        {index === 1 ? (
+          <Box pl="14px">Admin HKGroup</Box>
+        ) : (
+          <TextareaAutosize
+            defaultValue={role.roleName}
+            onChange={handleChangeName}
+          />
+        )}
       </TableCell>
       <TableCell>
         {

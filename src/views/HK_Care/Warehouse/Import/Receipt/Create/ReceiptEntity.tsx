@@ -125,6 +125,7 @@ const ReceiptEntity = ({
           setValue={setValue}
           control={control}
           value={getValues(`${object}.importPrice`)}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -140,6 +141,7 @@ const ReceiptEntity = ({
           setValue={setValue}
           control={control}
           errors={importPrice > price ? 'Giá bán không hợp lệ!' : ''}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell
@@ -154,6 +156,7 @@ const ReceiptEntity = ({
           defaultValue={getValues(`${object}.discount`)}
           setValue={setValue}
           control={control}
+          disabled={Boolean(id)}
         />
       </TableCell>
       <TableCell sx={{ verticalAlign: 'top', paddingY: '20px' }}>

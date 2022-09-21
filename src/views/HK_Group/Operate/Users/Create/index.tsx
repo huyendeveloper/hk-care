@@ -6,7 +6,7 @@ import { LinkButton, LoadingScreen, PageWrapper } from 'components/common';
 import {
   ControllerTextField,
   ControllerTextFieldPassword,
-  EntityMultipleSelecter,
+  EntitySelecter,
   FormContent,
   FormFooter,
   FormHeader,
@@ -19,6 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getUser } from 'redux/slices/staff';
 import { createUser, updateUser } from 'redux/slices/user';
 import userService from 'services/user.service';
 import randomPassword from 'utils/randomPasword';
@@ -47,9 +48,9 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập số điện thoại.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập số điện thoại.'),
-  role: yup
-    .array()
-    .min(1, 'Vui lòng chọn vai trò.')
+  roleId: yup
+    .string()
+    // .min(1, 'Vui lòng chọn vai trò.')
     .required('Vui lòng chọn vai trò.'),
   userName: yup
     .string()
@@ -63,7 +64,8 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập mật khẩu.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
-    .default(randomPassword(8, 15, true, true, true, true).toString()),
+    // .default(randomPassword(8, 15, true, true, true, true).toString()),
+    .default('HkCare@123'),
 });
 
 const Create = () => {
@@ -74,28 +76,28 @@ const Create = () => {
   const setNotification = useNotification();
   const [roles, setRoles] = useState<RoleMappingDto[]>([]);
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingFetchData, setLoadingFetchData] = useState<boolean>(true);
 
   const isUpdate = useMemo(
     () => location.pathname.includes('/update'),
     [location]
   );
 
-  const { control, handleSubmit, reset, setValue, getValues } = useForm<IUser>({
+  const { control, handleSubmit, reset } = useForm<IUser>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
     defaultValues: validationSchema.getDefault(),
   });
 
-  const onSubmit = async (payload: IUser) => {
+  const onSubmit = async (body: IUser) => {
     setShowBackdrop(true);
     if (id) {
-      const { error } = await dispatch(
+      const { payload, error } = await dispatch(
         // @ts-ignore
-        updateUser(payload)
+        updateUser(body)
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
         setShowBackdrop(false);
         return;
       }
@@ -104,12 +106,12 @@ const Create = () => {
         severity: 'success',
       });
     } else {
-      const { error } = await dispatch(
+      const { payload, error } = await dispatch(
         // @ts-ignore
-        createUser(payload)
+        createUser(body)
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
         setShowBackdrop(false);
         return;
       }
@@ -123,25 +125,33 @@ const Create = () => {
   };
 
   const fetchDataDetail = async () => {
-    const { data } = await userService.get(id || '');
-
-    const { name, phone, email, role, userName, password } = data;
-    reset({
-      name,
-      phone,
-      email,
-      role,
-      userName,
-      password,
-    });
-  };
-  const fetchData = async () => {
-    const { data } = await userService.getAllRolesForAccount();
-    setRoles(data);
-    if (id) {
-      fetchDataDetail();
+    setLoadingFetchData(true);
+    // @ts-ignore
+    const { payload, error } = await dispatch(getUser(id));
+    if (error) {
+      setNotification({
+        error: 'Lỗi!',
+      });
+      setLoadingFetchData(false);
+      return;
     }
-    setLoading(false);
+
+    reset(payload.user);
+    setLoadingFetchData(false);
+  };
+
+  const fetchData = async () => {
+    try {
+      const { data } = await userService.getAllRoles();
+      setRoles(data);
+      if (id) {
+        fetchDataDetail();
+      } else {
+        setLoadingFetchData(false);
+      }
+    } catch (error) {
+      setNotification({ error: 'Lỗi khi tải danh sách vai trò!' });
+    }
   };
 
   useEffect(() => {
@@ -150,7 +160,7 @@ const Create = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
+  if (loadingFetchData) {
     return <LoadingScreen />;
   }
 
@@ -204,16 +214,15 @@ const Create = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Vai trò" required name="role" />
-                <EntityMultipleSelecter
-                  name="role"
+                <EntitySelecter
+                  name="roleId"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
                   options={roles}
-                  renderValue="id"
-                  renderLabel={(field) => field.name}
+                  renderLabel={(field) => field.roleName}
+                  renderValue="roleId"
                   noOptionsText="Không tìm thấy vai trò"
                   placeholder=""
-                  defaultValue={getValues('role')}
                 />
               </Grid>
 
@@ -224,18 +233,19 @@ const Create = () => {
                 <FormLabel required title="Tên đăng nhập" name="userName" />
                 <ControllerTextField
                   name="userName"
-                  helperText={
-                    <>
-                      1. HK PRODUCT_Admin
-                      <br />
-                      2. HK CARE_Admin
-                      <br />
-                      3. HK TRADING_Admin
-                    </>
-                  }
                   control={control}
-                  disabled={!isUpdate && Boolean(id)}
+                  disabled={Boolean(id)}
                 />
+                <p
+                  style={{ fontSize: '0.75rem', marginLeft: '14px' }}
+                  className="MuiFormHelperText-root MuiFormHelperText-sizeSmall MuiFormHelperText-contained "
+                >
+                  1. HK_PRODUCT_Admin
+                  <br />
+                  2. HK_CARE_Admin
+                  <br />
+                  3. HK_TRADING_Admin
+                </p>
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel title="Mật khẩu" required name="password" />
@@ -243,6 +253,14 @@ const Create = () => {
                   name="password"
                   control={control}
                   disabled={!isUpdate && Boolean(id)}
+                  helperText={
+                    <>
+                      Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường, một
+                      chữ số và một ký tự đặc biệt
+                      <br />
+                      Ví dụ: abcXYZ123@
+                    </>
+                  }
                 />
               </Grid>
             </Grid>

@@ -63,11 +63,11 @@ const DashboardNavbar: FC<Props> = (props) => {
         <Box sx={{ flexGrow: 1 }} />
         <Hidden lgDown>
           <Stack direction="row" spacing={0.5}>
-            <LinkIconButton to="/user/profile">
+            {/* <LinkIconButton to="/user/profile">
               <IconButton>
                 <PersonIcon />
               </IconButton>
-            </LinkIconButton>
+            </LinkIconButton> */}
             <IconButton onClick={handleOpenLogoutDialog}>
               <LogoutIcon sx={{ mr: 1 }} />
               <Typography color="text.secondary">Đăng xuất</Typography>

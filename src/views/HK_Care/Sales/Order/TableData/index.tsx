@@ -42,10 +42,10 @@ const getCells = (): Cells<ISalesOrder> => [
     id: 'saleDate',
     label: 'Ngày bán',
   },
-  {
-    id: 'customer',
-    label: 'Khách hàng',
-  },
+  // {
+  //   id: 'customer',
+  //   label: 'Khách hàng',
+  // },
   {
     id: 'type',
     label: 'Loại hóa đơn',
@@ -191,7 +191,7 @@ const TableData = () => {
                       </TableCell>
                       <TableCell>{code}</TableCell>
                       <TableCell>{formatDateTime(saleDate)}</TableCell>
-                      <TableCell>{customerName}</TableCell>
+                      {/* <TableCell>{customerName}</TableCell> */}
                       <TableCell>{orderType}</TableCell>
                       <TableCell>{userName}</TableCell>
                       <TableCell>{numberFormat(totalMoney)}</TableCell>

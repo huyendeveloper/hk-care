@@ -1,5 +1,5 @@
 export const numberFormat = (value: number): string => {
-  const formatedValue = (Math.abs(Math.floor(value)) || 0).toLocaleString(
+  const formatedValue = (Math.abs(Math.round(value)) || 0).toLocaleString(
     'en-EN'
   );
 

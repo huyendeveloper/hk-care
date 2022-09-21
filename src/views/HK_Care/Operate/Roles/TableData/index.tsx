@@ -6,6 +6,7 @@ import {
   TableBody,
   TableContainer,
 } from '@mui/material';
+import { Box } from '@mui/system';
 import { Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import { TableContent, TableWrapper } from 'components/Table';
@@ -15,7 +16,6 @@ import { IRole } from 'interface';
 import { useEffect, useMemo, useState } from 'react';
 import userService from 'services/user.service';
 import { FilterParams } from 'types';
-import { isJSDocReturnTag } from 'typescript';
 import Role from './Role';
 
 const getCells = (): Cells<IRole> => [
@@ -25,19 +25,19 @@ const getCells = (): Cells<IRole> => [
   },
   {
     id: 'qlsp',
-    label: 'QLSP',
+    label: 'Quản lý sản phẩm',
   },
   {
     id: 'qlkh',
-    label: 'QLKH',
+    label: 'Quản lý kho',
   },
   {
     id: 'qlbh',
-    label: 'QLBH',
+    label: 'Quản lý bán hàng',
   },
   {
     id: 'qlvh',
-    label: 'QLVH',
+    label: 'Quản lý vận hành',
   },
   {
     id: 'qlvh',
@@ -59,7 +59,6 @@ const TableData = () => {
   const [permission, setPermission] = useState<IPermission[]>([]);
   const [currentID, setCurrentID] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [showBackdropDelete, setShowBackdropDelete] = useState<boolean>(false);
 
   const cells = useMemo(() => getCells(), []);
 
@@ -88,7 +87,7 @@ const TableData = () => {
     };
 
     // @ts-ignore
-    const { data } = await userService.changeSalePointPermission(newRole);
+    await userService.changeSalePointPermission(newRole);
     fetchData();
     setShowBackdrop(false);
     window.location.reload();
@@ -100,7 +99,7 @@ const TableData = () => {
       setPermission(data);
       const res = await userService.getPermissionDefault();
 
-      const roleList = res?.data
+      const roleList = res.data
         ? // @ts-ignore
           res.data.map((item) => {
             return {
@@ -153,7 +152,7 @@ const TableData = () => {
   const handleAddItem = () => {
     const newRoles: IRole = {
       roleName: '',
-      roleKey: undefined,
+      roleId: undefined,
       qlsp: false,
       qlkh: false,
       qlbh: false,
@@ -209,11 +208,20 @@ const TableData = () => {
       <DeleteDialog
         id={currentID}
         tableName="vai trò"
-        name={roles.find((x) => x.roleKey === currentID)?.roleName}
+        name={roles.find((x) => x.idRole === currentID)?.roleName}
         onClose={handleCloseDeleteDialog}
         open={openDeleteDialog}
         handleDelete={handleDelete}
-        loading={showBackdropDelete}
+        loading={false}
+        forwardContent={
+          <Box sx={{ textAlign: 'left', mb: 2 }}>
+            Khi bạn xóa vai trò{' '}
+            <b>{roles.find((x) => x.idRole === currentID)?.roleName}</b>, User
+            được gắn với vai trò này sẽ mất quyền sử dụng trên hệ thống như một{' '}
+            <b>{roles.find((x) => x.idRole === currentID)?.roleName}</b>.
+          </Box>
+        }
+        textAlign="left"
       />
 
       <Backdrop
