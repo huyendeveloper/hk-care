@@ -18,6 +18,7 @@ import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IRevenueReport, IRevenueReportStaff, IStaff } from 'interface';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -164,6 +165,16 @@ const TableData = () => {
   };
 
   const handleReport = () => {
+    const errorDate = moment(filters.lastDate).isBefore(
+      moment(filters.startDate)
+    );
+    if (errorDate) {
+      setNotification({
+        error:
+          'Ngày kết thúc phải sau hoặc từ ngày bắt đầu. Vui lòng nhập lại!',
+      });
+      return;
+    }
     setLoading(true);
     setStaffId(staffChoosed);
     setReported(true);

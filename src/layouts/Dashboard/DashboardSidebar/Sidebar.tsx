@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from 'redux/store';
@@ -227,9 +227,11 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
         )
       : items;
 
+  const start = isFirst;
+
   return (
     <List disablePadding>
-      {itemsFiltered.reduce((acc: JSX.Element[], item) => {
+      {itemsFiltered.reduce((acc: JSX.Element[], item, currentIndex) => {
         const { children, icon, info, path, title } = item;
         const key = `${title}-${depth}`;
         const partialMatch = pathname.startsWith(String(path));
@@ -239,6 +241,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
             const { roles } = item;
             return !roles || (roles && roles.some((r) => roleUser.includes(r)));
           });
+
           acc.push(
             <SidebarItem
               key={key}
@@ -247,7 +250,7 @@ const renderNavSectionItems = (props: NavItemsProps): JSX.Element => {
               path={path}
               title={title}
               depth={depth}
-              open={partialMatch || isFirst}
+              open={partialMatch || (start && currentIndex === 0)}
               active={partialMatch}
             >
               {renderNavSectionItems({

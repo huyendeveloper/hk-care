@@ -46,7 +46,7 @@ const getCells = (): Cells<ISupplier> => [
   { id: 'name', label: 'Tên nhà cung cấp' },
   { id: 'address', label: 'Địa chỉ' },
   { id: 'nameContact', label: 'Người liên hệ' },
-  { id: 'telephoneNumber', label: 'Điện thoại' },
+  { id: 'telephoneNumber', label: 'Di động' },
   { id: 'active', label: 'Trạng thái' },
   { id: 'active', label: 'Thao tác' },
 ];
@@ -289,7 +289,7 @@ const TableData = () => {
                     name,
                     address,
                     nameContact,
-                    telephoneNumber,
+                    mobileNumber,
                     active,
                   } = item;
 
@@ -299,7 +299,7 @@ const TableData = () => {
                         {(filters.pageIndex - 1) * filters.pageSize + index + 1}
                       </TableCell>
                       <TableCell>{name}</TableCell>
-                      <Tooltip title={address} placement="bottom">
+                      <Tooltip title={address || ''} placement="bottom">
                         <TableCell
                           sx={{
                             maxWidth: '240px',
@@ -313,7 +313,7 @@ const TableData = () => {
                       </Tooltip>
 
                       <TableCell>{nameContact}</TableCell>
-                      <TableCell>{telephoneNumber}</TableCell>
+                      <TableCell>{mobileNumber}</TableCell>
                       <TableCell>
                         {active === 1 ? (
                           <Button>Hoạt động</Button>

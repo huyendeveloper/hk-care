@@ -87,13 +87,15 @@ const validationSchema = yup.object().shape({
   password: yup
     .string()
     .required('Vui lòng nhập mật khẩu.')
-    .min(8, 'Mật khẩu ít nhất 8 ký tự.')
+    .min(8, 'Mật khẩu từ 8-20 ký tự.')
+    .max(20, 'Mật khẩu từ 8-20 ký tự.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
     .default(
-      randexp(
-        /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-      )
+      'HkCare@123'
+      // randexp(
+      //   /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+      // )
     ),
 });
 
@@ -342,8 +344,8 @@ const Create = () => {
                   disabled={!isUpdate && Boolean(id)}
                   helperText={
                     <>
-                      Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường, một
-                      chữ số và một ký tự đặc biệt
+                      Mật khẩu từ 8-20 ký tự bao gồm ít nhất một chữ in hoa, một
+                      chữ thường, một chữ số và một ký tự đặc biệt
                       <br />
                       Ví dụ: abcXYZ123@
                     </>

@@ -64,6 +64,8 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập mật khẩu.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
+    .min(8, 'Mật khẩu từ 8-20 ký tự.')
+    .max(20, 'Mật khẩu từ 8-20 ký tự.')
     // .default(randomPassword(8, 15, true, true, true, true).toString()),
     .default('HkCare@123'),
 });
@@ -255,8 +257,8 @@ const Create = () => {
                   disabled={!isUpdate && Boolean(id)}
                   helperText={
                     <>
-                      Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường, một
-                      chữ số và một ký tự đặc biệt
+                      Mật khẩu từ 8-20 ký tự bao gồm ít nhất một chữ in hoa, một
+                      chữ thường, một chữ số và một ký tự đặc biệt
                       <br />
                       Ví dụ: abcXYZ123@
                     </>

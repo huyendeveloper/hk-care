@@ -2,6 +2,7 @@ import axiosClient from 'api';
 import { baseURL } from 'config';
 import { IInventoryRecord } from 'interface';
 import { FilterParams } from 'types/common';
+import DateFns from 'utils/DateFns';
 
 interface IDetailAdd {
   idProduct: number | null;
@@ -53,8 +54,13 @@ class WhInventoryService {
         Keyword: searchText,
         SkipCount: (pageIndex - 1) * pageSize,
         MaxResultCount: pageSize,
-        From: startDate,
-        To: lastDate,
+        // From: startDate,
+        // To: lastDate,
+
+        From: startDate
+          ? DateFns.format(startDate, 'yyyy-MM-dd') + ' 00:00'
+          : '',
+        To: lastDate ? DateFns.format(lastDate, 'yyyy-MM-dd') + ' 23:59' : '',
       },
     });
   }

@@ -43,7 +43,7 @@ export interface IMeasure {
 export interface ISupplier {
   id: number;
   name: string;
-  address: string;
+  address: string | null;
   nameContact: string;
   telephoneNumber: string;
   mobileNumber: string;

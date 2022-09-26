@@ -10,7 +10,7 @@ import {
   FormGroup,
   FormHeader,
   FormLabel,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import { connectURL } from 'config';
 import { typeStringNumber } from 'constants/typeInput';
@@ -51,16 +51,36 @@ const validationSchema = yup.object().shape({
     .max(150, 'Tên nhà cung cấp không quá 150 ký tự.')
     .strict(true)
     .default(''),
-  telephoneNumber: yup
+  nameContact: yup
     .string()
-    .required('Vui lòng nhập số điện thoại.')
+    .required('Vui lòng nhập tên người liên hệ.')
     // @ts-ignore
-    .trimCustom('Vui lòng nhập số điện thoại.')
-    .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
-    .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
+    .trimCustom('Vui lòng nhập tên người liên hệ.')
     .strict(true)
     .default(''),
-  address: yup.string().max(150, 'Địa chỉ không quá 150 ký tự.').default(''),
+  // telephoneNumber: yup
+  //   .string()
+  //   // .required('Vui lòng nhập số điện thoại.')
+  //   // @ts-ignore
+  //   // .trimCustom('Vui lòng nhập số điện thoại.')
+  //   .min(9, 'Số điện thoại từ 9 đến 20 ký tự.')
+  //   .max(20, 'Số điện thoại từ 9 đến 20 ký tự.')
+  //   .strict(true)
+  //   .default(''),
+  mobileNumber: yup
+    .string()
+    .required('Vui lòng nhập số di động.')
+    // @ts-ignore
+    .trimCustom('Vui lòng nhập số di động.')
+    .min(9, 'Số di động từ 9 đến 20 ký tự.')
+    .max(20, 'Số di động từ 9 đến 20 ký tự.')
+    .strict(true)
+    .default(''),
+  address: yup
+    .string()
+    .max(150, 'Địa chỉ không quá 150 ký tự.')
+    .nullable()
+    .default(''),
 });
 
 const FormDialogSupplier = ({
@@ -204,7 +224,11 @@ const FormDialogSupplier = ({
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Người liên hệ" name="nameContact" />
+                  <FormLabel
+                    title="Người liên hệ"
+                    required
+                    name="nameContact"
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <ControllerTextField name="nameContact" control={control} />
@@ -220,17 +244,23 @@ const FormDialogSupplier = ({
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
-                  <FormLabel title="Di động" name="mobileNumber" />
+                  <FormLabel title="Di động" required name="mobileNumber" />
                 </Grid>
                 <Grid item xs={12}>
-                  <ControllerTextField name="mobileNumber" control={control} />
+                  <ControllerTextField
+                    inputProps={typeStringNumber((value) =>
+                      setValue('mobileNumber', value)
+                    )}
+                    name="mobileNumber"
+                    control={control}
+                  />
                 </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <Grid item xs={12}>
                   <FormLabel
-                    required
+                    // required
                     title="Điện thoại"
                     name="telephoneNumber"
                   />

@@ -64,6 +64,12 @@ const validationSchema = yup.object().shape({
           if (!dateManufacture || !expiryDate) {
             return true;
           }
+          if (
+            moment(dateManufacture).format('DD/MM/YYYY') ===
+            moment().format('DD/MM/YYYY')
+          ) {
+            return true;
+          }
           if (moment(expiryDate).isBefore(moment(dateManufacture))) {
             return false;
           }
@@ -79,6 +85,12 @@ const validationSchema = yup.object().shape({
           const expiryDate = item;
           if (!item) return true;
           if (!dateManufacture || !expiryDate) {
+            return true;
+          }
+          if (
+            moment(expiryDate).format('DD/MM/YYYY') ===
+            moment().format('DD/MM/YYYY')
+          ) {
             return true;
           }
           if (moment(expiryDate).isBefore(moment(dateManufacture))) {
