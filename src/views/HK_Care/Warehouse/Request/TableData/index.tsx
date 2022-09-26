@@ -22,6 +22,7 @@ import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
 import { IRequestImport } from 'interface';
+import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getAllExpected } from 'redux/slices/expected';
@@ -110,6 +111,14 @@ const TableData = () => {
   };
 
   const handleSelectTime = (time: ISelectTime) => {
+    const errorDate = moment(time.lastDate).isBefore(moment(time.startDate));
+    if (errorDate) {
+      setNotification({
+        error:
+          'Ngày kết thúc phải sau hoặc từ ngày bắt đầu. Vui lòng nhập lại!',
+      });
+      return;
+    }
     setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
   };
 

@@ -41,9 +41,20 @@ const Role = ({
 }: IProps) => {
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
+  // const handleChangeName = (e: any) => {
+  //   const value = e.target.value;
+  //   setRoleDetail({ ...roleDetail, roleName: value });
+  // };
+
   const handleChangeName = (e: any) => {
-    const value = e.target.value;
-    setRoleDetail({ ...roleDetail, roleName: value });
+    // const value = e.target.value;
+    const value = e.target.value.replace(/[^a-zA-Z0-9 -_]/g, '');
+
+    e.target.value = value;
+
+    if (value) {
+      setRoleDetail({ ...roleDetail, roleName: value });
+    }
   };
 
   const handleChange = (e: any) => {
@@ -52,7 +63,7 @@ const Role = ({
   };
 
   const handleSave = async () => {
-    if (roleDetail.roleName === '') {
+    if (roleDetail.roleName === '' || roleDetail.roleName.length === 1) {
       return;
     }
 

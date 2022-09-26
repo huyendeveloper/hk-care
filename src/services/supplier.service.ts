@@ -31,7 +31,7 @@ class SupplierService {
     params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
-    params.append('telephoneNumber', payload.telephoneNumber);
+    params.append('telephoneNumber', payload.telephoneNumber || '');
     payload.mobileNumber && params.append('mobileNumber', payload.mobileNumber);
     payload.fax && params.append('fax', payload.fax);
     payload.taxCode && params.append('taxCode', payload.taxCode);
@@ -62,7 +62,7 @@ class SupplierService {
     params.append('name', payload.name.trim());
     payload.address && params.append('address', payload.address);
     payload.nameContact && params.append('nameContact', payload.nameContact);
-    params.append('telephoneNumber', payload.telephoneNumber);
+    params.append('telephoneNumber', payload.telephoneNumber || '');
     payload.mobileNumber && params.append('mobileNumber', payload.mobileNumber);
     payload.fax && params.append('fax', payload.fax);
     payload.taxCode && params.append('taxCode', payload.taxCode);

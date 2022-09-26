@@ -23,7 +23,7 @@ const Details = ({ control, files }: IProps) => {
             <ControllerTextField disabled name="name" control={control} />
           </Grid>
           <Grid item xs={6}>
-            <FormLabel title="Người liên hệ" name="nameContact" />
+            <FormLabel title="Người liên hệ" required name="nameContact" />
             <ControllerTextField
               disabled
               name="nameContact"
@@ -35,7 +35,7 @@ const Details = ({ control, files }: IProps) => {
             <ControllerTextField disabled name="address" control={control} />
           </Grid>
           <Grid item xs={6}>
-            <FormLabel title="Di động" name="mobileNumber" />
+            <FormLabel title="Di động" required name="mobileNumber" />
             <ControllerTextField
               disabled
               name="mobileNumber"
@@ -43,7 +43,7 @@ const Details = ({ control, files }: IProps) => {
             />
           </Grid>{' '}
           <Grid item xs={6}>
-            <FormLabel required title="Điện thoại" name="telephoneNumber" />
+            <FormLabel title="Điện thoại" name="telephoneNumber" />
             <ControllerTextField
               disabled
               name="telephoneNumber"

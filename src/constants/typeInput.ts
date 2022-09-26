@@ -39,7 +39,7 @@ export const typeStringNumber = (setValue: (value: string) => void) => {
       // @ts-ignore
       if (!e.target.validity.valid) {
         // @ts-ignore
-        setValue(e.target.value.slice(0, -1));
+        setValue(e.target.value.replace(/[^0-9]/g, ''));
       }
     },
   };

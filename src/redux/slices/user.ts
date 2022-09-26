@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IUser } from 'interface';
-import userService from 'services/user.service';
+import userService, { IRoleSalePoint } from 'services/user.service';
 import { FilterParams } from 'types';
 
 interface IInitialState {}
@@ -48,6 +48,17 @@ export const updateUser = createAsyncThunk(
     try {
       const { data } = await userService.update(payload);
       return { id: data.id };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const changeSalePointPermission = createAsyncThunk(
+  'user/changeSalePointPermission',
+  async (payload: IRoleSalePoint, { rejectWithValue }) => {
+    try {
+      const { data } = await userService.changeSalePointPermission(payload);
     } catch (error) {
       return rejectWithValue(error);
     }

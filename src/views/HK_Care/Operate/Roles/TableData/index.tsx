@@ -99,9 +99,9 @@ const TableData = () => {
       setPermission(data);
       const res = await userService.getPermissionDefault();
 
-      const roleList = res.data
+      const roleList = res?.data
         ? // @ts-ignore
-          res.data.map((item) => {
+          res?.data.map((item) => {
             return {
               idRole: item.roleId,
               roleName: item.roleName,
@@ -109,22 +109,22 @@ const TableData = () => {
                 item.grantPermissionDtos.find(
                   // @ts-ignore
                   (x) => x?.permissionName === data[0].permissionName
-                ).isGrant || false,
+                )?.isGrant || false,
               qlkh:
                 item.grantPermissionDtos.find(
                   // @ts-ignore
                   (x) => x?.permissionName === data[1].permissionName
-                ).isGrant || false,
+                )?.isGrant || false,
               qlbh:
                 item.grantPermissionDtos.find(
                   // @ts-ignore
                   (x) => x?.permissionName === data[2].permissionName
-                ).isGrant || false,
+                )?.isGrant || false,
               qlvh:
                 item.grantPermissionDtos.find(
                   // @ts-ignore
                   (x) => x?.permissionName === data[3].permissionName
-                ).isGrant || false,
+                )?.isGrant || false,
             };
           })
         : [];

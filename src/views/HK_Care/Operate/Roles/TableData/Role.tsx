@@ -12,7 +12,9 @@ import { Box } from '@mui/system';
 import { useNotification } from 'hooks';
 import { IRole } from 'interface';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useDebounce } from 'react-use';
+import { changeSalePointPermission } from 'redux/slices/user';
 import userService, { IRoleSalePoint } from 'services/user.service';
 
 interface IPermission {
@@ -40,11 +42,16 @@ const Role = ({
   permission,
   setShowBackdrop,
 }: IProps) => {
+  const dispatch = useDispatch();
   const setNotification = useNotification();
   const [roleDetail, setRoleDetail] = useState<IRole>(role);
 
   const handleChangeName = (e: any) => {
-    const value = e.target.value;
+    // const value = e.target.value;
+    const value = e.target.value.replace(/[^a-zA-Z0-9 -_]/g, '');
+
+    e.target.value = value;
+
     if (value) {
       setRoleDetail({ ...roleDetail, roleName: value });
     }
@@ -56,7 +63,7 @@ const Role = ({
   };
 
   const handleSave = async () => {
-    if (roleDetail.roleName === '') {
+    if (roleDetail.roleName === '' || roleDetail.roleName.length === 1) {
       return;
     }
 
@@ -85,16 +92,29 @@ const Role = ({
       };
       setShowBackdrop(true);
 
-      try {
-        const { data } = await userService.changeSalePointPermission(newRole);
-        if (data) {
-          setShowBackdrop(false);
-          window.location.reload();
-        }
-      } catch (error) {
-        setNotification({ error: 'Lỗi!' });
+      // try {
+      //   const { data } = await userService.changeSalePointPermission(newRole);
+      //   if (data) {
+      //     setShowBackdrop(false);
+      //     window.location.reload();
+      //   }
+      //   console.log(data)
+      // } catch (error) {
+      //   setNotification({ error: 'Lỗi!' });
+      //   setShowBackdrop(false);
+      // }
+
+      const { payload, error } = await dispatch(
+        // @ts-ignore
+        changeSalePointPermission(newRole)
+      );
+      if (error) {
+        setNotification({ error: payload.response.data || 'Lỗi!' });
         setShowBackdrop(false);
+        return;
       }
+      setShowBackdrop(false);
+      window.location.reload();
     }
   };
 
@@ -129,7 +149,7 @@ const Role = ({
     <TableRow hover tabIndex={-1} key={index}>
       <TableCell>
         {index === 1 ? (
-          <Box pl="14px">Admin quản lý điểm bán</Box>
+          <Box pl="14px">Admin quan ly diem ban</Box>
         ) : (
           <TextareaAutosize
             defaultValue={role.roleName}

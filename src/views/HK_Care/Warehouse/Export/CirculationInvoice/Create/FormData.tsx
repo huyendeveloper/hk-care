@@ -96,6 +96,7 @@ const FormData = ({ defaultValue }: IProps) => {
   const [loadingTenant, setLoadingTenant] = useState<boolean>(true);
   const [filters, setFilters] = useState<FilterParams>(defaultFilters);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
 
   const handleChangePage = (pageIndex: number) => {
     setFilters((state) => ({
@@ -182,6 +183,7 @@ const FormData = ({ defaultValue }: IProps) => {
         ) || 0,
       exportType: 3,
     };
+    setLoadingAdd(true);
     if (id || exportWHId) {
       const { error, payload } = await dispatch(
         // @ts-ignore
@@ -189,6 +191,7 @@ const FormData = ({ defaultValue }: IProps) => {
       );
       if (error) {
         setNotification({ error: payload.response.data || 'Lỗi!' });
+        setLoadingAdd(false);
         return;
       }
       setNotification({
@@ -203,6 +206,7 @@ const FormData = ({ defaultValue }: IProps) => {
     );
     if (error) {
       setNotification({ error: payload.response.data || 'Lỗi!' });
+      setLoadingAdd(false);
       return;
     }
     setNotification({
@@ -368,7 +372,7 @@ const FormData = ({ defaultValue }: IProps) => {
                 Hủy
               </LinkButton>
 
-              <LoadingButton type="submit">
+              <LoadingButton type="submit" loading={loadingAdd}>
                 {id ? 'Lưu' : 'Xuất hàng'}
               </LoadingButton>
             </FormFooter>

@@ -93,12 +93,15 @@ const validationSchema = yup.object().shape({
   adminPassword: yup
     .string()
     .required('Vui lòng nhập mật khẩu.')
+    .min(8, 'Mật khẩu từ 8-20 ký tự.')
+    .max(20, 'Mật khẩu từ 8-20 ký tự.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập mật khẩu.')
     .default(
-      randexp(
-        /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-      )
+      'HkCare@123'
+      // randexp(
+      //   /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+      // )
     ),
 });
 
@@ -240,9 +243,10 @@ const FormDialog = ({
       setloadding(false);
       reset({
         isActived: true,
-        adminPassword: randexp(
-          /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
-        ),
+        adminPassword: 'HkCare@123',
+        // randexp(
+        //   /^(Hk)@(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/
+        // ),
       });
       setFiles([]);
     }
@@ -425,8 +429,8 @@ const FormDialog = ({
                     disabled={disabled}
                     helperText={
                       <>
-                        Mật khẩu chứa ít nhất một chữ in hoa, một chữ thường,
-                        một chữ số và một ký tự đặc biệt
+                        Mật khẩu từ 8-20 ký tự bao gồm ít nhất một chữ in hoa,
+                        một chữ thường, một chữ số và một ký tự đặc biệt
                         <br />
                         Ví dụ: abcXYZ123@
                       </>

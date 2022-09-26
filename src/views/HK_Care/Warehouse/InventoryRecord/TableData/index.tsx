@@ -35,6 +35,7 @@ import whInventoryService from 'services/whInventory.service';
 import { baseURL, connectURL } from 'config';
 import '../index.css';
 import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
+import moment from 'moment';
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -203,6 +204,14 @@ const TableData = () => {
   };
 
   const handleSelectTime = (time: ISelectTime) => {
+    const errorDate = moment(time.lastDate).isBefore(moment(time.startDate));
+    if (errorDate) {
+      setNotification({
+        error:
+          'Ngày kết thúc phải sau hoặc từ ngày bắt đầu. Vui lòng nhập lại!',
+      });
+      return;
+    }
     setFilters((prev) => ({ ...prev, ...time, pageIndex: 1 }));
   };
 
