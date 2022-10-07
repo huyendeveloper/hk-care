@@ -28,7 +28,7 @@ class TreatmentGroupService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/treatment-group/${id}`);
+    return axiosClient.delete(`${baseURL}/treatmentgroup/Delete/${id}`);
   }
 }
 

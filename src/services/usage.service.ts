@@ -28,7 +28,7 @@ class UsageService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/usage/${id}`);
+    return axiosClient.delete(`${baseURL}/usage/Delete/${id}`);
   }
 }
 

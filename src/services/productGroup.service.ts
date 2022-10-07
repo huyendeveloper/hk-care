@@ -28,7 +28,7 @@ class ProductGroupService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/product-group/${id}`);
+    return axiosClient.delete(`${baseURL}/productgroup/Delete/${id}`);
   }
 }
 

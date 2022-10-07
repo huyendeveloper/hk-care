@@ -256,7 +256,7 @@ const TableData = () => {
                         {isActive ? (
                           <Button>Hoạt động</Button>
                         ) : (
-                          <Button color="error">Không hoạt động</Button>
+                          <Button color="error">Dừng hoạt động</Button>
                         )}
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>

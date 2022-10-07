@@ -137,9 +137,9 @@ const TableData = () => {
     if (!currentID) return;
     handleCloseDeleteDialog();
     // @ts-ignore
-    const { error } = await dispatch(deleteProductGroup(currentID));
+    const { error, payload } = await dispatch(deleteProductGroup(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: payload.response.data || 'Lỗi!' });
       setShowBackdrop(false);
       return;
     }

@@ -260,7 +260,7 @@ const TableData = () => {
                         {isActived === TableActive.Active ? (
                           <Button>Hoạt động</Button>
                         ) : (
-                          <Button color="error">Dừng Hoạt động</Button>
+                          <Button color="error">Dừng hoạt động</Button>
                         )}
                       </TableCell>
                       <TableCell align="left">{renderAction(item)}</TableCell>

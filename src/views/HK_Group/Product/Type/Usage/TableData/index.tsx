@@ -134,9 +134,9 @@ const TableData = () => {
     if (!currentID) return;
     handleCloseDeleteDialog();
     // @ts-ignore
-    const { error } = await dispatch(deleteUsage(currentID));
+    const { error, payload } = await dispatch(deleteUsage(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: payload.response.data || 'Lỗi!' });
       setShowBackdrop(false);
       return;
     }

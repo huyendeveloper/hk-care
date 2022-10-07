@@ -247,9 +247,9 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
             <IconButton onClick={handleOpenUnBlockDialog(row.id)}>
               <CheckIcon />
             </IconButton>
-            <IconButton onClick={handleOpenDeleteDialog(row.id)}>
+            {/* <IconButton onClick={handleOpenDeleteDialog(row.id)}>
               <DeleteIcon />
-            </IconButton>
+            </IconButton> */}
           </>
         ) : (
           <IconButton onClick={handleOpenBlockDialog(row.id)}>

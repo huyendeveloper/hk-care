@@ -61,11 +61,11 @@ const validationSchema = yup.object().shape({
     .string()
     .required('Vui lòng nhập tên điểm bán.')
     .max(150, 'Tên điểm bán không quá 150 ký tự.')
-    .matches(
-      // eslint-disable-next-line no-useless-escape
-      /^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
-      'Điểm bán không đúng định dạng.'
-    )
+    // .matches(
+    //   // eslint-disable-next-line no-useless-escape
+    //   /^(HK)[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s_,.\-]+$/,
+    //   'Điểm bán không đúng định dạng.'
+    // )
     .strict(true)
     .default('John Doe'),
   hotline: yup
@@ -172,7 +172,7 @@ const FormDialog = ({
     const { payload, error } = await dispatch(updateSalePoint(tenant));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: payload.response.data || 'Lỗi!',
       });
       setloadding(false);
       return;

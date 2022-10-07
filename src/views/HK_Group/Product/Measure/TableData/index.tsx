@@ -134,9 +134,9 @@ const TableData = () => {
     handleCloseDeleteDialog();
     setShowBackdrop(true);
     // @ts-ignore
-    const { error } = await dispatch(deleteMeasure(currentID));
+    const { payload, error } = await dispatch(deleteMeasure(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: payload.response.data || 'Lỗi!' });
       setShowBackdrop(false);
       return;
     }

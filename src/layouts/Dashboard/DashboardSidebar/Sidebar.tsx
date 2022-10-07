@@ -88,6 +88,28 @@ const getSections = (): SectionItem[] => [
           },
         ],
       },
+      {
+        title: 'HK_Trading',
+        path: '/404',
+        roles: ['hkl4'],
+        children: [
+          {
+            title: 'Tổng hợp yêu cầu nhập',
+            path: '/hk_trading/request',
+            roles: ['hkl4'],
+          },
+          // {
+          //   title: 'Kế hoạch nhập kho',
+          //   path: '/404',
+          //   roles: ['hkl4'],
+          // },
+          // {
+          //   title: 'Kế hoạch phân phối',
+          //   path: '/404',
+          //   roles: ['hkl4'],
+          // },
+        ],
+      },
     ],
   },
   {
@@ -184,27 +206,6 @@ const getSections = (): SectionItem[] => [
           },
         ],
       },
-    ],
-  },
-  {
-    title: 'HK_Trading',
-    roles: ['hkl4'],
-    children: [
-      {
-        title: 'Tổng hợp yêu cầu nhập',
-        path: '/hk_trading/request',
-        roles: ['hkl4'],
-      },
-      // {
-      //   title: 'Kế hoạch nhập kho',
-      //   path: '/404',
-      //   roles: ['hkl4'],
-      // },
-      // {
-      //   title: 'Kế hoạch phân phối',
-      //   path: '/404',
-      //   roles: ['hkl4'],
-      // },
     ],
   },
 ];

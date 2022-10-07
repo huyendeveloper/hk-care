@@ -7,11 +7,13 @@ import {
   TableCell,
   TableRow,
   TextareaAutosize,
+  TextField,
+  Tooltip,
 } from '@mui/material';
 import { Box } from '@mui/system';
 import { useNotification } from 'hooks';
 import { IRole } from 'interface';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useDebounce } from 'react-use';
 import { changeSalePointPermission } from 'redux/slices/user';
@@ -52,9 +54,7 @@ const Role = ({
 
     e.target.value = value;
 
-    if (value) {
-      setRoleDetail({ ...roleDetail, roleName: value });
-    }
+    setRoleDetail({ ...roleDetail, roleName: value });
   };
 
   const handleChange = (e: any) => {
@@ -63,6 +63,7 @@ const Role = ({
   };
 
   const handleSave = async () => {
+    console.log('roleDetail', roleDetail);
     if (roleDetail.roleName === '' || roleDetail.roleName.length === 1) {
       return;
     }
@@ -122,7 +123,7 @@ const Role = ({
     () => {
       handleSave();
     },
-    1000,
+    2000,
     [roleDetail]
   );
 
@@ -147,14 +148,26 @@ const Role = ({
 
   return (
     <TableRow hover tabIndex={-1} key={index}>
+      {console.log(
+        'role.roleName.length === 0 :>> ',
+        role.roleName.length === 0
+      )}
       <TableCell>
         {index === 1 ? (
           <Box pl="14px">Admin quan ly diem ban</Box>
         ) : (
-          <TextareaAutosize
-            defaultValue={role.roleName}
-            onChange={handleChangeName}
-          />
+          <Tooltip title={roleDetail.roleName || ''} placement="bottom">
+            <TextField
+              defaultValue={role.roleName}
+              onChange={handleChangeName}
+              error={roleDetail.roleName.length === 0 && Boolean(role.idRole)}
+              helperText={
+                roleDetail.roleName.length === 0 && Boolean(role.idRole)
+                  ? 'Vui lòng nhập tên vai trò'
+                  : ''
+              }
+            />
+          </Tooltip>
         )}
       </TableCell>
       <TableCell>

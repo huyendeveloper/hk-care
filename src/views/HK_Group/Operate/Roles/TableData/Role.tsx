@@ -8,6 +8,8 @@ import {
   TableCell,
   TableRow,
   TextareaAutosize,
+  TextField,
+  Tooltip,
 } from '@mui/material';
 import { IRole } from 'interface';
 import { useState } from 'react';
@@ -52,9 +54,7 @@ const Role = ({
 
     e.target.value = value;
 
-    if (value) {
-      setRoleDetail({ ...roleDetail, roleName: value });
-    }
+    setRoleDetail({ ...roleDetail, roleName: value });
   };
 
   const handleChange = (e: any) => {
@@ -111,11 +111,13 @@ const Role = ({
   const renderAction = () => {
     return (
       <Stack>
-        <IconButton
-          onClick={() => handleOpenDeleteDialog(role?.roleId || null)}
-        >
-          <RemoveCircleIcon />
-        </IconButton>
+        {index !== 1 && (
+          <IconButton
+            onClick={() => handleOpenDeleteDialog(role?.roleId || null)}
+          >
+            <RemoveCircleIcon />
+          </IconButton>
+        )}
         {addItem && (
           <IconButton onClick={handleAddItem}>
             <AddIcon />
@@ -131,10 +133,18 @@ const Role = ({
         {index === 1 ? (
           <Box pl="14px">Admin HKGroup</Box>
         ) : (
-          <TextareaAutosize
-            defaultValue={role.roleName}
-            onChange={handleChangeName}
-          />
+          <Tooltip title={roleDetail.roleName || ''} placement="bottom">
+            <TextField
+              defaultValue={role.roleName}
+              onChange={handleChangeName}
+              error={roleDetail.roleName.length === 0 && Boolean(role.roleId)}
+              helperText={
+                roleDetail.roleName.length === 0 && Boolean(role.roleId)
+                  ? 'Vui lòng nhập tên vai trò'
+                  : ''
+              }
+            />
+          </Tooltip>
         )}
       </TableCell>
       <TableCell>

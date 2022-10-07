@@ -12,6 +12,7 @@ import { createTheme } from 'theme';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { register as registerServiceWorker } from './serviceWorkerRegistration';
 
 import vi from 'date-fns/locale/vi';
 import DateFnsUtils from '@date-io/date-fns';
@@ -36,6 +37,8 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+
+registerServiceWorker();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

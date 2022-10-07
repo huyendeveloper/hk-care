@@ -194,7 +194,7 @@ const CreateForm = () => {
         to: -1,
       });
       if (data.length === 0) {
-        setNotification({ error: 'Không có sản phẩm nào!' });
+        // setNotification({ error: 'Không có sản phẩm nào!' });
         setLoadingExpiredProduct(false);
         return;
       }

@@ -28,7 +28,7 @@ class MeasureService {
   }
 
   delete(id: number | null) {
-    return axiosClient.delete(`${baseURL}/measure/${id}`);
+    return axiosClient.delete(`${baseURL}/measure/Delete/${id}`);
   }
 }
 
