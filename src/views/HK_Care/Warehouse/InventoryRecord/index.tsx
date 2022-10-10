@@ -3,7 +3,7 @@ import TableData from './TableData';
 
 const InventoryRecord = () => {
   return (
-    <PageWrapper title="Biên bản kiểm kê kho">
+    <PageWrapper title="Kiểm kê kho">
       <TableData />
     </PageWrapper>
   );

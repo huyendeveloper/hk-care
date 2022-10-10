@@ -154,7 +154,7 @@ const getSections = (): SectionItem[] => [
             roles: ['hkl2_1_2'],
           },
           {
-            title: 'Biên bản kiểm kê kho',
+            title: 'Kiểm kê kho',
             path: '/hk_care/warehouse/inventory_record',
             roles: ['hkl2_1_2'],
           },

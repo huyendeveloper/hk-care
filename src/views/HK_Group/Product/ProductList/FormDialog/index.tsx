@@ -69,10 +69,30 @@ const validationSchema = yup.object().shape({
     .required('Vui lòng nhập tên sản phẩm.')
     // @ts-ignore
     .trimCustom('Vui lòng nhập tên sản phẩm.'),
-  productGroupId: yupOnlyNumber('Vui lòng chọn nhóm sản phẩm.'),
-  treamentGroupId: yupOnlyNumber('Vui lòng chọn nhóm điều trị.'),
-  usageId: yupOnlyNumber('Vui lòng chọn dạng dùng.'),
-  mesureLevelFisrt: yupOnlyNumber('Vui lòng chọn đơn vị cấp 1.'),
+  productGroupId: yup
+    .number()
+    .required('Vui lòng chọn nhóm sản phẩm.')
+    .typeError('Vui lòng chọn nhóm sản phẩm.')
+    .integer('Vui lòng chọn nhóm sản phẩm.')
+    .min(0, 'Vui lòng chọn nhóm sản phẩm.'),
+  treamentGroupId: yup
+    .number()
+    .required('Vui lòng chọn nhóm điều trị.')
+    .typeError('Vui lòng chọn nhóm điều trị.')
+    .integer('Vui lòng chọn nhóm điều trị.')
+    .min(0, 'Vui lòng chọn nhóm điều trị.'),
+  usageId: yup
+    .number()
+    .required('Vui lòng chọn dạng dùng.')
+    .typeError('Vui lòng chọn dạng dùng.')
+    .integer('Vui lòng chọn dạng dùng.')
+    .min(0, 'Vui lòng chọn dạng dùng.'),
+  mesureLevelFisrt: yup
+    .number()
+    .required('Vui lòng chọn đơn vị cấp 1.')
+    .typeError('Vui lòng chọn đơn vị cấp 1.')
+    .integer('Vui lòng chọn đơn vị cấp 1.')
+    .min(0, 'Vui lòng chọn đơn vị cấp 1.'),
   outOfDate: yupDate,
   dosage: yup
     .string()

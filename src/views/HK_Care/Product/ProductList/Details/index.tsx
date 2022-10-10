@@ -94,6 +94,11 @@ const DetailsForm = () => {
     } = productDetail;
     productImage && setImage(`${connectURL}/${productImage}`);
 
+    setProductGroupList([productGroupO]);
+    setTreatmentGroupList([treamentGroupO]);
+    setUsageList([usageO]);
+    setMeasureList([mesureLevelFisrt, mesureLevelSecond, mesureLevelThird]);
+
     reset({
       name,
       numberRegister,
@@ -142,64 +147,9 @@ const DetailsForm = () => {
     setLoading(false);
   };
 
-  const fetchProductGroupList = () => {
-    productGroupService
-      .getAllProductGroup()
-      .then(({ data }) => {
-        setProductGroupList(data.items);
-      })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
-  const fetchMeasureList = () => {
-    measureService
-      .getAllMeasure()
-      .then(({ data }) => {
-        setMeasureList(data.items);
-      })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
-  const fetchTreatmentGroupList = () => {
-    treatmentGroupService
-      .getAllTreatmentGroup()
-      .then(({ data }) => {
-        setTreatmentGroupList(data.items);
-      })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
-  const fetchUsageList = () => {
-    usageService
-      .getAllUsage()
-      .then(({ data }) => {
-        setUsageList(data.items);
-      })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
-  const fetchSupplierList = () => {
-    supplierService
-      .getAllSupplier()
-      .then(({ data }) => {
-        setSupplierList(data);
-      })
-      .catch((err) => {})
-      .finally(() => {});
-  };
-
   useEffect(() => {
     setLoading(true);
     fetchData();
-    fetchProductGroupList();
-    fetchTreatmentGroupList();
-    fetchUsageList();
-    fetchMeasureList();
-    fetchSupplierList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 

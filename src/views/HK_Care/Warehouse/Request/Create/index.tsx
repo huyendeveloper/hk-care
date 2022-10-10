@@ -298,7 +298,7 @@ const Create = () => {
               </Grid>
             </FormContent>
             <FormFooter>
-              <LinkButton to="/hk_care/warehouse/request">Hủy</LinkButton>
+              <LinkButton to="/hk_care/warehouse/request">Quay lại</LinkButton>
               {!id && (
                 <LoadingButton type="submit" loading={loadingSubmit}>
                   Gửi yêu cầu

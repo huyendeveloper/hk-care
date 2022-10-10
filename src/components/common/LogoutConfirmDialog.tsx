@@ -57,17 +57,18 @@ const LogoutConfirmDialog = (props: Props) => {
       >
         {<Icon sx={{ fontSize: 70, color: 'text.secondary' }} />}
       </Box>
-      {description && (
-        <>
-          {' '}
-          <Divider />
-          <DialogContent>
-            <Typography variant="subtitle2" sx={{ textAlign: 'center' }}>
-              {description}
-            </Typography>
-          </DialogContent>
-        </>
-      )}
+
+      <Divider />
+      <DialogContent>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ textAlign: 'center' }}
+        >
+          Bạn có chắc chắn muốn đăng xuất không?
+        </Typography>
+      </DialogContent>
+
       <Divider />
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 2, py: 2 }}>
         <Stack direction="row" spacing={1}>
