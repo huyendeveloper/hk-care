@@ -65,7 +65,7 @@ const LogoutConfirmDialog = (props: Props) => {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Bạn có chắc chắn muốn đăng xuất không?
+          Bạn có chắc chắn muốn đăng xuất?
         </Typography>
       </DialogContent>
 

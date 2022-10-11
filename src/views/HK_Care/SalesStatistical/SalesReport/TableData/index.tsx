@@ -2,6 +2,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { DatePicker, LoadingButton } from '@mui/lab';
 import {
   Box,
+  Divider,
   Grid,
   Paper,
   Stack,
@@ -243,8 +244,9 @@ const TableData = () => {
         >
           Báo cáo doanh thu
         </Typography>
-        <Stack flexDirection="row" py={2} gap={1}>
-          <Grid item width="800px">
+        <Divider />
+        <Stack flexDirection="row" justifyContent={'flex-end'} py={2} gap={1}>
+          <Grid item xs={5}>
             {/* <Selecter
               options={staffList}
               renderLabel={(field) => field.name}
@@ -294,6 +296,14 @@ const TableData = () => {
               )}
             />
           </Grid>
+          <Grid item xs={1}>
+            <LoadingButton
+              sx={{ height: '40px', width: '100px' }}
+              onClick={handleReport}
+            >
+              Báo cáo
+            </LoadingButton>
+          </Grid>
         </Stack>
         <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
           <LoadingButton
@@ -305,12 +315,6 @@ const TableData = () => {
             loading={open}
           >
             PDF
-          </LoadingButton>
-          <LoadingButton
-            sx={{ height: '40px', width: '100px' }}
-            onClick={handleReport}
-          >
-            Báo cáo
           </LoadingButton>
         </Stack>
       </Box>
