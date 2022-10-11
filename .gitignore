@@ -28,4 +28,4 @@ package-lock.json
 .idea/Transpora-Client.iml
 .idea/vcs.xml
 .idea/inspectionProfiles/Project_Default.xml
-yarn.lock
+# yarn.lock

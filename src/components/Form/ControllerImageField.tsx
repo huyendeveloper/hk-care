@@ -62,6 +62,7 @@ const ControllerImageField = ({
         className="button-select-file"
         style={{ cursor: disabled ? 'default' : 'pointer' }}
         onClick={handleClick}
+        type="button"
       >
         {preview ? (
           <>
