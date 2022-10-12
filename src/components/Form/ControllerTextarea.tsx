@@ -2,7 +2,8 @@ import { TextareaAutosize, TextareaAutosizeProps } from '@mui/material';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-interface Props<T> extends Omit<TextareaAutosizeProps, 'name'> {
+interface Props<T extends FieldValues>
+  extends Omit<TextareaAutosizeProps, 'name'> {
   control: Control<T>;
   name: FieldPath<T>;
 }

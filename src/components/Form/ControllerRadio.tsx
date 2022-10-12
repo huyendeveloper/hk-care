@@ -13,7 +13,8 @@ export interface Option {
   label: string;
 }
 
-interface Props<T> extends Omit<FormControlLabelProps, 'control' | 'label'> {
+interface Props<T extends FieldValues>
+  extends Omit<FormControlLabelProps, 'control' | 'label'> {
   control: Control<T>;
   name: FieldPath<T>;
   options: Option[];

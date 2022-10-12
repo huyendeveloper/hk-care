@@ -74,11 +74,11 @@ const TableSearchField = (props: Props) => {
           <DatePicker
             // @ts-ignore
             value={start}
-            onChange={(newValue) => {
+            onChange={(newValue: Date | null) => {
               setStart && setStart(newValue || null);
             }}
             inputFormat="dd/MM/yyyy"
-            renderInput={(params) => (
+            renderInput={(params: any) => (
               <TextField
                 {...params}
                 inputProps={{
@@ -93,11 +93,11 @@ const TableSearchField = (props: Props) => {
           <DatePicker
             // @ts-ignore
             value={end}
-            onChange={(newValue) => {
+            onChange={(newValue: Date | null) => {
               setEnd && setEnd(newValue || null);
             }}
             inputFormat="dd/MM/yyyy"
-            renderInput={(params) => (
+            renderInput={(params: any) => (
               <TextField
                 {...params}
                 inputProps={{

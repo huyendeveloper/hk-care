@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Scrollbar } from 'components/common';
-import { Selecter } from 'components/Form';
 import { TableContent, TablePagination, TableWrapper } from 'components/Table';
 import { connectURL } from 'config';
 import { defaultFilters } from 'constants/defaultFilters';
@@ -261,11 +260,11 @@ const TableData = () => {
             <DatePicker
               // @ts-ignore
               value={filters.startDate}
-              onChange={(newValue) => {
+              onChange={(newValue: Date | null) => {
                 setFilters({ ...filters, startDate: newValue || null });
               }}
               inputFormat="dd/MM/yyyy"
-              renderInput={(params) => (
+              renderInput={(params: any) => (
                 <TextField
                   {...params}
                   inputProps={{
@@ -281,11 +280,11 @@ const TableData = () => {
             <DatePicker
               // @ts-ignore
               value={filters.lastDate}
-              onChange={(newValue) => {
+              onChange={(newValue: Date | null) => {
                 setFilters({ ...filters, lastDate: newValue || null });
               }}
               inputFormat="dd/MM/yyyy"
-              renderInput={(params) => (
+              renderInput={(params: any) => (
                 <TextField
                   {...params}
                   inputProps={{

@@ -58,7 +58,7 @@ interface IForm {
     productName: string;
     quantity: number;
     price: number;
-    measureId: number;
+    measureId: any;
     measureName: string;
     discount: number;
     mor: string;

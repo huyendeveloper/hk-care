@@ -11,7 +11,7 @@ export interface Label extends FieldValues {
   caption: string | null;
 }
 
-interface Props<T, O extends FieldValues[]>
+interface Props<T extends FieldValues, O extends FieldValues[]>
   extends Omit<TextFieldProps, 'name'> {
   control: Control<T>;
   name: FieldPath<T>;
@@ -54,7 +54,8 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
     disableClearable = false,
     ...rest
   } = props;
-  const labels = options.reduce((acc: Record<number, Label>, option) => {
+
+  const labels = options.reduce<Record<number, Label>>((acc, option) => {
     const id = renderValue ? option[renderValue] : option.id;
     const desc = moreInfor ? option[moreInfor] : '';
     const caption = sublabel ? sublabel(option) : null;
@@ -64,7 +65,7 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
 
   return (
     <Controller
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { value, ...others }, fieldState: { error } }) => (
         <Autocomplete
           id={name}
           disabled={disabled}
@@ -116,9 +117,10 @@ const EntitySelecter = <T extends FieldValues, O extends FieldValues[]>(
               </Box>
             );
           }}
-          {...field}
+          {...others}
+          value={value in labels ? value : null}
           onChange={(_event, value: number | null) => {
-            field.onChange(value);
+            others.onChange(value);
             if (onChangeSelect) {
               onChangeSelect(value);
             }

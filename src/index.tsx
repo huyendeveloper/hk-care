@@ -1,5 +1,5 @@
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ThemeProvider } from '@mui/material/styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -15,7 +15,6 @@ import reportWebVitals from './reportWebVitals';
 import { register as registerServiceWorker } from './serviceWorkerRegistration';
 
 import vi from 'date-fns/locale/vi';
-import DateFnsUtils from '@date-io/date-fns';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -107,7 +107,7 @@ const Login = () => {
       <Grid container sx={{ height: 1 }}>
         <Grid
           item
-          xs={false}
+          xs={0}
           sm={12}
           md={12}
           lg={12}

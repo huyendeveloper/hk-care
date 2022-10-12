@@ -162,7 +162,7 @@ const TableData = ({ active = 1 }: IProps) => {
   return (
     <TableWrapper sx={{ height: 1 }} component={Paper}>
       <TableSearchField
-        title=" "
+        title="Danh sách sản phẩm"
         placeHolder="Tìm kiếm sản phẩm"
         onSearch={handleSearch}
         searchText={filters.searchText}

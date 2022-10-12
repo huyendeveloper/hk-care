@@ -5,7 +5,7 @@ import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 import { UseFormSetValue } from 'react-hook-form';
 import NumberFormat from 'react-number-format';
 
-interface Props<T> extends Omit<TextFieldProps, 'name'> {
+interface Props<T extends FieldValues> extends Omit<TextFieldProps, 'name'> {
   name: FieldPath<T>;
   setValue: UseFormSetValue<T>;
   value?: number | null | undefined;

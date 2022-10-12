@@ -76,6 +76,7 @@ const SearchField = (props: Props) => {
           id="search"
           fullWidth
           placeholder={placeHolder}
+          // @ts-nocheck
           variant="outlined"
           // @ts-ignore
           onChange={handleChange}
@@ -121,6 +122,7 @@ const SearchField = (props: Props) => {
         id="search"
         fullWidth
         placeholder={placeHolder}
+        // @ts-nocheck
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         sx={{

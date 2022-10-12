@@ -6,7 +6,8 @@ import Switch from '@mui/material/Switch';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-interface Props<T> extends Omit<FormControlLabelProps, 'control'> {
+interface Props<T extends FieldValues>
+  extends Omit<FormControlLabelProps, 'control'> {
   control: Control<T>;
   name: FieldPath<T>;
   onChangeSelect?: (value: boolean) => void;

@@ -11,7 +11,7 @@ export interface Label extends FieldValues {
   caption: string | null;
 }
 
-interface Props<T, O extends FieldValues[]>
+interface Props<T extends FieldValues, O extends FieldValues[]>
   extends Omit<TextFieldProps, 'name'> {
   control: Control<T>;
   name: FieldPath<T>;
@@ -54,7 +54,7 @@ const EntityMultipleSelecter = <T extends FieldValues, O extends FieldValues[]>(
 
   return (
     <Controller
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { value, ...others }, fieldState: { error } }) => (
         <Autocomplete
           id={name}
           fullWidth
@@ -78,9 +78,7 @@ const EntityMultipleSelecter = <T extends FieldValues, O extends FieldValues[]>(
               error={Boolean(error)}
               helperText={error?.message && error.message}
               placeholder={
-                Array.isArray(field.value) && field.value.length
-                  ? undefined
-                  : placeholder
+                Array.isArray(value) && value.length ? undefined : placeholder
               }
               {...params}
               {...rest}
@@ -101,9 +99,14 @@ const EntityMultipleSelecter = <T extends FieldValues, O extends FieldValues[]>(
               </Box>
             );
           }}
-          {...field}
+          {...others}
+          value={
+            Array.isArray(value) && value.every((id: number) => id in labels)
+              ? value
+              : []
+          }
           onChange={(_event, value: number[] | null) => {
-            field.onChange(value);
+            others.onChange(value);
             if (onChangeSelect) {
               onChangeSelect(value);
             }

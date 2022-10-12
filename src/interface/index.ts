@@ -151,7 +151,7 @@ export interface IReceipt {
   productReceiptWHDtos?: IProductReceiptWHDtos[];
   discount?: number;
   amount: number;
-  mesureNameLevelFirst?: string;
+  mesureNameLevelFirst: string;
   pathFile?: string;
   measure?: string;
   totalMoney: number;
