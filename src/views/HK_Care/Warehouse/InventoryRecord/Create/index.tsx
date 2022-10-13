@@ -265,7 +265,7 @@ const Create = () => {
     const { error, payload } = await dispatch(createWhInventory(data));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoading(false);
       return;
@@ -280,7 +280,7 @@ const Create = () => {
     );
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoading(false);
       return;
@@ -440,7 +440,7 @@ const Create = () => {
                         onChangePage={handleChangePage}
                         onChangeRowsPerPage={handleChangeRowsPerPage}
                         rowsPerPage={filters.pageSize}
-                        rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                        rowsPerPageOptions={[10, 25, 50, 100]}
                       />
                     </Grid>
                   </Grid>
@@ -495,7 +495,7 @@ const Create = () => {
           </FormContent>
           <FormFooter>
             <LinkButton to="/hk_care/warehouse/inventory_record">
-              {v !== '0' ? 'Hủy' : 'Quay lại'}
+              Quay lại
             </LinkButton>
             {v !== '0' && (
               <LoadingButton type="submit" loading={loading}>

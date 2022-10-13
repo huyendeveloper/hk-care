@@ -45,6 +45,7 @@ const SelectTime = ({ defaultTime, onSelectTime }: IProps) => {
         sx={{ width: '150px' }}
         control={control}
         errors={errors}
+        placeholder="Từ"
       />
       <h2 style={{ margin: 0 }}>-</h2>
       <ControllerDatePicker
@@ -52,6 +53,7 @@ const SelectTime = ({ defaultTime, onSelectTime }: IProps) => {
         sx={{ width: '150px' }}
         control={control}
         errors={errors}
+        placeholder="Đến"
       />
       <Button type="submit" sx={{ height: '40px' }}>
         Chọn

@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { LinkIconButton, LoadingScreen, Scrollbar } from 'components/common';
 import { BlockDialog, DeleteDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
@@ -25,6 +25,7 @@ import {
   TableSearchField,
   TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -81,7 +82,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }
@@ -125,7 +126,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
     // @ts-ignore
     const { error } = await dispatch(deleteProduct(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -190,7 +191,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       changeStatus({ id: currentID, status: true })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -211,7 +212,7 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
       changeStatus({ id: currentID, status: false })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -280,18 +281,22 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={productList.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {productList.map((item, index) => {
                   const { id, name, productGroup, importPrice, price, hidden } =
                     item;
@@ -315,20 +320,21 @@ const TableData = ({ supplierId, active = 1 }: IProps) => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <BlockDialog
         id={currentID}

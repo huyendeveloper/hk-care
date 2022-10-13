@@ -107,7 +107,7 @@ const FormDialogSupplier = ({
     );
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setShowBackdrop(false);
       return;
@@ -125,7 +125,7 @@ const FormDialogSupplier = ({
     );
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setShowBackdrop(false);
       return;

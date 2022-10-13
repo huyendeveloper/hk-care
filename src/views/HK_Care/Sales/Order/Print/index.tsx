@@ -34,7 +34,7 @@ const PrintOrder = () => {
     const { payload, error } = await dispatch(getSaleOrder(id));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       return;
     }

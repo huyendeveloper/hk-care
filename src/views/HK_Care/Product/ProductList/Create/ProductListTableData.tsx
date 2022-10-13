@@ -152,7 +152,7 @@ const ProductListTableData = ({ registerList, handleCancelRegist }: IProps) => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+          rowsPerPageOptions={[10, 25, 50, 100]}
         />
       </TableContent>
     </TableWrapper>

@@ -6,7 +6,7 @@ import LoadingScreen from 'components/common/LoadingScreen';
 import type { FC } from 'react';
 
 interface Props extends BoxProps {
-  loading: boolean;
+  loading?: boolean;
   total?: number;
   noDataText?: string;
 }

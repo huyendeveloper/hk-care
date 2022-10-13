@@ -137,7 +137,7 @@ const FormData = ({ defaultValue }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       return;
     }
     setProductList(payload.productList);
@@ -190,7 +190,9 @@ const FormData = ({ defaultValue }: IProps) => {
         updateExportWH({ ...newPayload, id, exportWHId })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setLoadingAdd(false);
         return;
       }
@@ -205,7 +207,9 @@ const FormData = ({ defaultValue }: IProps) => {
       createExportWH(newPayload)
     );
     if (error) {
-      setNotification({ error: payload.response.data || 'Lỗi!' });
+      setNotification({
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
+      });
       setLoadingAdd(false);
       return;
     }
@@ -255,7 +259,7 @@ const FormData = ({ defaultValue }: IProps) => {
       }
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
     }
   };
 
@@ -358,7 +362,7 @@ const FormData = ({ defaultValue }: IProps) => {
                       onChangePage={handleChangePage}
                       onChangeRowsPerPage={handleChangeRowsPerPage}
                       rowsPerPage={filters.pageSize}
-                      rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                      rowsPerPageOptions={[10, 25, 50, 100]}
                     />
                   </Grid>
                   <Grid item xs={12} p={2}>
@@ -369,7 +373,7 @@ const FormData = ({ defaultValue }: IProps) => {
             </FormContent>
             <FormFooter>
               <LinkButton to="/hk_care/warehouse/export/circulation_invoice">
-                Hủy
+                Quay lại
               </LinkButton>
 
               <LoadingButton type="submit" loading={loadingAdd}>

@@ -11,7 +11,12 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import {
+  LinkButton,
+  LinkIconButton,
+  LoadingScreen,
+  Scrollbar,
+} from 'components/common';
 import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 import {
   TableContent,
@@ -20,6 +25,7 @@ import {
   TableSearchField,
   TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -75,7 +81,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllImportReceipt(filters));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoading(false);
       return;
@@ -176,18 +182,22 @@ const TableData = () => {
           onSelectTime={handleSelectTime}
         />
       </div>
-      <TableContent total={importReceipt.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={importReceipt.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {importReceipt.map((item, index) => {
                   const { id, code, creationTime, moneyToPay, debts } = item;
                   return (
@@ -203,20 +213,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
     </TableWrapper>
   );
 };

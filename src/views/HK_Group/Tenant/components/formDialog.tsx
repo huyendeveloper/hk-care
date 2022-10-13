@@ -152,7 +152,7 @@ const FormDialog = ({
 
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setloadding(false);
       return;
@@ -172,7 +172,7 @@ const FormDialog = ({
     const { payload, error } = await dispatch(updateSalePoint(tenant));
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setloadding(false);
       return;

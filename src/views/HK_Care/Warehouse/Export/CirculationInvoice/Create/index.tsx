@@ -24,7 +24,7 @@ const CreateForm = () => {
     );
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }

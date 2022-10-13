@@ -199,7 +199,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getImportReceipt(id));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }
@@ -243,7 +243,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoadingProductList(false);
       return;
     }
@@ -297,7 +297,9 @@ const CreateForm = () => {
         updateImportReceipt({ ...newPayload, pathFile, id })
       );
       if (error) {
-        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data.join(',') || 'Hệ thống đang gặp sự cố',
+        });
         setLoadingButton(false);
         return;
       }
@@ -313,7 +315,9 @@ const CreateForm = () => {
       createImportReceipt({ ...newPayload, pathFile })
     );
     if (error) {
-      setNotification({ error: payload.response.data.join(' ') || 'Lỗi!' });
+      setNotification({
+        error: payload.response.data.join(' ') || 'Hệ thống đang gặp sự cố',
+      });
       setLoadingButton(false);
       return;
     }
@@ -446,7 +450,7 @@ const CreateForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_care/warehouse/import/receipt">Hủy</LinkButton>
+          <LinkButton to="/hk_care/warehouse/import/receipt">Quay lại</LinkButton>
 
           <LoadingButton loading={loadingButton} type="submit">
             {id ? 'Lưu' : 'Nhập kho'}

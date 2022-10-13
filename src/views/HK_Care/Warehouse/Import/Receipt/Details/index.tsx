@@ -89,7 +89,7 @@ const Details = () => {
 
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoading(false);
       return;

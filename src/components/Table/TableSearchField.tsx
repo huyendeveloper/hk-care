@@ -6,7 +6,7 @@ import SearchField from './SearchField';
 import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { DatePicker } from '@mui/lab';
+import { DatePicker } from '@mui/x-date-pickers';
 import DateFns from 'utils/DateFns';
 
 interface Props extends BoxProps {

@@ -1,5 +1,6 @@
 import DownloadIcon from '@mui/icons-material/Download';
-import { DatePicker, LoadingButton } from '@mui/lab';
+import { LoadingButton } from '@mui/lab';
+import { DatePicker } from '@mui/x-date-pickers';
 import {
   Box,
   Divider,
@@ -63,7 +64,7 @@ const TableData = () => {
 
       if (error) {
         setNotification({
-          error: 'Lỗi!',
+          error: 'Hệ thống đang gặp sự cố',
         });
         setLoading(false);
         return;
@@ -77,7 +78,7 @@ const TableData = () => {
       const { payload, error } = await dispatch(getRevenueReportAll(filters));
       if (error) {
         setNotification({
-          error: 'Lỗi!',
+          error: 'Hệ thống đang gặp sự cố',
         });
         setLoading(false);
         return;
@@ -228,7 +229,7 @@ const TableData = () => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
           rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
+          rowsPerPageOptions={[10, 25, 50, 100]}
         />
       </TableContent>
     );
@@ -258,12 +259,12 @@ const TableData = () => {
           </Grid>
           <Grid item xs={3}>
             <DatePicker
-              // @ts-ignore
               value={filters.startDate}
               onChange={(newValue: Date | null) => {
                 setFilters({ ...filters, startDate: newValue || null });
               }}
               inputFormat="dd/MM/yyyy"
+              InputProps={{ style: { width: '150px' } }}
               renderInput={(params: any) => (
                 <TextField
                   {...params}
@@ -284,6 +285,7 @@ const TableData = () => {
                 setFilters({ ...filters, lastDate: newValue || null });
               }}
               inputFormat="dd/MM/yyyy"
+              InputProps={{ style: { width: '150px' } }}
               renderInput={(params: any) => (
                 <TextField
                   {...params}

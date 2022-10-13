@@ -47,7 +47,7 @@ const NormUpdate = ({
       updateNorm({ productId, norm: body.norm })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }

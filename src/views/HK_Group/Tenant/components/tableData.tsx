@@ -15,7 +15,7 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
-import { Scrollbar } from 'components/common';
+import { LoadingScreen, Scrollbar } from 'components/common';
 import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
@@ -24,6 +24,7 @@ import {
   TableSearchField,
   TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -139,7 +140,7 @@ const TableData = () => {
       changeStatus({ id: currentID })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -160,7 +161,7 @@ const TableData = () => {
       changeStatus({ id: currentID })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -233,18 +234,22 @@ const TableData = () => {
         </Button>
       </TableSearchField>
 
-      <TableContent total={tenantList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={tenantList.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {tenantList.map((item: any, index: number) => {
                   const { id, name, address, hotline, isActived } = item;
                   return (
@@ -267,20 +272,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <FormDialog
         currentID={currentID}

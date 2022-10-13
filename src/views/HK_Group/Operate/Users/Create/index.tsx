@@ -99,7 +99,9 @@ const Create = () => {
         updateUser(body)
       );
       if (error) {
-        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data.join(',') || 'Hệ thống đang gặp sự cố',
+        });
         setShowBackdrop(false);
         return;
       }
@@ -113,7 +115,9 @@ const Create = () => {
         createUser(body)
       );
       if (error) {
-        setNotification({ error: payload.response.data.join(',') || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data.join(',') || 'Hệ thống đang gặp sự cố',
+        });
         setShowBackdrop(false);
         return;
       }
@@ -132,7 +136,7 @@ const Create = () => {
     const { payload, error } = await dispatch(getUser(id));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoadingFetchData(false);
       return;

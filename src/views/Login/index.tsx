@@ -72,7 +72,7 @@ const Login = () => {
     // @ts-ignore
     const { payload, error } = await dispatch(getTenants());
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       return;
     }
     setTenantList(payload.tenants);

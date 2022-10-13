@@ -143,7 +143,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getGetDetail(id));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoadingFetchData(false);
       return;
@@ -170,7 +170,7 @@ const CreateForm = () => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoadingFetchProducts(false);
       return;
     }
@@ -212,7 +212,7 @@ const CreateForm = () => {
       });
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
     }
     setLoadingExpiredProduct(false);
   };
@@ -244,7 +244,7 @@ const CreateForm = () => {
         updateExportCancel({ ...newPayload, id })
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: 'Hệ thống đang gặp sự cố' });
         setLoading(false);
         return;
       }
@@ -260,7 +260,7 @@ const CreateForm = () => {
       createExportWH(newPayload)
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }
@@ -309,7 +309,7 @@ const CreateForm = () => {
       });
       setFilters({ ...filters, sortBy: '' });
     } catch (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoadingAdd(false);
     }
     setLoadingAdd(false);
@@ -481,7 +481,7 @@ const CreateForm = () => {
                     onChangePage={handleChangePage}
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                     rowsPerPage={filters.pageSize}
-                    rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                    rowsPerPageOptions={[10, 25, 50, 100]}
                   />
                 </Grid>
                 <Grid item lg={9} xs={0}></Grid>
@@ -507,7 +507,7 @@ const CreateForm = () => {
           </FormGroup>
         </FormContent>
         <FormFooter>
-          <LinkButton to="/hk_care/warehouse/export/cancel">Hủy</LinkButton>
+          <LinkButton to="/hk_care/warehouse/export/cancel">Quay lại</LinkButton>
 
           <LoadingButton loading={loading} type="submit">
             {id ? 'Lưu' : 'Xuất hủy'}

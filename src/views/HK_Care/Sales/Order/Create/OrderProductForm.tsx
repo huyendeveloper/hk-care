@@ -15,6 +15,7 @@ import {
   FormPaperGrid,
 } from 'components/Form';
 import { TableContent, TableHeader, TableWrapper } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -141,7 +142,9 @@ const OrderProductForm = ({
         updateSalesOrder({ ...body, orderId: Number(id) })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setLoading(false);
         return;
       }
@@ -158,7 +161,9 @@ const OrderProductForm = ({
         createSalesOrder(body)
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setLoading(false);
         return;
       }
@@ -182,27 +187,26 @@ const OrderProductForm = ({
       gridTemplateRows="1fr"
     >
       <FormHeader title="" hidden />
-      <FormContent>
-        <Grid container sx={{ height: 1 }}>
-          <Grid item xs={12} md={9}>
-            <TableWrapper
-              sx={{ height: 'calc(100vh - 98px)' }}
-              component={Paper}
-            >
-              <TableContent total={1} loading={false}>
-                <TableContainer
-                  sx={{ p: 1.5, maxHeight: 'calc(100vh - 98px)' }}
-                >
-                  <Scrollbar>
-                    <Table sx={{ minWidth: 'max-content' }} size="small">
-                      <TableHeader
-                        cells={cells}
-                        onSort={handleOnSort}
-                        sortDirection={filters.sortDirection}
-                        sortBy={filters.sortBy}
-                      />
+      <Grid container sx={{ height: 1 }}>
+        <Grid item xs={12} md={9}>
+          <TableWrapper sx={{ height: 'calc(100vh - 98px)' }} component={Paper}>
+            <TableContent total={1} loading={false}>
+              <TableContainer sx={{ p: 1.5, maxHeight: 'calc(100vh - 98px)' }}>
+                <Scrollbar>
+                  <Table sx={{ minWidth: 'max-content' }} size="small">
+                    <TableHeader
+                      cells={cells}
+                      onSort={handleOnSort}
+                      sortDirection={filters.sortDirection}
+                      sortBy={filters.sortBy}
+                    />
 
-                      <TableBody>
+                    <TableBody>
+                      <TableBodyContent
+                        total={1}
+                        loading={false}
+                        colSpan={cells.length}
+                      >
                         {fields &&
                           fields.map((item, index) => (
                             <OrderProduct
@@ -214,32 +218,32 @@ const OrderProductForm = ({
                               getValues={getValues}
                             />
                           ))}
-                      </TableBody>
-                    </Table>
-                  </Scrollbar>
-                </TableContainer>
-              </TableContent>
-            </TableWrapper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <OrderDetail
-              control={control}
-              setValue={setValue}
-              getValues={getValues}
-            />
-            <Stack p={2} gap={2} flexDirection="row" justifyContent="flex-end">
-              {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
-              <LoadingButton
-                type="submit"
-                loading={loading}
-                sx={id ? {} : { fontSize: '28px', width: '100%' }}
-              >
-                {id ? 'Lưu' : 'Thanh toán'}
-              </LoadingButton>
-            </Stack>
-          </Grid>
+                      </TableBodyContent>
+                    </TableBody>
+                  </Table>
+                </Scrollbar>
+              </TableContainer>
+            </TableContent>
+          </TableWrapper>
         </Grid>
-      </FormContent>
+        <Grid item xs={12} md={3}>
+          <OrderDetail
+            control={control}
+            setValue={setValue}
+            getValues={getValues}
+          />
+          <Stack p={2} gap={2} flexDirection="row" justifyContent="flex-end">
+            {id && <LinkButton to="/hk_care/sales/order">Hủy</LinkButton>}
+            <LoadingButton
+              type="submit"
+              loading={loading}
+              sx={id ? {} : { fontSize: '28px', width: '100%' }}
+            >
+              {id ? 'Lưu' : 'Thanh toán'}
+            </LoadingButton>
+          </Stack>
+        </Grid>
+      </Grid>
       <FormFooter hidden></FormFooter>
     </FormPaperGrid>
   );

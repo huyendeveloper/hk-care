@@ -56,9 +56,9 @@ const DashboardLayoutRoot = styled('div')((prop) => {
     flexDirection: 'column',
     flex: '1 1 auto',
     maxWidth: '100%',
-    paddingTop: 64,
+    paddingTop: 55,
     [theme.breakpoints.up('lg')]: {
-      paddingLeft: openDrawer ? 280 : 0,
+      paddingLeft: openDrawer ? 240 : 0,
     },
   };
 });

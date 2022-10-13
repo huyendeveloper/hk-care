@@ -320,7 +320,9 @@ const FormDialog = ({
         updateProduct({ ...body, image })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setShowBackdrop(false);
         return;
       }
@@ -335,7 +337,9 @@ const FormDialog = ({
         createProduct({ ...body, image, ...suppliers })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setShowBackdrop(false);
         return;
       }

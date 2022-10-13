@@ -6,9 +6,10 @@ import {
   TableBody,
   TableContainer,
 } from '@mui/material';
-import { Scrollbar } from 'components/common';
+import { LoadingScreen, Scrollbar } from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import { TableContent, TableWrapper } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -192,18 +193,22 @@ const TableData = () => {
 
   return (
     <TableWrapper sx={{ height: 1, p: 1.5 }} component={Paper}>
-      <TableContent total={roles.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5 }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, minHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={roles.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {roles.map((item, index) => {
                   return (
                     <Role
@@ -218,11 +223,12 @@ const TableData = () => {
                     />
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
-      </TableContent>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
       <DeleteDialog
         id={currentID}

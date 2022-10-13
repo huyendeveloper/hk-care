@@ -3,6 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Backdrop,
+  Box,
   CircularProgress,
   IconButton,
   Paper,
@@ -11,8 +12,14 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Typography,
 } from '@mui/material';
-import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import {
+  LinkButton,
+  LinkIconButton,
+  LoadingScreen,
+  Scrollbar,
+} from 'components/common';
 import { DeleteDialog } from 'components/Dialog';
 import {
   TableContent,
@@ -21,6 +28,7 @@ import {
   TableSearchField,
   TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import type { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -68,7 +76,7 @@ const TableData = ({ active = 1 }: IProps) => {
     const { payload, error } = await dispatch(getAllProduct(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }
@@ -128,7 +136,7 @@ const TableData = ({ active = 1 }: IProps) => {
     // @ts-ignore
     const { error } = await dispatch(deleteProductList(currentID));
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -179,18 +187,22 @@ const TableData = ({ active = 1 }: IProps) => {
         )}
       </TableSearchField>
 
-      <TableContent total={productList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={productList.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {productList.map((item, index) => {
                   const {
                     id,
@@ -225,20 +237,21 @@ const TableData = ({ active = 1 }: IProps) => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <DeleteDialog
         id={currentID}

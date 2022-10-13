@@ -6,16 +6,17 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
-import { LinkIconButton, Scrollbar } from 'components/common';
+import { LinkIconButton, LoadingScreen, Scrollbar } from 'components/common';
 import {
   TableContent,
   TableHeader,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { IReferencePricesMock } from 'interface';
@@ -47,7 +48,7 @@ const TableData = () => {
 
     // if (error) {
     //   setNotification({
-    //     error: 'Lỗi!',
+    //     error: 'Hệ thống đang gặp sự cố',
     //   });
     //   return;
     // }
@@ -194,18 +195,22 @@ const TableData = () => {
         onSearch={handleSearch}
         searchText={filters.searchText}
       />
-      <TableContent total={referencePrices.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={referencePrices.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {referencePrices.map((item, index) => {
                   const { id, name, mesure, type, importPrice, price } = item;
                   return (
@@ -222,20 +227,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
     </TableWrapper>
   );
 };

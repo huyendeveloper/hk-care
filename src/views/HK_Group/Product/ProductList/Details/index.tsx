@@ -13,7 +13,7 @@ import {
   FormFooter,
   FormHeader,
   FormLabel,
-  FormPaperGrid
+  FormPaperGrid,
 } from 'components/Form';
 import ControllerNumberInput from 'components/Form/ControllerNumberInput';
 import { connectURL } from 'config';
@@ -25,7 +25,7 @@ import {
   IProductGroup,
   ISupplier,
   ITreatmentGroup,
-  IUsage
+  IUsage,
 } from 'interface';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -255,7 +255,7 @@ const DetailsForm = () => {
       updateProduct({ ...payload, image })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }

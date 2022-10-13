@@ -103,7 +103,7 @@ const DashboardSidebar: FC<Props> = (props) => {
             sx: {
               backgroundColor: 'background.paper',
               height: '100% !important',
-              width: 280,
+              width: 240,
             },
           }}
         >

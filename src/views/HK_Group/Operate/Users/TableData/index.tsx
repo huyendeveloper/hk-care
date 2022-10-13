@@ -13,16 +13,22 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
 } from '@mui/material';
-import { LinkButton, LinkIconButton, Scrollbar } from 'components/common';
+import {
+  LinkButton,
+  LinkIconButton,
+  LoadingScreen,
+  Scrollbar,
+} from 'components/common';
 import { BlockDialog, UnBlockDialog } from 'components/Dialog';
 import {
   TableContent,
   TablePagination,
   TableSearchField,
-  TableWrapper
+  TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -77,7 +83,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllUser(filters));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoading(false);
       return;
@@ -148,7 +154,7 @@ const TableData = () => {
       changeStatusUser({ id: currentID })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -169,7 +175,7 @@ const TableData = () => {
       changeStatusUser({ id: currentID })
     );
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setShowBackdrop(false);
       return;
     }
@@ -226,20 +232,25 @@ const TableData = () => {
           Thêm mới người dùng
         </LinkButton>
       </TableSearchField>
-      <TableContent total={userList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={userList.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {userList.map((item, index) => {
-                  const { id, name, phone, roleName, tenant,role, isActive } = item;
+                  const { id, name, phone, roleName, tenant, role, isActive } =
+                    item;
                   return (
                     <TableRow hover tabIndex={-1} key={id}>
                       <TableCell>
@@ -263,20 +274,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <BlockDialog
         id={currentID}

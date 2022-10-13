@@ -1,4 +1,4 @@
-import DatePicker from '@mui/lab/DatePicker';
+import { DatePicker } from '@mui/x-date-pickers';
 import type { TextFieldProps } from '@mui/material/TextField';
 import TextField from '@mui/material/TextField';
 import type {
@@ -16,6 +16,7 @@ interface Props<T extends FieldValues> extends Omit<TextFieldProps, 'name'> {
   mask?: string;
   onChangeSelect?: (date: Date | null) => void;
   minDate?: Date;
+  placeholder?: string;
 }
 
 const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
@@ -27,6 +28,7 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
     mask,
     onChangeSelect,
     minDate,
+    placeholder,
     ...rest
   } = props;
 
@@ -34,16 +36,24 @@ const ControllerDatePicker = <T extends FieldValues>(props: Props<T>) => {
     <Controller
       render={({ field: { ref, ...others }, fieldState: { error } }) => (
         <DatePicker
-          renderInput={(props: TextFieldProps) => (
-            <TextField
-              {...props}
-              {...rest}
-              fullWidth
-              error={Boolean(error)}
-              helperText={error?.message}
-              id={name}
-            />
-          )}
+          renderInput={(props: TextFieldProps) => {
+            const inputProps = {
+              ...props.inputProps,
+              placeholder: placeholder || props?.inputProps?.placeholder || '',
+            };
+            const newProps = { ...props, inputProps };
+            return (
+              <TextField
+                {...newProps}
+                {...rest}
+                fullWidth
+                error={Boolean(error)}
+                helperText={error?.message}
+                placeholder="hehee"
+                id={name}
+              />
+            );
+          }}
           mask={mask}
           InputAdornmentProps={{
             position: 'end',

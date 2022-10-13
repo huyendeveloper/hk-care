@@ -165,7 +165,9 @@ const Create = () => {
         })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setLoading(false);
         return;
       }
@@ -183,7 +185,9 @@ const Create = () => {
         })
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setLoading(false);
         return;
       }
@@ -202,7 +206,7 @@ const Create = () => {
     const { payload, error } = await dispatch(getStaff(id));
     if (error) {
       setNotification({
-        error: 'Lỗi!',
+        error: 'Hệ thống đang gặp sự cố',
       });
       setLoadingFetchData(false);
       return;
@@ -357,9 +361,7 @@ const Create = () => {
         </FormContent>
 
         <FormFooter>
-          <LinkButton to="/hk_care/operate/staff">
-            {isUpdate || !Boolean(id) ? 'Hủy' : 'Quay lại'}
-          </LinkButton>
+          <LinkButton to="/hk_care/operate/staff">Quay lại</LinkButton>
 
           {isUpdate || !Boolean(id) ? (
             <LoadingButton loading={loading} type="submit">

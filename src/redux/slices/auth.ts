@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ILogin } from 'interface';
+import moment from 'moment';
 import authService from 'services/auth.service';
 import userService from 'services/user.service';
 import { Role, UserInfo } from 'types';
@@ -11,6 +12,7 @@ interface IInitialState {
   isAuthenticated: boolean;
   isInitialized: boolean;
   loading: boolean;
+  lastLogin: string | null;
 }
 
 const initialState: IInitialState = {
@@ -19,6 +21,7 @@ const initialState: IInitialState = {
   isAuthenticated: false,
   isInitialized: false,
   loading: false,
+  lastLogin: null,
 };
 
 export const connectToken = createAsyncThunk(
@@ -81,6 +84,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.isInitialized = true;
         state.loading = false;
+        state.lastLogin = moment().format('yyyy-MM-DD');
       }
     );
 

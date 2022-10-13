@@ -101,7 +101,7 @@ const Role = ({
       //   }
       //   console.log(data)
       // } catch (error) {
-      //   setNotification({ error: 'Lỗi!' });
+      //   setNotification({ error: 'Hệ thống đang gặp sự cố' });
       //   setShowBackdrop(false);
       // }
 
@@ -110,7 +110,9 @@ const Role = ({
         changeSalePointPermission(newRole)
       );
       if (error) {
-        setNotification({ error: payload.response.data || 'Lỗi!' });
+        setNotification({
+          error: payload.response.data || 'Hệ thống đang gặp sự cố',
+        });
         setShowBackdrop(false);
         return;
       }

@@ -49,7 +49,7 @@ const DashboardNavbar: FC<Props> = (props) => {
 
   return (
     <StyledAppBar open={openDrawer} elevation={0}>
-      <Toolbar>
+      <Toolbar sx={{ minHeight: '55px !important' }}>
         <Hidden lgDown>
           <IconButton edge="start" onClick={onToggleDrawer}>
             <MenuIcon />
@@ -104,7 +104,7 @@ const StyledAppBar = styled(AppBar, {
   }),
   ...(open && {
     marginLeft: 280,
-    width: 'calc(100% - 280px)',
+    width: 'calc(100% - 240px)',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,

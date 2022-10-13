@@ -39,6 +39,7 @@ const PageBreadcrumbs = () => {
               color={'text.primary'}
               variant="subtitle2"
               fontSize={'1rem'}
+              sx={{ textDecoration: 'none !important', cursor: 'default' }}
             >
               {text}
             </Link>

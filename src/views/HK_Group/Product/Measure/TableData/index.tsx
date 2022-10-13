@@ -14,8 +14,10 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material';
+import { LoadingScreen } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
 import DeleteDialog from 'components/Dialog/DeleteDialog';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import TableContent from 'components/Table/TableContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
 import TablePagination from 'components/Table/TablePagination';
@@ -65,7 +67,7 @@ const TableData = () => {
     const { payload, error } = await dispatch(getAllMeasure(filters));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       setLoading(false);
       return;
     }
@@ -136,7 +138,9 @@ const TableData = () => {
     // @ts-ignore
     const { payload, error } = await dispatch(deleteMeasure(currentID));
     if (error) {
-      setNotification({ error: payload.response.data || 'Lỗi!' });
+      setNotification({
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
+      });
       setShowBackdrop(false);
       return;
     }
@@ -196,18 +200,22 @@ const TableData = () => {
         </Button>
       </TableSearchField>
 
-      <TableContent total={measureList.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={measureList.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {measureList.map((item, index) => {
                   const { id, name } = item;
                   return (
@@ -222,20 +230,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <DeleteDialog
         id={currentID}

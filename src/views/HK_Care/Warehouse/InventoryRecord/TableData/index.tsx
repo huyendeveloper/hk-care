@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { LinkButton, LinkIconButton } from 'components/common';
+import { LinkButton, LinkIconButton, LoadingScreen } from 'components/common';
 import Scrollbar from 'components/common/Scrollbar';
 import TableContent from 'components/Table/TableContent';
 import TableHeader, { Cells } from 'components/Table/TableHeader';
@@ -36,6 +36,7 @@ import { baseURL, connectURL } from 'config';
 import '../index.css';
 import SelectTime, { ISelectTime } from 'components/Form/SelectTime';
 import moment from 'moment';
+import TableBodyContent from 'components/Table/TableBodyContent';
 
 const getCells = (): Cells<IInventoryRecord> => [
   {
@@ -269,18 +270,22 @@ const TableData = () => {
           onSelectTime={handleSelectTime}
         />
       </div>
-      <TableContent total={inventoryRecord.length} loading={loading}>
-        <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
-          <Scrollbar>
-            <Table sx={{ minWidth: 'max-content' }} size="small">
-              <TableHeader
-                cells={cells}
-                onSort={handleOnSort}
-                sortDirection={filters.sortDirection}
-                sortBy={filters.sortBy}
-              />
+      <TableContainer sx={{ p: 1.5, maxHeight: '60vh' }}>
+        <Scrollbar>
+          <Table sx={{ minWidth: 'max-content' }} size="small">
+            <TableHeader
+              cells={cells}
+              onSort={handleOnSort}
+              sortDirection={filters.sortDirection}
+              sortBy={filters.sortBy}
+            />
 
-              <TableBody>
+            <TableBody>
+              <TableBodyContent
+                total={inventoryRecord.length}
+                loading={loading}
+                colSpan={cells.length}
+              >
                 {inventoryRecord.map((item, index) => {
                   const {
                     codeInventory,
@@ -301,20 +306,21 @@ const TableData = () => {
                     </TableRow>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+              </TableBodyContent>
+            </TableBody>
+          </Table>
+        </Scrollbar>
+        {loading && <LoadingScreen />}
+      </TableContainer>
 
-        <TablePagination
-          pageIndex={filters.pageIndex}
-          totalPages={totalRows}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          rowsPerPage={filters.pageSize}
-          rowsPerPageOptions={[10, 20, 30, 40, 50]}
-        />
-      </TableContent>
+      <TablePagination
+        pageIndex={filters.pageIndex}
+        totalPages={totalRows}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        rowsPerPage={filters.pageSize}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+      />
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}

@@ -82,7 +82,7 @@ const FormDialog = ({
     const { error, payload } = await dispatch(updateProductGroup(data));
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setShowBackdrop(false);
       return;
@@ -98,7 +98,7 @@ const FormDialog = ({
     const { error, payload } = await dispatch(createProductGroup(data));
     if (error) {
       setNotification({
-        error: payload.response.data || 'Lỗi!',
+        error: payload.response.data || 'Hệ thống đang gặp sự cố',
       });
       setShowBackdrop(false);
       return;

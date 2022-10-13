@@ -8,7 +8,7 @@ import {
   TableBody,
   TableContainer,
 } from '@mui/material';
-import { LinkButton, Scrollbar } from 'components/common';
+import { LinkButton, LoadingScreen, Scrollbar } from 'components/common';
 import PageWrapperFullwidth from 'components/common/PageWrapperFullwidth';
 import {
   ControllerTextarea,
@@ -26,6 +26,7 @@ import {
   TablePagination,
   TableWrapper,
 } from 'components/Table';
+import TableBodyContent from 'components/Table/TableBodyContent';
 import { Cells } from 'components/Table/TableHeader';
 import { defaultFilters } from 'constants/defaultFilters';
 import { useNotification } from 'hooks';
@@ -104,7 +105,7 @@ const Create = () => {
     const { payload, error } = await dispatch(addExpectedDetails(id));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       return;
     }
     const expectedList = payload.expectedList;
@@ -125,7 +126,7 @@ const Create = () => {
     const { payload, error } = await dispatch(getExpected(id));
 
     if (error) {
-      setNotification({ error: 'Lỗi!' });
+      setNotification({ error: 'Hệ thống đang gặp sự cố' });
       return;
     }
     reset(payload.expected);
@@ -159,7 +160,7 @@ const Create = () => {
         createExpected(body)
       );
       if (error) {
-        setNotification({ error: 'Lỗi!' });
+        setNotification({ error: 'Hệ thống đang gặp sự cố' });
         setLoadingSubmit(false);
         return;
       }
@@ -245,18 +246,23 @@ const Create = () => {
                   sx={{ height: 1, minHeight: '50vh' }}
                   component={Paper}
                 >
-                  <TableContent total={1} noDataText=" " loading={loading}>
-                    <TableContainer sx={{ p: 1.5 }}>
-                      <Scrollbar>
-                        <Table sx={{ minWidth: 'max-content' }} size="small">
-                          <TableHeader
-                            cells={cells}
-                            onSort={handleOnSort}
-                            sortDirection={filters.sortDirection}
-                            sortBy={filters.sortBy}
-                          />
+                  <TableContainer sx={{ p: 1.5 }}>
+                    <Scrollbar>
+                      <Table sx={{ minWidth: 'max-content' }} size="small">
+                        <TableHeader
+                          cells={cells}
+                          onSort={handleOnSort}
+                          sortDirection={filters.sortDirection}
+                          sortBy={filters.sortBy}
+                        />
 
-                          <TableBody>
+                        <TableBody>
+                          <TableBodyContent
+                            total={1}
+                            loading={loading}
+                            colSpan={cells.length}
+                            noDataText=" "
+                          >
                             {[...fields]
                               .splice(
                                 (filters.pageIndex - 1) * filters.pageSize,
@@ -277,11 +283,12 @@ const Create = () => {
                                   control={control}
                                 />
                               ))}
-                          </TableBody>
-                        </Table>
-                      </Scrollbar>
-                    </TableContainer>
-                  </TableContent>
+                          </TableBodyContent>
+                        </TableBody>
+                      </Table>
+                    </Scrollbar>
+                    {loading && <LoadingScreen />}
+                  </TableContainer>
                 </TableWrapper>
               </Grid>
               <Grid container alignItems="center">
@@ -292,7 +299,7 @@ const Create = () => {
                     onChangePage={handleChangePage}
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                     rowsPerPage={filters.pageSize}
-                    rowsPerPageOptions={[10, 20, 30, 40, 50]}
+                    rowsPerPageOptions={[10, 25, 50, 100]}
                   />
                 </Grid>
               </Grid>

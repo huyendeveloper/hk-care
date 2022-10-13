@@ -1,3 +1,4 @@
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
@@ -38,7 +39,7 @@ const TablePagination = (props: Props) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', p: 2, justifyContent: 'flex-end' }}>
+    <Box sx={{ display: 'flex', p: 2, justifyContent: 'space-between' }}>
       <Box
         sx={{
           display: { xs: 'none', sm: 'flex' },
@@ -46,13 +47,13 @@ const TablePagination = (props: Props) => {
           mr: 3,
         }}
       >
-        {/* <Typography
+        <Typography
           variant="subtitle2"
           color="text.secondary"
           sx={{ whiteSpace: 'nowrap' }}
         >
-          Số dòng mỗi trang
-        </Typography> */}
+          Số bản ghi trên trang
+        </Typography>
         <FormControl sx={{ ml: 1, mr: 2 }}>
           <Select
             value={String(rowsPerPage)}
@@ -76,6 +77,8 @@ const TablePagination = (props: Props) => {
             ))}
           </Select>
         </FormControl>
+      </Box>
+      <Stack flexDirection="row" alignItems="center">
         <Typography
           variant="subtitle2"
           color="text.secondary"
@@ -87,16 +90,16 @@ const TablePagination = (props: Props) => {
             : pageIndex * rowsPerPage}{' '}
           trên tổng {totalPages}
         </Typography>
-      </Box>
-      <Pagination
-        page={pageIndex}
-        count={Math.ceil(totalPages / rowsPerPage)}
-        shape="rounded"
-        showFirstButton={!isSmall}
-        showLastButton={!isSmall}
-        onChange={handleChangePage}
-        size={isSmall ? 'small' : 'medium'}
-      />
+        <Pagination
+          page={pageIndex}
+          count={Math.ceil(totalPages / rowsPerPage)}
+          shape="rounded"
+          showFirstButton={!isSmall}
+          showLastButton={!isSmall}
+          onChange={handleChangePage}
+          size={isSmall ? 'small' : 'medium'}
+        />
+      </Stack>
     </Box>
   );
 };
