@@ -2,9 +2,9 @@ import { Stack } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import FormLabel from '@mui/material/FormLabel';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { memo, useState } from 'react';
+import { FormEventHandler, memo, useState } from 'react';
 import { useDebounce } from 'react-use';
 import type { ChangeEvent, KeyDownEvent } from 'types';
 
@@ -27,10 +27,6 @@ const SearchField = (props: Props) => {
     ...rest
   } = props;
   const [value, setValue] = useState<string>('');
-
-  const handleChange: ChangeEvent = (event) => {
-    setValue(event.target.value);
-  };
 
   const handleKeyDown: KeyDownEvent = async (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -76,10 +72,10 @@ const SearchField = (props: Props) => {
           id="search"
           fullWidth
           placeholder={placeHolder}
-          // @ts-nocheck
           variant="outlined"
-          // @ts-ignore
-          onChange={handleChange}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           sx={{
             mr: 1,
@@ -88,7 +84,7 @@ const SearchField = (props: Props) => {
             backgroundColor: 'white',
             borderRadius: '4px',
           }}
-          {...rest}
+          // {...rest}
         />
         {/* <SearchIcon
           fontSize="medium"
@@ -122,8 +118,9 @@ const SearchField = (props: Props) => {
         id="search"
         fullWidth
         placeholder={placeHolder}
-        // @ts-nocheck
-        onChange={handleChange}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
         onKeyDown={handleKeyDown}
         sx={{
           mr: 1,
